@@ -56,6 +56,20 @@ const totMMSY = fmpRows.reduce((s, r) => s + num(r.MMSY_p50_lb), 0);
 const totCatch = fmpRows.reduce((s, r) => s + num(r.catch_lb), 0);
 const lob = g("spiny_lobster"), qt = g("queen_triggerfish");
 const trapCeil = ceil.find((r) => r.gear === "trap_fish");
+const lobCeil = ceil.find((r) => r.gear === "trap_lobster");
+const calRows = fmpRows.filter((r) => r.calibrated === "TRUE");
+const calMMSY = calRows.reduce((s, r) => s + num(r.MMSY_p50_lb), 0);
+const calCatch = calRows.reduce((s, r) => s + num(r.catch_lb), 0);
+const selfT = readCSV(path.join(TAB, "self_test_summary.csv"));
+const loo = readCSV(path.join(TAB, "validation_loo_benchmarks.csv"));
+const ensP = readCSV(path.join(TAB, "structural_ensemble_pooled.csv"));
+const eco = readCSV(path.join(TAB, "ecosystem_overfishing_indices.csv"));
+const diagS = readCSV(path.join(TAB, "sir_diagnostics_summary.csv"))[0];
+const scen = readCSV(path.join(TAB, "spf_scenario_reference_points.csv"));
+const cov90 = selfT.map((r) => num(r.coverage90));
+const ensG = (gname) => ensP.find((r) => r.group === gname);
+const ecoLast = eco.filter((r) => ["2022", "2023", "2024"].includes(r.year));
+const sc = (sn, gname) => scen.find((r) => r.scenario === sn && r.group === gname);
 
 // ---------------------------------------------------------------- theme
 const THEME = {
@@ -379,8 +393,8 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   // UNCERTAINTY & SIR
   s = content("Uncertainty is propagated end to end and conditioned on data", S1);
   const stg = [
-    ["random", "Stage 1  Prior", `${fmt(NPRIOR)} Monte Carlo draws of every uncertain input; Baseline history simulated for each`],
-    ["filter", "Stage 2  SIR", "Weights from index fits, assessment OFLs and catch feasibility; resample"],
+    ["random", "Stage 1  Prior", `${fmt(NPRIOR)} draws in adaptive importance-sampling rounds; Baseline history simulated in parallel`],
+    ["filter", "Stage 2  SIR", "Weights from assessment OFLs and catch feasibility for trap focus groups, corrected for the proposal mixture; resample"],
     ["layers", "Stage 3  Scenarios", "All scenarios run for the retained draws only (paired, memory-light)"],
   ];
   stg.forEach((t, i) => {
@@ -400,10 +414,29 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   ], { x: 0.5, y: 4.45, w: 6.0, h: 2.3, fontSize: 13 });
   txt(s, "Likelihood components", { x: 6.9, y: 4.0, w: 6, h: 0.4, fontSize: 16, bold: true, fontFace: THEME.headFontFace });
   bullets(s, [
-    "Indices (CPUE, surveys): trend shape, analytical q",
+    "Indices (CPUE, surveys): trend shape, analytical q; role fit or held out to validate",
     "Assessment OFLs (SEDAR 57, 80): absolute scale",
     "Catch feasibility (stock reduction analysis): stock must supply every year's landings",
   ], { x: 6.9, y: 4.45, w: 5.9, h: 2.3, fontSize: 13 });
+
+  // ROBUSTNESS TOOLKIT
+  s = content("Built for review: calibration is tested, not just performed", S1);
+  const rob = [
+    ["filter", "Adaptive importance sampling", "Factorized per-group proposals re-centred only for conflicted groups; deterministic-mixture weights (Owen & Zhou 2000); ESS, Pareto k, shrinkage reported"],
+    ["flask", "Simulation self-test", "Simulate data from a known draw, refit, and score bias and interval coverage"],
+    ["check", "Out-of-sample validation", "Indices held out by role; leave-one-benchmark-out; retrospective peel"],
+    ["chart", "Global sensitivity", "Rank regression (SRRC, PRCC) of MMSY on every sampled input"],
+    ["diagram", "Structural ensemble", "x_msy, TTE, food-web fraction, thermal and fishing feedbacks, pelagic NPP source; equal-weight pooling"],
+    ["globe", "Ecosystem overfishing", "Ryther and Fogarty indices (Link & Watson 2019) against published thresholds"],
+  ];
+  rob.forEach((o, i) => {
+    const col = i % 2, row = Math.floor(i / 2);
+    const x = 0.5 + col * 6.2, y = 1.45 + row * 1.75;
+    card(s, x, y, 6.0, 1.55);
+    iconCircle(s, o[0], x + 0.25, y + 0.42, 0.65, col ? HEX.accent1 : HEX.accent6);
+    txt(s, o[1], { x: x + 1.1, y: y + 0.2, w: 4.7, h: 0.42, fontSize: 17, bold: true, fontFace: THEME.headFontFace });
+    txt(s, o[2], { x: x + 1.1, y: y + 0.65, w: 4.7, h: 0.8, fontSize: 13, color: "34474F" });
+  });
 
   // DATA ACQUISITION
   s = content("Public-API inputs are acquired automatically; user values win", S1);
@@ -414,6 +447,8 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
     ["Pelagic NPP index", "VGPM + Eppley-VGPM from OC-CCI chl, SST, PAR", "algorithm spread"],
     ["Climate projections", "CMIP6 CESM2 + ACCESS-ESM1-5 (ERDDAP)", "between-model SD"],
     ["Habitat areas", "NOAA NCCOS benthic habitat maps (ArcGIS REST)", "class-mapping CV"],
+    ["Deeper shelf", "ETOPO 2022 depth + Kd490 + PAR, light-limited NPP", "CV 0.6"],
+    ["Species traits", "FishBase (M, Linf, TL, thermal range)", "between-species SD"],
     ["Hurricanes", "NOAA NHC HURDAT2 best tracks", "intensity CV"],
     ["Optional", "MOM6-NWA12 (THREDDS), GLORYS12 (Copernicus)", "spatial SD"],
   ];
@@ -454,8 +489,8 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   const needs = [
     ["ship", "A  Fishery-dependent", "Landings by gear x group (1983-), effort, expansion factor, gear splits", "High", HEX.accent2],
     ["clip", "B  Assessments", "SEDAR 57 / 80 / 84 indices, B0, natural mortality", "High", HEX.accent2],
-    ["fish", "C  Surveys and biology", "NCRMP biomass densities, competitor groups, P/B, diet, habitat use", "High", HEX.accent2],
-    ["map", "D  Habitat and production", "Deeper-shelf habitat (388 km2), food-web fraction, TTE, early coral cover", "High", HEX.accent2],
+    ["fish", "C  Surveys and biology", "NCRMP biomass densities (pipeline ready), thermal response for lobster, habitat use", "High", HEX.accent2],
+    ["map", "D  Habitat and production", "Pavement production, food-web fraction, TTE, early coral cover", "High", HEX.accent2],
     ["thermo", "E  Driver effects", "Thermal sensitivities, hurricane losses, bleaching frequency", "Medium", HEX.accent3],
     ["cloud", "F  Automated already", "SST, DHW, NPP, CMIP6, habitat areas, hurricanes", "Done", HEX.accent5],
   ];
@@ -480,13 +515,13 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   // DOMAIN & HABITAT (native chart)
   s = content("St. Croix: an isolated shelf dominated by colonized hardbottom", S2);
   const habOrder = hab.slice().sort((a, b) => num(b.area_km2) - num(a.area_km2));
-  const habLab = { colonized_pavement: "Colonized pavement", coral_reef: "Coral reef", deep_hardbottom: "Deeper shelf (unmapped)", seagrass: "Seagrass", macroalgae: "Macroalgae", sand: "Sand / mud", mangrove: "Mangrove" };
+  const habLab = { colonized_pavement: "Colonized pavement", coral_reef: "Coral reef", deep_hardbottom: "Deeper shelf 30-100 m", seagrass: "Seagrass", macroalgae: "Macroalgae", sand: "Sand / mud", mangrove: "Mangrove" };
   s.addChart(pres.charts.BAR, [{ name: "Area (km2)", labels: habOrder.map((h) => habLab[h.habitat] || h.habitat), values: habOrder.map((h) => Math.round(num(h.area_km2) * 10) / 10) }], {
     x: 0.5, y: 1.4, w: 7.4, h: 5.3, barDir: "bar", chartColors: [HEX.accent1], showValue: true, dataLabelPosition: "outEnd", dataLabelFormatCode: "#,##0.0",
     dataLabelFontFace: "+mn-lt", dataLabelFontSize: 12, dataLabelColor: "34474F",
     catAxisLabelFontFace: "+mn-lt", catAxisLabelFontSize: 12, catAxisLabelColor: "34474F", catAxisOrientation: "maxMin",
     valAxisHidden: true, valGridLine: { style: "none" }, catGridLine: { style: "none" }, showLegend: false,
-    showTitle: true, title: "Benthic habitat area (km2), NOAA NCCOS map via API", titleFontFace: "+mn-lt", titleFontSize: 14, titleColor: "34474F",
+    showTitle: true, title: "Benthic habitat area (km2), NOAA NCCOS map + ETOPO via API", titleFontFace: "+mn-lt", titleFontSize: 14, titleColor: "34474F",
   });
   card(s, 8.3, 1.4, 4.5, 5.3);
   stat(s, fmt(habOrder.reduce((a, h) => a + num(h.area_km2), 0)) + " km2", "benthic habitat in the model domain", 8.6, 1.6, 4.0);
@@ -494,7 +529,7 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
     "Single FMP unit, separated by deep trenches from the PR-VI platform",
     "Pelagic area: shelf + 10 km buffer (1,500 km2)",
     "1983-2024 history (SEDAR 80 landings start); 2025-2045 projections",
-    "19 FMP groups + 10 non-fishery competitor groups; 4 gears",
+    "19 FMP groups + 10 competitor groups; 13 trap groups + 2 assessed stocks calibrated",
   ], { x: 8.6, y: 3.15, w: 4.0, h: 3.4, fontSize: 14 });
 
   // ENVIRONMENT
@@ -514,22 +549,22 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   txt(s, "Intensity = (max wind - 34 kt)/(137 - 34 kt) x distance decay; losses to NPP, coral cover, trap effort and lobster production scale with intensity and recover with half-lives of 1.5-2 years. Each event carries a 30% intensity CV.", { x: 0.5, y: 5.95, w: 12.3, h: 0.8, fontSize: 14, color: HEX.dk2 });
 
   // ENERGY BUDGET
-  s = content("Colonized pavement and the deeper shelf supply most benthic energy", S2);
+  s = content("Colonized pavement supplies most benthic energy", S2);
   figure(s, "fig01_energy_budget.png", 0.5, 1.35, 8.0, 4.6, "Primary production by habitat");
   card(s, 8.8, 1.35, 4.0, 5.3);
   bullets(s, [
-    "Large area beats high per-area rates: pavement and deeper shelf outweigh coral reef",
-    "Deeper-shelf productivity is a high-priority data gap (placeholder NPP, area CV 0.5)",
+    "Large area beats high per-area rates: pavement outweighs coral reef",
+    "Deeper shelf re-mapped from ETOPO: 41 km2 at 30-100 m with light-limited NPP (the 388 km2 unmapped class was mostly off-shelf)",
     "Bars show the 90% interval across draws",
   ], { x: 9.05, y: 1.6, w: 3.5, h: 4.9, fontSize: 14 });
 
   // SIR
-  s = content("SIR anchors scale on assessed stocks and rejects infeasible draws", S2);
+  s = content("Adaptive SIR anchors scale on assessed stocks and rejects infeasible draws", S2);
   figure(s, "fig08_sir.png", 0.5, 1.35, 8.3, 4.6, "Prior vs SIR posterior MMSY");
   card(s, 9.1, 1.35, 3.7, 5.3);
   stat(s, fmt(NPRIOR), "prior Monte Carlo draws", 9.35, 1.55, 3.3);
   stat(s, isNaN(ESS) ? "-" : fmt(ESS), "effective sample size after SIR", 9.35, 3.05, 3.3, HEX.accent2);
-  txt(s, "Dashed lines: SEDAR OFLs. Placeholder indices are down-weighted (lambda = 0.5) until real series are added.", { x: 9.35, y: 4.6, w: 3.3, h: 1.9, fontSize: 13, color: "34474F" });
+  txt(s, `${fmt(NUNIQ)} unique draws; largest weight ${fmt(100 * num(diagS.max_weight), 1)}%. Dashed lines: SEDAR OFLs. Placeholder indices are held out for validation, not fitted.`, { x: 9.35, y: 4.6, w: 3.3, h: 1.9, fontSize: 13, color: "34474F" });
 
   // GROUP MMSY
   s = content("Group MMSY with current catch and management benchmarks", S2);
@@ -537,7 +572,7 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   card(s, 8.4, 1.35, 4.4, 5.3);
   stat(s, fmtK(num(lob.MMSY_p50_lb)) + " lb", "spiny lobster median MMSY (SEDAR 57 OFL 164k lb)", 8.65, 1.5, 4.0);
   stat(s, fmtK(num(qt.MMSY_p50_lb)) + " lb", "queen triggerfish median MMSY (SEDAR 80 OFL 23k lb)", 8.65, 3.0, 4.0, HEX.accent2);
-  txt(s, "Unassessed complexes are bounded below by catch feasibility and above by shared energy; their absolute scale is the most placeholder-sensitive output.", { x: 8.65, y: 4.6, w: 4.0, h: 1.9, fontSize: 13, color: "34474F" });
+  txt(s, "Unassessed complexes are bounded below by catch feasibility and above by shared energy. Conch, yellowtail, deep snappers, jacks and pelagics are outside the trap focus and are not calibrated.", { x: 8.65, y: 4.6, w: 4.0, h: 1.9, fontSize: 13, color: "34474F" });
 
   // GUILD (native chart)
   s = content("Guild-level MMSY compared with current (expanded) catch", S2);
@@ -554,8 +589,8 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
     showLegend: true, legendPos: "t", legendFontFace: "+mn-lt", legendFontSize: 12, legendColor: "34474F",
   });
   card(s, 9.2, 1.4, 3.6, 5.3);
-  stat(s, fmtK(totMMSY) + " lb", "total FMP MMSY (median, harvested groups)", 9.45, 1.6, 3.2);
-  stat(s, fmtK(totCatch) + " lb", "current expanded catch", 9.45, 3.1, 3.2, HEX.accent2);
+  stat(s, fmtK(calMMSY) + " lb", "summed median MMSY, calibrated trap groups", 9.45, 1.6, 3.2);
+  stat(s, fmtK(calCatch) + " lb", "their current expanded catch", 9.45, 3.1, 3.2, HEX.accent2);
   txt(s, "Guild sums are computed draw by draw, so uncertainty reflects shared energy among groups.", { x: 9.45, y: 4.6, w: 3.2, h: 1.9, fontSize: 13, color: "34474F" });
 
   // SCENARIOS
@@ -563,9 +598,9 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   figure(s, "fig03_scenario_status.png", 0.5, 1.3, 9.0, 5.6, "Scenario status heat map");
   card(s, 9.8, 1.35, 3.0, 5.3);
   bullets(s, [
-    "Climate: CMIP6 SSP2-4.5 and SSP5-8.5 SST and NPP",
-    "Hurricane, SCTLD and trap-effort scenarios",
-    "Status: Below target / Caution / Overfishing / Overfished",
+    `SSP5-8.5 cuts Parrotfish 2 MMSY ${fmt(100 * (1 - num(sc("Climate_SSP585", "parrotfish_2").MMSY_p50_lb) / num(sc("Baseline", "parrotfish_2").MMSY_p50_lb)))}% and queen triggerfish ${fmt(100 * (1 - num(sc("Climate_SSP585", "queen_triggerfish").MMSY_p50_lb) / num(sc("Baseline", "queen_triggerfish").MMSY_p50_lb)))}% by 2043-45`,
+    `Combined stress: queen triggerfish P(overfishing) ${fmt(100 * num(sc("Baseline", "queen_triggerfish").P_overfishing))}% to ${fmt(100 * num(sc("Combined_stress", "queen_triggerfish").P_overfishing))}%`,
+    "Lobster has no thermal curve yet: its climate insensitivity is an assumption",
   ], { x: 10.05, y: 1.6, w: 2.6, h: 4.9, fontSize: 13 });
 
   // TRAJECTORIES
@@ -576,9 +611,57 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   s = content("Gear effort ceilings and choke groups feed the frontier analysis", S2);
   figure(s, "fig07_effort_ceilings.png", 0.5, 1.35, 8.3, 4.6, "Gear effort ceilings");
   card(s, 9.1, 1.35, 3.7, 5.3);
-  stat(s, trapCeil ? "x" + fmt(num(trapCeil.effort_multiplier_p50), 2) : "-", "fish-trap effort multiplier at median MMSY", 9.35, 1.55, 3.3);
-  stat(s, trapCeil ? "x" + fmt(num(trapCeil.effort_multiplier_target), 2) : "-", "at the P* (40%) target", 9.35, 3.05, 3.3, HEX.accent2);
-  txt(s, trapCeil ? `Choke group for fish traps: ${trapCeil.choke_group.replace(/_/g, " ")} (${fmt(100 * num(trapCeil.P_choke))}% of draws)` : "", { x: 9.35, y: 4.6, w: 3.3, h: 1.9, fontSize: 13, color: "34474F" });
+  stat(s, "x" + fmt(num(lobCeil.effort_multiplier_p50), 2), `lobster-trap effort multiplier; choke: ${lobCeil.choke_group.replace(/_/g, " ")} (${fmt(100 * num(lobCeil.P_choke))}%)`, 9.35, 1.55, 3.3);
+  stat(s, "x" + fmt(num(trapCeil.effort_multiplier_p50), 2), `fish-trap effort multiplier; choke: ${trapCeil.choke_group.replace(/_/g, " ")} (${fmt(100 * num(trapCeil.P_choke))}%)`, 9.35, 3.05, 3.3, HEX.accent2);
+  txt(s, "Only SIR-calibrated groups can be choke groups. Small, low-MMSY bycatch groups, not lobster, bind first.", { x: 9.35, y: 4.6, w: 3.3, h: 1.9, fontSize: 13, color: "34474F" });
+
+  // ===== ROBUSTNESS AND VALIDATION =====
+  s = content("Calibration passes a simulation self-test", S2);
+  figure(s, "fig11_sensitivity_total_focus_MMSY.png", 0.5, 1.35, 7.4, 5.0, "Global sensitivity of total focus MMSY");
+  card(s, 8.2, 1.35, 4.6, 5.3);
+  stat(s, `${fmt(Math.min(...cov90), 2)}-${fmt(Math.max(...cov90), 2)}`, "self-test 90% interval coverage across 13 trap groups (100 replicates)", 8.45, 1.55, 4.1);
+  stat(s, fmt(num(diagS.ESS)), `effective sample size from ${fmt(num(diagS.n_prior))} prior draws`, 8.45, 3.05, 4.1, HEX.accent2);
+  txt(s, "Left: rank-regression sensitivity of total trap-focus MMSY. Pavement TTE and NPP, competitor biomass and food-web fraction dominate. Hogfish and porgies are biased low in the self-test (about -35%), a conservative error for choke groups.", { x: 8.45, y: 4.55, w: 4.1, h: 2.0, fontSize: 12, color: "34474F" });
+
+  s = content("Out-of-sample: queen triggerfish passes, lobster needs its assessment", S2);
+  figure(s, "fig13_loo_benchmarks.png", 0.5, 1.35, 7.6, 3.0, "Leave-one-benchmark-out predictions");
+  figure(s, "fig12_validation.png", 0.5, 4.45, 7.6, 2.45, "Held-out index validation");
+  card(s, 8.4, 1.35, 4.4, 5.3);
+  const looQ = loo.find((r) => r.held_out.startsWith("queen")), looL = loo.find((r) => r.held_out.startsWith("spiny"));
+  bullets(s, [
+    `Queen triggerfish OFL withheld: predicted ${fmtK(num(looQ.pred_p50))} lb (90% ${fmtK(num(looQ.pred_p05))}-${fmtK(num(looQ.pred_p95))}) vs ${fmtK(num(looQ.benchmark_lb))}: inside`,
+    `Spiny lobster OFL withheld: predicted ${fmtK(num(looL.pred_p50))} vs ${fmtK(num(looL.benchmark_lb))}: outside. Lobster scale is identified only by assessment information`,
+    "Held-out indices are placeholders: the bottom panel demonstrates the machinery, not skill",
+  ], { x: 8.65, y: 1.6, w: 4.0, h: 4.9, fontSize: 13 });
+
+  s = content("Structural uncertainty: anchored stocks are robust, unassessed groups are not", S2);
+  figure(s, "fig15_structural_ensemble.png", 0.5, 1.35, 8.3, 5.3, "Structural ensemble MMSY by variant");
+  card(s, 9.1, 1.35, 3.7, 5.3);
+  stat(s, fmt(num(ensG("spiny_lobster").between_variant_cv), 2) + " / " + fmt(num(ensG("queen_triggerfish").between_variant_cv), 2), "between-variant CV: lobster / queen triggerfish", 9.35, 1.55, 3.3);
+  stat(s, fmt(num(ensG("parrotfish_2").between_variant_cv), 2), "between-variant CV: Parrotfish 2", 9.35, 3.05, 3.3, HEX.accent2);
+  txt(s, "10 variants: x_msy 0.3/0.4, TTE 0.10/0.20, food-web fraction x0.67/x1.5, no thermal effects, no fishing feedback, satellite pelagic NPP.", { x: 9.35, y: 4.6, w: 3.3, h: 1.9, fontSize: 12, color: "34474F" });
+
+  s = content("Ecosystem-level overfishing indicators", S2);
+  figure(s, "fig14_eco_indices.png", 0.5, 1.35, 8.3, 5.3, "Ryther and Fogarty indices");
+  card(s, 9.1, 1.35, 3.7, 5.3);
+  stat(s, fmt(Math.min(...ecoLast.map((r) => num(r.ryther_p50))), 2) + "-" + fmt(Math.max(...ecoLast.map((r) => num(r.ryther_p50))), 2), "Ryther index 2022-24 (t/km2/yr): below the 1 t threshold", 9.35, 1.55, 3.3, HEX.accent5);
+  stat(s, fmt(Math.min(...ecoLast.map((r) => num(r.fogarty_permil_p50))), 2) + "-" + fmt(Math.max(...ecoLast.map((r) => num(r.fogarty_permil_p50))), 2), "Fogarty index (per mil): inside the 0.22-0.92 caution band", 9.35, 3.05, 3.3, HEX.accent3);
+  txt(s, "Link & Watson (2019). Catch relative to area and to primary production.", { x: 9.35, y: 4.6, w: 3.3, h: 1.9, fontSize: 12, color: "34474F" });
+
+  s = content("Review readiness: what is addressed and what still needs data", S2);
+  const rr = [
+    ["check", "Addressed", HEX.accent5, ["Degenerate SIR (ESS 1 to 86)", "Input-uncertainty propagation", "Self-test coverage and bias", "Global sensitivity", "Structural ensemble", "Status of uncalibrated groups", "Reproducible parallel runs"]],
+    ["warn", "Depends on placeholders", HEX.accent3, ["Ecopath / FishBase priors", "Gear choke groups", "Scenario magnitudes", "Ecosystem indices"]],
+    ["clip", "Needs data", HEX.accent2, ["SEDAR 57 / 80 CPUE as fit indices", "Real landings and effort by gear", "NCRMP densities", "Lobster thermal response"]],
+  ];
+  rr.forEach((c, i) => {
+    const x = 0.5 + i * 4.15;
+    card(s, x, 1.45, 3.95, 5.25);
+    iconCircle(s, c[0], x + 0.3, 1.7, 0.65, c[2]);
+    txt(s, c[1], { x: x + 1.1, y: 1.82, w: 2.75, h: 0.45, fontSize: 17, bold: true, fontFace: THEME.headFontFace });
+    bullets(s, c[3], { x: x + 0.3, y: 2.6, w: 3.45, h: 3.9, fontSize: 13 });
+  });
+  txt(s, "Critique-by-critique responses and evidence files: docs/review_readiness.md", { x: 0.5, y: 6.75, w: 12.3, h: 0.3, fontSize: 12, italic: true, color: "6B7F87" });
 
   // CAVEATS
   s = content("What is real, what is placeholder", S2);
@@ -586,12 +669,12 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   iconCircle(s, "check", 0.8, 1.7, 0.65, HEX.accent5);
   txt(s, "Real public data", { x: 1.6, y: 1.82, w: 4.7, h: 0.45, fontSize: 18, bold: true, fontFace: THEME.headFontFace });
   bullets(s, [
-    "Habitat areas (NOAA NCCOS)",
+    "Habitat areas (NOAA NCCOS); deeper shelf (ETOPO)",
     "SST, DHW, chlorophyll, PAR, computed NPP (satellite)",
     "CMIP6 SST and NPP projections",
     "Hurricane tracks (HURDAT2)",
     "SEDAR 57 / 80 OFLs; FMP ACLs; queen conch 2021 landings",
-    "Published Caribbean productivity rates",
+    "Ecopath (Opitz 1996) and FishBase priors",
   ], { x: 0.8, y: 2.6, w: 5.5, h: 4.0, fontSize: 14 });
   card(s, 6.8, 1.45, 6.0, 5.25, "FDE3E0");
   iconCircle(s, "warn", 7.1, 1.7, 0.65, HEX.accent2);
@@ -599,8 +682,8 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   bullets(s, [
     "Landings and effort by gear (confidential trip tickets)",
     "Assessment CPUE indices and survey densities",
-    "Partition priors, P/B, diets, habitat preferences",
-    "Deeper-shelf productivity; pre-2000 coral cover",
+    "Conch, pelagic and deep-snapper priors; habitat preferences",
+    "Pre-2000 coral cover; lobster thermal response",
     "Thermal sensitivities and hurricane loss magnitudes",
   ], { x: 7.1, y: 2.6, w: 5.5, h: 4.0, fontSize: 14 });
 
@@ -608,10 +691,10 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   s = pres.addSlide({ masterName: "TITLE_DARK", sectionTitle: S2 });
   s.addText("Next steps", { placeholder: "title" });
   s.addText([
-    { text: "1. Load confidential landings and effort by gear (A1-A6) and SEDAR indices (B1-B3)", options: { breakLine: true } },
-    { text: "2. Replace partition priors with NCRMP densities; add Opitz (1996) competitor biomass", options: { breakLine: true } },
-    { text: "3. Map the deeper shelf (NCCOS 2017 composite) and refine its productivity", options: { breakLine: true } },
-    { text: "4. Hand SPF tables to the frontier team; run closed-loop MSE" },
+    { text: "1. Fit SEDAR 57 / 80 CPUE; keep NCRMP held out for validation", options: { breakLine: true } },
+    { text: "2. Load confidential landings and effort by gear (A1-A6)", options: { breakLine: true } },
+    { text: "3. Ingest NCRMP densities (pipeline ready) and add a lobster thermal curve", options: { breakLine: true } },
+    { text: "4. Re-run, refresh validation, hand SPF tables to the frontier team" },
   ], { placeholder: "body" });
 
   await pres.writeFile({ fileName: DECK });
