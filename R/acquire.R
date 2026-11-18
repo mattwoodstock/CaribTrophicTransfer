@@ -533,7 +533,23 @@ acquire_project_data <- function(project_dir, only = NULL, verbose = TRUE) {
       },
       npp_ensemble = {
         keys <- if (!is.null(a$keys)) strsplit(a$keys, "\\|")[[1]] else c("modis_vgpm_npp", "viirs_snpp_npp", "viirs_noaa20_npp")
-        e <- fetch_npp_ensemble(bbox, yrs, keys, stride = as.integer(.pick(a$stride_space, 1)))
+        e <- tryCatch(fetch_npp_ensemble(bbox, yrs, keys, stride = as.integer(.pick(a$stride_space, 1))),
+                      error = function(err) NULL)
+        if (is.null(e) && !is.null(a$fallback_key)) {
+          # Fallback: chlorophyll-based relative productivity proxy (sd doubled)
+          warning("NPP products unavailable; using ", a$fallback_key, " as a relative productivity proxy")
+          cc <- ocean_source_catalog(); cc <- cc[cc$key == a$fallback_key, ]
+          x <- fetch_erddap_series(cc$server, cc$dataset_id, cc$variable, yrs, bbox, .parse_dims(cc$extra_dims),
+                                   stride = c(time = 1, lat = as.integer(.pick(a$stride_space, 1)),
+                                              lon = as.integer(.pick(a$stride_space, 1))))
+          b0 <- mean(x$value)
+          return_list <- list(cov = data.frame(year = x$year, variable = r$target, value = x$value / b0,
+                                               sd = 2 * x$sd / b0, units = "relative",
+                                               source = paste("Chlorophyll proxy:", cc$dataset_id),
+                                               data_status = "API (proxy)"))
+          return_list
+        } else {
+        if (is.null(e)) stop("No NPP products could be retrieved")
         base <- mean(e$value)
         hb <- .pick(a$habitat, "pelagic")
         list(cov = rbind(
@@ -544,6 +560,7 @@ acquire_project_data <- function(project_dir, only = NULL, verbose = TRUE) {
              hab = data.frame(habitat = hb, area_km2 = NA, area_cv = NA, npp_value = round(base, 2),
                               npp_unit = "g_C_m2_yr", npp_cv = round(stats::sd(e$value) / base + 0.1, 3),
                               classes = "", source = "API: satellite NPP ensemble (ERDDAP)"))
+        }
       },
       opendap = {
         x <- fetch_opendap_series(a$url, a$variable, bbox, yrs, .pick(a$time_agg, "mean"),
