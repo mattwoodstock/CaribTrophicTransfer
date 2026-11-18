@@ -17,7 +17,8 @@
 #' @export
 get_metric <- function(res, metric, scenario = "Baseline") {
   a <- res$results[[scenario]][[metric]]
-  idx <- c(list(res$draws), rep(list(TRUE), length(dim(a)) - 1))
+  rows <- if (is.null(res$row_of_draw)) res$draws else res$row_of_draw[res$draws]
+  idx <- c(list(rows), rep(list(TRUE), length(dim(a)) - 1))
   do.call(`[`, c(list(a), idx, list(drop = FALSE)))
 }
 

@@ -31,62 +31,81 @@ run_ttm <- function(proj, n_draws = proj$settings$n_draws, scenarios = scenario_
   drvs <- lapply(scenarios, function(s) build_drivers(proj, s)); names(drvs) <- scenarios
   per_draw <- has_driver_uncertainty(proj)
   if (verbose && per_draw) message("Driver uncertainty (covariate sd / disturbance intensity_cv): drivers rebuilt per draw")
-  arr <- function() array(NA_real_, c(n_draws, length(years), nrow(g)),
-                          dimnames = list(NULL, years, g$group))
-  res <- lapply(scenarios, function(s) {
-    l <- lapply(.metrics, function(m) arr()); names(l) <- .metrics
-    l$Cg <- array(NA_real_, c(n_draws, length(years), max(1, length(proj$gear_names)), nrow(g)),
-                  dimnames = list(NULL, years, if (length(proj$gear_names)) proj$gear_names else "none", g$group))
-    l$P1 <- array(NA_real_, c(n_draws, length(years), nrow(proj$habitats)),
-                  dimnames = list(NULL, years, proj$habitats$habitat))
-    l$Q <- l$P1
-    l$Eff <- array(NA_real_, c(n_draws, length(years), max(1, length(proj$gear_names))),
-                   dimnames = list(NULL, years, if (length(proj$gear_names)) proj$gear_names else "none"))
-    l
-  })
-  names(res) <- scenarios
-  TL <- matrix(NA_real_, n_draws, nrow(g), dimnames = list(NULL, g$group))
+  ny <- length(years); ng <- nrow(g)
+  gnames <- if (length(proj$gear_names)) proj$gear_names else "none"
+  alloc <- function(n) {
+    res <- lapply(scenarios, function(s) {
+      l <- lapply(.metrics, function(m) array(NA_real_, c(n, ny, ng), dimnames = list(NULL, years, g$group)))
+      names(l) <- .metrics
+      l$Cg <- array(NA_real_, c(n, ny, length(gnames), ng), dimnames = list(NULL, years, gnames, g$group))
+      l$P1 <- array(NA_real_, c(n, ny, nrow(proj$habitats)), dimnames = list(NULL, years, proj$habitats$habitat))
+      l$Q <- l$P1
+      l$Eff <- array(NA_real_, c(n, ny, length(gnames)), dimnames = list(NULL, years, gnames))
+      l
+    })
+    names(res) <- scenarios
+    res
+  }
+  TL <- matrix(NA_real_, n_draws, ng, dimnames = list(NULL, g$group))
   bfrac <- TL; shortfall <- TL
-  pars <- vector("list", n_draws)
+  seeds <- vector("list", n_draws)   # RNG state per draw: parameters are regenerated in Stage 3
   # deterministic run
   par0 <- draw_parameters(proj, stochastic = FALSE)
   det <- lapply(scenarios, function(s) {
     base <- simulate_ttm(proj, par0, drvs[["Baseline"]])
     if (s == "Baseline") base else simulate_ttm(proj, par0, drvs[[s]], q = base$q)
   }); names(det) <- scenarios
-  store <- function(s, d, o) {
-    for (m in .metrics) res[[s]][[m]][d, , ] <<- o[[m]]
-    res[[s]]$Cg[d, , , ] <<- o$Cg; res[[s]]$P1[d, , ] <<- o$P1; res[[s]]$Q[d, , ] <<- o$Q
-    res[[s]]$Eff[d, , ] <<- o$Eff
-  }
   qs <- vector("list", n_draws)
-  # Stage 1: Baseline for every prior draw (history is identical across scenarios)
+  # Stage 1: Baseline for every prior draw. Only what SIR and prior summaries
+  # need is kept for all draws (memory-light): biomass trajectories and
+  # reference-year means of the main metrics.
+  ref_y <- as.character(seq(st$hist_end - st$ref_years + 1, st$hist_end))
+  stage1 <- list(B = array(NA_real_, c(n_draws, ny, ng), dimnames = list(NULL, years, g$group)))
+  for (m in c("MMSY", "MMSY0", "K", "K0", "B", "C", "P")) stage1[[paste0(m, "_ref")]] <- TL
   if (verbose) message("Stage 1: Baseline, ", n_draws, " prior draws")
   for (d in seq_len(n_draws)) {
     if (verbose && (d %% max(1, n_draws %/% 10) == 0)) message("  draw ", d, "/", n_draws)
-    par <- draw_parameters(proj, stochastic = TRUE); pars[[d]] <- par
+    seeds[[d]] <- get(".Random.seed", envir = .GlobalEnv)
+    par <- draw_parameters(proj, stochastic = TRUE)
     base <- simulate_ttm(proj, par, .drv_for(proj, drvs, "Baseline", par, per_draw))
-    store("Baseline", d, base); qs[[d]] <- base$q
+    qs[[d]] <- base$q
+    stage1$B[d, , ] <- base$B
+    for (m in c("MMSY", "MMSY0", "K", "K0", "B", "C", "P"))
+      stage1[[paste0(m, "_ref")]][d, ] <- colMeans(base[[m]][ref_y, , drop = FALSE])
     TL[d, ] <- base$TL; bfrac[d, ] <- base$bfrac; shortfall[d, ] <- base$catch_shortfall
   }
-  out <- list(proj = proj, results = res, deterministic = det, TL = TL, bfrac = bfrac,
-              catch_shortfall = shortfall,
-              pars = pars, draws = seq_len(n_draws), weights = rep(1 / n_draws, n_draws),
+  out <- list(proj = proj, results = NULL, deterministic = det, TL = TL, bfrac = bfrac,
+              catch_shortfall = shortfall, stage1 = stage1, n_prior = n_draws,
+              draws = seq_len(n_draws), weights = rep(1 / n_draws, n_draws),
               scenarios = scenarios, sir = NULL)
   class(out) <- "ttm_results"
   # Stage 2: SIR on the Baseline history
   if (is.null(sir)) sir <- (!is.null(proj$indices) || !is.null(proj$benchmarks) ||
                            isTRUE(st$sir_catch_feasibility)) && isTRUE(st$sir_resample > 0)
   if (sir) out <- apply_sir(out, n_resample = st$sir_resample)
-  # Stage 3: other scenarios only for draws in use (paired with Baseline)
-  others <- setdiff(scenarios, "Baseline")
-  todo <- sort(unique(out$draws))
-  if (length(others)) {
-    if (verbose) message("Stage 3: ", length(others), " scenarios x ", length(todo), " draws")
-    for (d in todo) for (s in others)
-      store(s, d, simulate_ttm(proj, pars[[d]], .drv_for(proj, drvs, s, pars[[d]], per_draw), q = qs[[d]]))
+  # Stage 3: full results for all scenarios, only for the draws in use
+  keep <- sort(unique(out$draws))
+  res <- alloc(length(keep))
+  if (verbose) message("Stage 3: ", length(scenarios), " scenarios x ", length(keep), " draws")
+  pars <- vector("list", length(keep))
+  rng_now <- get(".Random.seed", envir = .GlobalEnv)
+  for (k in seq_along(keep)) {
+    d <- keep[k]
+    assign(".Random.seed", seeds[[d]], envir = .GlobalEnv)
+    pars[[k]] <- draw_parameters(proj, stochastic = TRUE)
+    for (s in scenarios) {
+      o <- simulate_ttm(proj, pars[[k]], .drv_for(proj, drvs, s, pars[[k]], per_draw),
+                        q = if (s == "Baseline") NULL else qs[[d]])
+      for (m in .metrics) res[[s]][[m]][k, , ] <- o[[m]]
+      res[[s]]$Cg[k, , , ] <- o$Cg; res[[s]]$P1[k, , ] <- o$P1; res[[s]]$Q[k, , ] <- o$Q
+      res[[s]]$Eff[k, , ] <- o$Eff
+    }
   }
+  assign(".Random.seed", rng_now, envir = .GlobalEnv)
   out$results <- res
+  out$pars <- pars          # parameter sets of the stored (kept) draws
+  out$keep <- keep
+  out$row_of_draw <- match(seq_len(n_draws), keep)
   out
 }
 
@@ -119,7 +138,7 @@ has_driver_uncertainty <- function(proj) {
 index_nll <- function(res) {
   idx <- res$proj$indices
   if (is.null(idx) || !nrow(idx)) stop("No indices.csv in project")
-  B <- res$results[["Baseline"]]$B
+  B <- res$stage1$B
   years <- as.integer(dimnames(B)[[2]])
   idx <- idx[idx$year %in% years, , drop = FALSE]
   names_i <- unique(idx$index)
@@ -156,10 +175,7 @@ benchmark_nll <- function(res) {
   if (is.null(bm) || !"use_in_sir" %in% names(bm)) return(NULL)
   bm <- bm[as.logical(bm$use_in_sir) %in% TRUE, , drop = FALSE]
   if (!nrow(bm)) return(NULL)
-  st <- res$proj$settings
-  yy <- as.character(seq(st$hist_end - st$ref_years + 1, st$hist_end))
-  MM <- res$results[["Baseline"]]$MMSY[, yy, , drop = FALSE]
-  MM <- apply(MM, c(1, 3), mean)
+  MM <- res$stage1$MMSY_ref
   nll <- matrix(0, nrow(MM), nrow(bm), dimnames = list(NULL, paste(bm$group, bm$metric, sep = "_")))
   for (j in seq_len(nrow(bm))) {
     grp <- strsplit(bm$group[j], ";")[[1]]
@@ -236,20 +252,39 @@ apply_sir <- function(res, n_resample = length(res$draws)) {
 
 #' Return a copy of results using the unconditioned (prior) draws
 #'
-#' When SIR was applied, non-Baseline scenarios were only simulated for the
-#' resampled draws, so prior results are only complete for the Baseline.
+#' Full results are stored only for draws retained by SIR. This returns the
+#' prior when all draws were retained (no SIR); otherwise use
+#' [prior_reference_points()] for prior summaries.
 #' @param res `ttm_results`
 #' @export
 prior_results <- function(res) {
-  res$draws <- seq_along(res$pars); res$weights <- rep(1 / length(res$draws), length(res$draws))
+  if (length(res$keep) < res$n_prior)
+    stop("Full prior results are not stored when SIR is used; see prior_reference_points()")
+  res$draws <- seq_len(res$n_prior); res$weights <- rep(1 / length(res$draws), length(res$draws))
   res$sir <- NULL
   res
+}
+
+#' Prior (unconditioned) reference-point summary for every group
+#'
+#' Uses the reference-year means kept for all prior draws in Stage 1.
+#' @param res `ttm_results`
+#' @export
+prior_reference_points <- function(res) {
+  s1 <- res$stage1; g <- res$proj$groups
+  q <- function(x, p) unname(stats::quantile(x, p, na.rm = TRUE))
+  data.frame(group = g$group, group_type = g$group_type,
+             MMSY_p05_t = apply(s1$MMSY_ref, 2, q, 0.05), MMSY_p50_t = apply(s1$MMSY_ref, 2, q, 0.5),
+             MMSY_p95_t = apply(s1$MMSY_ref, 2, q, 0.95), B0_p50_t = apply(s1$K0_ref, 2, q, 0.5),
+             catch_p50_t = apply(s1$C_ref, 2, q, 0.5),
+             P_infeasible_landings = colMeans(res$catch_shortfall > 0.05, na.rm = TRUE),
+             MMSY_p50_lb = t_to_lb(apply(s1$MMSY_ref, 2, q, 0.5)), row.names = NULL)
 }
 
 #' @export
 print.ttm_results <- function(x, ...) {
   cat("<ttm_results>", x$proj$settings$project_name, "\n")
-  cat("  draws:", length(x$pars), " used:", length(x$draws),
+  cat("  prior draws:", x$n_prior, " used:", length(x$draws), " stored:", length(x$keep),
       if (!is.null(x$sir)) sprintf("(SIR, ESS = %.1f, unique = %d)", x$sir$ess, x$sir$n_unique) else "(prior)", "\n")
   cat("  scenarios:", paste(x$scenarios, collapse = ", "), "\n")
   invisible(x)

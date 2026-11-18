@@ -30,7 +30,7 @@ print(res)
 
 # ---- tables for SPF collaborators + diagnostics ------------------------------
 files <- write_spf_inputs(res, file.path(out_dir, "tables"))
-write.csv(reference_points(prior_results(res)), file.path(out_dir, "tables", "prior_group_reference_points.csv"),
+write.csv(prior_reference_points(res), file.path(out_dir, "tables", "prior_group_reference_points.csv"),
           row.names = FALSE)
 
 # ---- headline summaries -------------------------------------------------------
@@ -51,5 +51,6 @@ print(benchmark_comparison(res)[, c("group", "metric", "value_lb", "MMSY_p50_lb"
 
 # ---- figures -----------------------------------------------------------------
 save_standard_plots(res, file.path(out_dir, "figures"))
+res$pars <- NULL   # parameter draws are large; drop before saving
 saveRDS(res, file.path(out_dir, "ttm_results.rds"))
 message("Done. Outputs in ", out_dir)

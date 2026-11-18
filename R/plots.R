@@ -206,8 +206,7 @@ plot_sir <- function(res, groups = NULL) {
     groups <- unique(c(unlist(strsplit(res$proj$indices$group, ";")),
                        res$proj$benchmarks$group[as.logical(res$proj$benchmarks$use_in_sir) %in% TRUE]))
   }
-  yy <- .ref_years(res)
-  MM <- apply(res$results$Baseline$MMSY[, yy, groups, drop = FALSE], c(1, 3), mean)
+  MM <- res$stage1$MMSY_ref[, groups, drop = FALSE]
   df <- rbind(
     data.frame(dist = "Prior", group = rep(groups, each = nrow(MM)), MMSY_lb = t_to_lb(as.vector(MM))),
     data.frame(dist = "SIR posterior", group = rep(groups, each = length(res$draws)),
@@ -219,7 +218,7 @@ plot_sir <- function(res, groups = NULL) {
     ggplot2::scale_colour_manual(values = ttm_palette()[1:2], name = NULL) +
     ggplot2::scale_fill_manual(values = ttm_palette()[1:2], name = NULL) +
     ggplot2::labs(title = "MMSY: prior vs SIR-conditioned",
-                  subtitle = sprintf("ESS = %.0f of %d draws", res$sir$ess, length(res$pars)),
+                  subtitle = sprintf("ESS = %.0f of %d draws", res$sir$ess, res$n_prior),
                   x = "MMSY (lb / yr, log scale)", y = "Density") + .theme_ttm()
   bm <- res$proj$benchmarks
   if (!is.null(bm)) {
@@ -245,5 +244,62 @@ save_standard_plots <- function(res, dir) {
   if ("coral_reef" %in% res$proj$habitats$habitat) sv(plot_habitat_drivers(res), "fig06_coral_quality.png", 9, 5)
   if (length(res$proj$gear_names)) sv(plot_effort_ceilings(gear_allocation(res)), "fig07_effort_ceilings.png", 10, 4.5)
   if (!is.null(res$sir)) sv(plot_sir(res), "fig08_sir.png", 10, 5)
+  if (!is.null(res$proj$env_covariates)) sv(plot_environment(res$proj), "fig09_environment.png", 10, 6)
+  if (!is.null(res$proj$disturbances)) sv(plot_disturbances(res$proj), "fig10_hurricanes.png", 10, 4)
   invisible(list.files(dir, pattern = "png$", full.names = TRUE))
+}
+
+#' Environmental drivers panel (covariates and disturbance events)
+#'
+#' Small multiples of the historical covariates (with observation SD bands)
+#' and a lollipop timeline of disturbance intensities.
+#' @param proj a `ttm_project`
+#' @param variables covariates to show
+#' @param labels facet labels
+#' @export
+plot_environment <- function(proj, variables = c("sst", "dhw", "npp_pelagic_index", "coral_cover"),
+                             labels = c("SST (°C, annual mean)", "Degree heating weeks (annual max)",
+                                        "Pelagic NPP index (VGPM ensemble)", "Coral cover (proportion)")) {
+  .need_gg()
+  ec <- proj$env_covariates
+  ec <- ec[ec$variable %in% variables & ec$year <= proj$settings$hist_end & ec$year >= proj$settings$hist_start, ]
+  if (!"sd" %in% names(ec)) ec$sd <- 0
+  ec$sd[is.na(ec$sd)] <- 0
+  ec$panel <- factor(labels[match(ec$variable, variables)], levels = labels)
+  p1 <- ggplot2::ggplot(ec, ggplot2::aes(year, value)) +
+    ggplot2::geom_ribbon(ggplot2::aes(ymin = value - sd, ymax = value + sd), fill = "#86b6ef", alpha = 0.5) +
+    ggplot2::geom_line(colour = ttm_palette()[1], linewidth = 0.8) +
+    ggplot2::geom_point(colour = ttm_palette()[1], size = 1.2) +
+    ggplot2::facet_wrap(~panel, scales = "free_y", ncol = 2) +
+    ggplot2::labs(x = NULL, y = NULL, title = "Environmental drivers acquired from public APIs",
+                  subtitle = "Lines: annual values; bands: observation uncertainty (±1 SD) propagated in the Monte Carlo") +
+    .theme_ttm()
+  p1
+}
+
+#' Disturbance (hurricane) intensity timeline
+#' @param proj a `ttm_project`
+#' @export
+plot_disturbances <- function(proj) {
+  .need_gg()
+  d <- proj$disturbances
+  d <- d[!is.na(d$year) & !grepl("other gears", d$event), ]
+  d$label <- sub("^Hurricane ", "", sub(" \\(AL[0-9]+\\)", "", d$event))
+  d <- d[order(d$year, -d$intensity), ]
+  lab <- d[d$intensity >= 0.3, ]
+  # stagger labels of nearby events left/right to avoid overlap
+  lab$hjust <- 0.5
+  for (k in seq_len(nrow(lab))[-1]) if (lab$year[k] - lab$year[k - 1] < 5) {
+    if (lab$hjust[k - 1] == 0.5) lab$hjust[k - 1] <- 1.05
+    lab$hjust[k] <- -0.05
+  }
+  ggplot2::ggplot(d, ggplot2::aes(year, intensity)) +
+    ggplot2::geom_segment(ggplot2::aes(xend = year, y = 0, yend = intensity), colour = "#86b6ef", linewidth = 1.2) +
+    ggplot2::geom_point(colour = ttm_palette()[2], size = 3) +
+    ggplot2::geom_text(data = lab, ggplot2::aes(label = paste(label, year), hjust = hjust),
+                       vjust = -0.9, size = 3.2, colour = "#0b0b0b") +
+    ggplot2::scale_y_continuous(limits = c(0, 1.15), breaks = c(0, 0.5, 1)) +
+    ggplot2::labs(title = "Hurricane disturbance intensity (NHC HURDAT2)", x = NULL,
+                  y = "Intensity (0-1)", subtitle = "Wind at closest approach x distance decay; losses scale with intensity") +
+    .theme_ttm()
 }
