@@ -1,0 +1,4 @@
+"index","group","mode","n_obs","coverage50","coverage90","rmse_log","MASE_vs_naive","cor_anomaly"
+"SEDAR57_lobster_trap_CPUE","spiny_lobster","scale-free anomalies (whole series held out)",10,1,1,0.172496387239393,1.55098020713312,0.662990467474911
+"SEDAR80_QT_trap_CPUE","queen_triggerfish","scale-free anomalies (whole series held out)",35,0.571428571428571,1,0.270259198002891,1.75226283993929,-0.385584896960231
+"NCRMP_parrotfish_density","parrotfish_1;parrotfish_2","scale-free anomalies (whole series held out)",6,0.833333333333333,1,0.173690734967565,1.24299586258049,0.169346451205305
