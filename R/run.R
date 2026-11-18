@@ -46,45 +46,102 @@ run_ttm <- function(proj, n_draws = proj$settings$n_draws, scenarios = scenario_
     names(res) <- scenarios
     res
   }
-  TL <- matrix(NA_real_, n_draws, ng, dimnames = list(NULL, g$group))
+  # ---- adaptive importance sampling set-up ------------------------------------
+  if (is.null(sir)) sir <- (!is.null(proj$indices) || !is.null(proj$benchmarks) ||
+                           isTRUE(st$sir_catch_feasibility)) && isTRUE(st$sir_resample > 0)
+  rounds <- if (sir && isTRUE(st$sir_adaptive_rounds > 0)) as.integer(st$sir_adaptive_rounds) else 0L
+  pv_groups <- g$group[g$partition_cv > 0 & g$partition_method != "fixed_biomass"]
+  s_pr <- sqrt(log(1 + g[pv_groups, "partition_cv"]^2))
+  prior_mu <- log(g[pv_groups, "partition_value"]) - s_pr^2 / 2
+  proposals <- list(list(mu = prior_mu, sd = s_pr, n = n_draws))
+  N <- n_draws * (rounds + 1L)
+  TL <- matrix(NA_real_, N, ng, dimnames = list(NULL, g$group))
   bfrac <- TL; shortfall <- TL
-  seeds <- vector("list", n_draws)   # RNG state per draw: parameters are regenerated in Stage 3
+  seeds <- vector("list", N)   # RNG state per draw: parameters are regenerated in Stage 3
+  part_vals <- matrix(NA_real_, N, length(pv_groups), dimnames = list(NULL, pv_groups))
   # deterministic run
   par0 <- draw_parameters(proj, stochastic = FALSE)
   det <- lapply(scenarios, function(s) {
     base <- simulate_ttm(proj, par0, drvs[["Baseline"]])
     if (s == "Baseline") base else simulate_ttm(proj, par0, drvs[[s]], q = base$q)
   }); names(det) <- scenarios
-  qs <- vector("list", n_draws)
-  # Stage 1: Baseline for every prior draw. Only what SIR and prior summaries
-  # need is kept for all draws (memory-light): biomass trajectories and
-  # reference-year means of the main metrics.
+  qs <- vector("list", N)
+  # Stage 1: Baseline for every draw (prior round + adaptive rounds). Only what
+  # SIR and prior summaries need is kept for all draws (memory-light).
   ref_y <- as.character(seq(st$hist_end - st$ref_years + 1, st$hist_end))
-  stage1 <- list(B = array(NA_real_, c(n_draws, ny, ng), dimnames = list(NULL, years, g$group)))
+  stage1 <- list(B = array(NA_real_, c(N, ny, ng), dimnames = list(NULL, years, g$group)))
   for (m in c("MMSY", "MMSY0", "K", "K0", "B", "C", "P")) stage1[[paste0(m, "_ref")]] <- TL
-  if (verbose) message("Stage 1: Baseline, ", n_draws, " prior draws")
-  for (d in seq_len(n_draws)) {
-    if (verbose && (d %% max(1, n_draws %/% 10) == 0)) message("  draw ", d, "/", n_draws)
-    seeds[[d]] <- get(".Random.seed", envir = .GlobalEnv)
-    par <- draw_parameters(proj, stochastic = TRUE)
-    base <- simulate_ttm(proj, par, .drv_for(proj, drvs, "Baseline", par, per_draw))
-    qs[[d]] <- base$q
-    stage1$B[d, , ] <- base$B
-    pv <- .param_vector(par, proj)
-    if (is.null(stage1$params)) stage1$params <- matrix(NA_real_, n_draws, length(pv), dimnames = list(NULL, names(pv)))
-    stage1$params[d, names(pv)] <- pv
-    for (m in c("MMSY", "MMSY0", "K", "K0", "B", "C", "P"))
-      stage1[[paste0(m, "_ref")]][d, ] <- colMeans(base[[m]][ref_y, , drop = FALSE])
-    TL[d, ] <- base$TL; bfrac[d, ] <- base$bfrac; shortfall[d, ] <- base$catch_shortfall
+  log_mix <- function(x) {   # log density of the mixture of proposals used so far (log scale)
+    lx <- log(x)
+    comp <- vapply(proposals, function(pp) rowSums(stats::dnorm(lx, rep(pp$mu, each = nrow(lx)),
+                                                               rep(pp$sd, each = nrow(lx)), log = TRUE)), numeric(nrow(lx)))
+    comp <- matrix(comp, nrow = nrow(lx))
+    nr <- vapply(proposals, function(pp) pp$n, numeric(1)); lw <- log(nr / sum(nr))
+    apply(sweep(comp, 2, lw, "+"), 1, function(z) { mz <- max(z); mz + log(sum(exp(z - mz))) })
   }
+  log_prior <- function(x) rowSums(stats::dnorm(log(x), rep(prior_mu, each = nrow(x)), rep(s_pr, each = nrow(x)), log = TRUE))
+  d <- 0L
+  for (rd in 0:rounds) {
+    pp <- proposals[[rd + 1L]]
+    if (verbose) message(if (rd == 0) "Stage 1: Baseline, " else sprintf("Stage 1 (adaptive round %d): ", rd),
+                         n_draws, " draws")
+    for (j in seq_len(n_draws)) {
+      d <- d + 1L
+      if (verbose && (j %% max(1, n_draws %/% 5) == 0)) message("  draw ", j, "/", n_draws)
+      seeds[[d]] <- get(".Random.seed", envir = .GlobalEnv)
+      par <- draw_parameters(proj, stochastic = TRUE)
+      if (rd > 0 && length(pv_groups))
+        par$partition_value[pv_groups] <- exp(stats::rnorm(length(pv_groups), pp$mu, pp$sd))
+      part_vals[d, ] <- par$partition_value[pv_groups]
+      base <- simulate_ttm(proj, par, .drv_for(proj, drvs, "Baseline", par, per_draw))
+      qs[[d]] <- base$q
+      stage1$B[d, , ] <- base$B
+      pv <- .param_vector(par, proj)
+      if (is.null(stage1$params)) stage1$params <- matrix(NA_real_, N, length(pv), dimnames = list(NULL, names(pv)))
+      stage1$params[d, names(pv)] <- pv
+      for (m in c("MMSY", "MMSY0", "K", "K0", "B", "C", "P"))
+        stage1[[paste0(m, "_ref")]][d, ] <- colMeans(base[[m]][ref_y, , drop = FALSE])
+      TL[d, ] <- base$TL; bfrac[d, ] <- base$bfrac; shortfall[d, ] <- base$catch_shortfall
+    }
+    if (rd < rounds) {   # fit the next proposal to the current importance-weighted posterior
+      tmp <- list(proj = proj, stage1 = lapply(stage1, function(a) if (is.matrix(a)) a[seq_len(d), , drop = FALSE] else a[seq_len(d), , , drop = FALSE]),
+                  catch_shortfall = shortfall[seq_len(d), , drop = FALSE])
+      tmp$stage1$log_is_correction <- log_prior(part_vals[seq_len(d), , drop = FALSE]) - log_mix(part_vals[seq_len(d), , drop = FALSE])
+      nll <- .total_nll(tmp, .fit_indices(proj), .sir_bm(proj))
+      w <- exp(-(nll - min(nll))); w <- w / sum(w)
+      lx <- log(part_vals[seq_len(d), , drop = FALSE])
+      # Factorized proposal: each group's partition proposal is fitted to the
+      # group's own likelihood components (catch feasibility, own benchmarks);
+      # the final weights still use the joint likelihood with the exact
+      # mixture correction, so only sampling efficiency is affected.
+      cf <- catch_feasibility_nll(tmp)
+      bmj <- .sir_bm(proj)
+      nb <- .bench_nll_rows(tmp$stage1$MMSY_ref, bmj)
+      ni <- .index_nll_rows(tmp$stage1$B, .fit_indices(proj), st$index_min_cv)
+      shared <- if (ncol(ni)) rowSums(ni) else 0
+      corr <- tmp$stage1$log_is_correction
+      mu <- sdv <- setNames(numeric(length(pv_groups)), pv_groups)
+      for (k in seq_along(pv_groups)) {
+        gi <- pv_groups[k]
+        own <- shared - corr
+        if (!is.null(cf) && paste0("feasibility_", gi) %in% colnames(cf)) own <- own + cf[, paste0("feasibility_", gi)]
+        if (ncol(nb)) { jj <- grepl(paste0("(^|;)", gi, "(;|_)"), colnames(nb)); if (any(jj)) own <- own + rowSums(nb[, jj, drop = FALSE]) }
+        wk <- exp(-(own - min(own))); wk <- wk / sum(wk)
+        mu[k] <- sum(lx[, k] * wk); sdv[k] <- sqrt(sum(wk * (lx[, k] - mu[k])^2))
+      }
+      proposals[[rd + 2L]] <- list(mu = mu, sd = pmax(0.1, 1.5 * sdv), n = n_draws)
+      if (verbose) message(sprintf("  joint importance ESS after round %d: %.1f", rd, 1 / sum(w^2)))
+    }
+  }
+  n_draws <- N
+  stage1$log_is_correction <- if (rounds > 0) log_prior(part_vals) - log_mix(part_vals) else rep(0, N)
+  stage1$partition_draws <- part_vals
   out <- list(proj = proj, results = NULL, deterministic = det, TL = TL, bfrac = bfrac,
               catch_shortfall = shortfall, stage1 = stage1, n_prior = n_draws,
               draws = seq_len(n_draws), weights = rep(1 / n_draws, n_draws),
               scenarios = scenarios, sir = NULL)
   class(out) <- "ttm_results"
   # Stage 2: SIR on the Baseline history
-  if (is.null(sir)) sir <- (!is.null(proj$indices) || !is.null(proj$benchmarks) ||
-                           isTRUE(st$sir_catch_feasibility)) && isTRUE(st$sir_resample > 0)
   if (sir) out <- apply_sir(out, n_resample = st$sir_resample)
   # Stage 3: full results for all scenarios, only for the draws in use
   keep <- sort(unique(out$draws))
@@ -96,6 +153,7 @@ run_ttm <- function(proj, n_draws = proj$settings$n_draws, scenarios = scenario_
     d <- keep[k]
     assign(".Random.seed", seeds[[d]], envir = .GlobalEnv)
     pars[[k]] <- draw_parameters(proj, stochastic = TRUE)
+    if (length(pv_groups)) pars[[k]]$partition_value[pv_groups] <- part_vals[d, ]
     for (s in scenarios) {
       o <- simulate_ttm(proj, pars[[k]], .drv_for(proj, drvs, s, pars[[k]], per_draw),
                         q = if (s == "Baseline") NULL else qs[[d]])
@@ -225,6 +283,7 @@ apply_sir <- function(res, n_resample = length(res$draws)) {
   if (!length(comps)) stop("SIR requested but no indices or SIR benchmarks are available")
   nll_all <- do.call(cbind, comps)
   tot <- rowSums(nll_all)
+  if (!is.null(res$stage1$log_is_correction)) tot <- tot - res$stage1$log_is_correction
   lw <- -(tot - min(tot))
   wts <- exp(lw); wts <- wts / sum(wts)
   ess <- 1 / sum(wts^2)

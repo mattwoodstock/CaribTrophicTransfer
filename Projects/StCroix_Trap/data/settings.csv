@@ -7,7 +7,7 @@ ref_years,3,Years averaged for reference points (2022-2024)
 substeps,12,Monthly Euler steps for biomass dynamics
 c_to_ww,9,g wet weight per g C (Pauly & Christensen 1995)
 c_to_ww_cv,0.1,
-n_draws,5000,Monte Carlo draws
+n_draws,4000,Monte Carlo draws per sampling round (prior + adaptive rounds)
 seed,103,Random seed (SEDAR 103)
 diet_concentration,40,Dirichlet concentration for diet uncertainty
 catch_expansion,1.5,Reported-to-total landings expansion (PR logbook expansion ~2.0; USVI unquantified - SEDAR103-DW-20)
@@ -25,7 +25,7 @@ dhw_variable,dhw,Covariate name holding annual max DHW
 sir_resample,2000,Number of SIR resamples (0 = off)
 index_min_cv,0.2,Minimum CV applied to index observations
 sir_catch_feasibility,TRUE,Stock-reduction-analysis penalty when simulated stock cannot support observed landings
-catch_feasibility_cv,0.1,
+catch_feasibility_cv,0.25,Tolerance of the catch-feasibility penalty (self-reported landings with ~20% error)
 bbmsy_overfished,0.5,B/BMSY threshold for Overfished status (MSST proxy)
 domain_lon_min,-65.0,St. Croix shelf bounding box (data acquisition)
 domain_lon_max,-64.4,
@@ -36,3 +36,10 @@ landings_cv,0.2,Observation CV of each landings record (self-reported trip ticke
 effort_cv,0.1,Observation CV of each effort record
 pref_cv,0.2,CV on habitat preferences
 coral_growth_cv,0.3,
+disturbance_loss_cv,0.5,Uncertainty (CV) of a common multiplier on hurricane loss magnitudes (placeholder losses)
+holdout_from_year,,Set (e.g. 2015) to hold later index observations out of calibration; validation designs are also evaluated by re-weighting
+ryther_low,1,Ryther index thresholds (t/km2/yr; Link & Watson 2019 - verify)
+ryther_high,3,
+fogarty_low,0.22,Fogarty ratio thresholds (per mil; Link & Watson 2019)
+fogarty_high,0.92,
+sir_adaptive_rounds,3,Adaptive importance-sampling rounds (proposal refit on partition priors; exact mixture correction)

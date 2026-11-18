@@ -47,3 +47,12 @@ test_that("ecosystem overfishing indices and structural ensemble run", {
   expect_equal(sort(unique(ens$by_variant$variant)), c("base", "tte_0.10"))
   expect_true(all(ens$pooled$MMSY_p05_t <= ens$pooled$MMSY_p95_t))
 })
+
+test_that("adaptive importance sampling adds rounds with finite corrections", {
+  p <- ttm_example_project(n_draws = 30); p$settings$sir_resample <- 30; p$settings$sir_adaptive_rounds <- 1
+  res <- suppressWarnings(run_ttm(p, verbose = FALSE))
+  expect_equal(res$n_prior, 60)
+  expect_true(all(is.finite(res$stage1$log_is_correction)))
+  expect_equal(sum(res$stage1$log_is_correction[1:30] == res$stage1$log_is_correction[1]) < 30, TRUE)
+  expect_true(res$sir$ess >= 1)
+})

@@ -47,7 +47,7 @@ Two columns, `key` and `value` (plus optional `notes`).
 | `substeps` | – | 12 | 12 | sub-annual integration steps |
 | `c_to_ww` | g WW g C⁻¹ | 9 | 9 | carbon to wet-weight conversion (Pauly & Christensen 1995) |
 | `c_to_ww_cv` | CV | 0.1 | 0.1 | uncertainty |
-| `n_draws` | – | 500 | 5000 | Monte Carlo draws |
+| `n_draws` | – | 500 | 4000 | Monte Carlo draws per sampling round (total = n_draws × (1 + adaptive rounds)) |
 | `seed` | – | 1 | 103 | random seed |
 | `diet_concentration` | – | 50 | 40 | Dirichlet concentration for diet uncertainty (higher = less uncertainty; 0 = fixed) |
 | `catch_expansion` | × | 1.0 | 1.5 | reported-to-total landings multiplier |
@@ -65,13 +65,18 @@ Two columns, `key` and `value` (plus optional `notes`).
 | `sir_resample` | – | 0 | 2000 | SIR resamples (0 = no SIR) |
 | `index_min_cv` | CV | 0.2 | 0.2 | minimum CV applied to index observations |
 | `sir_catch_feasibility` | logical | TRUE | TRUE | SRA-style penalty for draws that cannot support observed landings |
-| `catch_feasibility_cv` | CV | 0.1 | 0.1 | tolerance of the feasibility penalty (max annual shortfall) |
+| `catch_feasibility_cv` | CV | 0.1 | 0.25 | tolerance of the feasibility penalty (max annual shortfall) |
 | `bbmsy_overfished` | B/BMSY | 0.5 | 0.5 | threshold for "Overfished" status |
 | `landings_cv` | CV | 0 | 0.2 | default observation CV of each landings record |
 | `effort_cv` | CV | 0 | 0.1 | default observation CV of each effort record |
 | `pref_cv` | CV | 0 | 0.2 | CV on habitat preferences |
 | `coral_growth_cv` | CV | 0 | 0.3 | CV on coral growth |
 | `use_acquired` | logical | TRUE | TRUE | merge API-acquired data (`data/acquired/`) where the user left blanks/placeholders |
+| `sir_adaptive_rounds` | – | 0 | 3 | adaptive importance-sampling rounds (factorized proposal on partition priors) |
+| `disturbance_loss_cv` | CV | 0 | 0.5 | common multiplier on disturbance loss magnitudes (uncertain hurricane impacts) |
+| `holdout_from_year` | year | NA | NA | index observations from this year on are held out of calibration |
+| `ryther_low`, `ryther_high` | t km⁻² yr⁻¹ | 1, 3 | 1, 3 | Ryther-index thresholds (Link & Watson 2019; verify) |
+| `fogarty_low`, `fogarty_high` | per mil | 0.22, 0.92 | 0.22, 0.92 | Fogarty-ratio thresholds (Link & Watson 2019) |
 | `domain_lon_min`, `domain_lon_max`, `domain_lat_min`, `domain_lat_max` | decimal degrees | – | −65.0, −64.4, 17.6, 17.95 | domain bounding box for data acquisition |
 
 ---
@@ -282,8 +287,9 @@ St. Croix: `disturbances.csv` holds only the templates `major_hurricane` and `ma
 | `value` | relative | index value (any scale) |
 | `cv` | CV | observation CV (floored at `index_min_cv`) |
 | `lambda` | weight | likelihood weight |
+| `role` | fit / validate | `fit` = used in SIR; `validate` = held out for out-of-sample validation |
 
-St. Croix: SEDAR 57 lobster trap CPUE (2012–2021), SEDAR 80 queen triggerfish trap CPUE (1985–2019), NCRMP parrotfish density (2013–2023). **All placeholders.** Replace with the published standardized series.
+St. Croix: SEDAR 57 lobster trap CPUE (2012–2021), SEDAR 80 queen triggerfish trap CPUE (1985–2019), NCRMP parrotfish density (2013–2023). **All placeholders**, so all are set to `role = validate`: calibration uses only the real assessment OFLs and catch feasibility. Replace them with the published standardized series and choose `fit` or `validate` for each. NCRMP biomass for every FMP group can be added automatically with the `ncrmp_fish` acquisition method once NCEI downloads are available.
 
 ## benchmarks.csv
 

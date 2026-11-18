@@ -303,3 +303,89 @@ plot_disturbances <- function(proj) {
                   y = "Intensity (0-1)", subtitle = "Wind at closest approach x distance decay; losses scale with intensity") +
     .theme_ttm()
 }
+
+#' Tornado plot of global sensitivity (SRRC) for one output
+#' @param sa output of [sensitivity_analysis()]
+#' @param output output name
+#' @export
+plot_sensitivity <- function(sa, output = unique(sa$output)[1]) {
+  .need_gg()
+  d <- sa[sa$output == output, ]
+  d$input <- factor(d$input, levels = rev(d$input[order(-abs(d$SRRC))]))
+  d$sign <- ifelse(d$SRRC > 0, "increases output", "decreases output")
+  ggplot2::ggplot(d, ggplot2::aes(SRRC, input, fill = sign)) +
+    ggplot2::geom_col(width = 0.6) +
+    ggplot2::geom_vline(xintercept = 0, colour = "#52514e", linewidth = 0.3) +
+    ggplot2::scale_fill_manual(values = c("increases output" = ttm_palette()[1], "decreases output" = ttm_palette()[2]), name = NULL) +
+    ggplot2::labs(title = paste("Global sensitivity:", output),
+                  subtitle = sprintf("Standardized rank regression coefficients; rank-model R2 = %.2f", d$R2_rank_model[1]),
+                  x = "SRRC", y = NULL) + .theme_ttm()
+}
+
+#' Out-of-sample predictions vs held-out observations
+#' @param val output of [validate_out_of_sample()]
+#' @export
+plot_validation <- function(val) {
+  .need_gg()
+  o <- val$observations
+  ggplot2::ggplot(o, ggplot2::aes(year)) +
+    ggplot2::geom_ribbon(ggplot2::aes(ymin = pred_p05, ymax = pred_p95), fill = "#86b6ef", alpha = 0.5) +
+    ggplot2::geom_line(ggplot2::aes(y = pred_p50, colour = "Predicted (median)"), linewidth = 0.7) +
+    ggplot2::geom_point(ggplot2::aes(y = observed, colour = "Held-out observation"), size = 1.8) +
+    ggplot2::facet_wrap(~index, scales = "free_y") +
+    ggplot2::scale_colour_manual(values = c("Predicted (median)" = ttm_palette()[1], "Held-out observation" = ttm_palette()[2]), name = NULL) +
+    ggplot2::labs(title = "Out-of-sample validation", subtitle = "90% predictive interval from calibration without these data",
+                  x = NULL, y = "Index (or scale-free anomaly)") + .theme_ttm()
+}
+
+#' Leave-one-benchmark-out predictions
+#' @param lb output of [loo_benchmarks()]
+#' @export
+plot_loo_benchmarks <- function(lb) {
+  .need_gg()
+  ggplot2::ggplot(lb, ggplot2::aes(y = held_out)) +
+    ggplot2::geom_linerange(ggplot2::aes(xmin = pred_p05, xmax = pred_p95), colour = "#86b6ef", linewidth = 3) +
+    ggplot2::geom_point(ggplot2::aes(x = pred_p50, shape = "Predicted MMSY (median)"), colour = ttm_palette()[1], size = 3) +
+    ggplot2::geom_point(ggplot2::aes(x = benchmark_lb, shape = "Held-out assessment OFL"), colour = ttm_palette()[2], size = 3.5) +
+    ggplot2::scale_x_log10(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+    ggplot2::scale_shape_manual(values = c("Predicted MMSY (median)" = 16, "Held-out assessment OFL" = 18), name = NULL) +
+    ggplot2::labs(title = "Leave-one-benchmark-out validation",
+                  subtitle = "Each assessment OFL predicted from a calibration that excludes it (bar = 90% interval)",
+                  x = "lb / yr (log scale)", y = NULL) + .theme_ttm()
+}
+
+#' Ecosystem-overfishing indices through time with thresholds
+#' @param eo output of [ecosystem_overfishing_indices()]
+#' @export
+plot_eco_indices <- function(eo) {
+  .need_gg()
+  th <- attr(eo, "thresholds")
+  d <- rbind(data.frame(year = eo$year, index = "Ryther index (t / km2 / yr)", p50 = eo$ryther_p50, lo = eo$ryther_p05, hi = eo$ryther_p95),
+             data.frame(year = eo$year, index = "Fogarty ratio (per mil)", p50 = eo$fogarty_permil_p50, lo = eo$fogarty_permil_p05, hi = eo$fogarty_permil_p95))
+  thr <- rbind(data.frame(index = "Ryther index (t / km2 / yr)", y = th$ryther),
+               data.frame(index = "Fogarty ratio (per mil)", y = th$fogarty))
+  ggplot2::ggplot(d, ggplot2::aes(year, p50)) +
+    ggplot2::geom_ribbon(ggplot2::aes(ymin = lo, ymax = hi), fill = "#86b6ef", alpha = 0.5) +
+    ggplot2::geom_line(colour = ttm_palette()[1], linewidth = 0.8) +
+    ggplot2::geom_hline(data = thr, ggplot2::aes(yintercept = y), linetype = "dashed", colour = ttm_palette()[2]) +
+    ggplot2::facet_wrap(~index, scales = "free_y", ncol = 1) +
+    ggplot2::labs(title = "Ecosystem-overfishing indices (Link & Watson 2019)",
+                  subtitle = "Median and 90% interval; dashed lines = proposed thresholds", x = NULL, y = NULL) + .theme_ttm()
+}
+
+#' Structural ensemble: MMSY by variant for selected groups
+#' @param ens output of [run_structural_ensemble()]
+#' @param groups groups to show
+#' @export
+plot_ensemble <- function(ens, groups = c("spiny_lobster", "queen_triggerfish", "parrotfish_2", "grunts")) {
+  .need_gg()
+  d <- ens$by_variant[ens$by_variant$group %in% groups, ]
+  d$variant <- factor(d$variant, levels = unique(ens$by_variant$variant))
+  ggplot2::ggplot(d, ggplot2::aes(y = variant)) +
+    ggplot2::geom_linerange(ggplot2::aes(xmin = MMSY_p05_lb, xmax = MMSY_p95_lb), colour = "#86b6ef", linewidth = 2) +
+    ggplot2::geom_point(ggplot2::aes(x = MMSY_p50_lb), colour = ttm_palette()[1], size = 2.4) +
+    ggplot2::facet_wrap(~group, scales = "free_x") +
+    ggplot2::scale_x_log10(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+    ggplot2::labs(title = "Structural uncertainty: MMSY under alternative model assumptions",
+                  subtitle = "Median and 90% interval per variant (lb / yr, log scale)", x = NULL, y = NULL) + .theme_ttm()
+}

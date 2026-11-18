@@ -32,12 +32,12 @@ Already real: lobster OFL/ABC/ACL, queen triggerfish OFL/ABC/ACL, Parrotfish 2, 
 
 | # | Item | File / columns | Current placeholder | Suggested source | Priority |
 |---|---|---|---|---|---|
-| C1 | Biomass density (t km⁻² = g m⁻²) by FMP group and habitat, for partitioning | `groups.csv: partition_value` (method `biomass`) | literature-typical guesses; lobster, queen triggerfish, conch and deepwater snapper re-centred by the catch-feasibility check | NCRMP / DCRMP St. Croix fish surveys (2001–present), TCRMP, NCCOS fish census | **H** |
+| C1 | Biomass density (t km⁻² = g m⁻²) by FMP group and habitat, for partitioning | `groups.csv: partition_value` | **now derived** from Opitz (1996) VI species biomass × mass-balance factor; conch, pelagics and deepwater snappers still placeholders | NCRMP St. Croix fish surveys: the ingestion pipeline (`ncrmp_fish` method, stratified estimator) is built and tested; NCEI downloads were unavailable (HTTP 503) during development | **H** |
 | C2 | Parrotfish biomass density index | `indices.csv` (`NCRMP_parrotfish_density`) | synthetic biennial 2013–2023 | NCRMP St. Croix Scaridae density | M |
 | C3 | Queen conch density / abundance surveys | `indices.csv`, `groups.csv` | none | St. Croix conch surveys (DPNR / SEFSC) | M |
-| C4 | Non-fishery competitor biomass (benthic grazers, detritivores/filter feeders, predatory invertebrates, small reef fish, zooplankton, sharks, etc.) | `groups.csv: partition_value` | literature-typical | Opitz (1996) Caribbean Ecopath models (ICLARM TR 43); NCRMP benthic invertebrate counts | **H** (they set the FMP share of energy) |
-| C5 | P/B for unassessed groups | `groups.csv: pb`, `pb_cv` | literature-typical | Opitz (1996); FishBase / SeaLifeBase empirical M (Then et al. 2015) | M |
-| C6 | Diet composition by trophic-level pool | `diet.csv` | literature-informed estimates (Randall 1967 style) | Randall (1967); Opitz (1996); stable isotopes | M |
+| C4 | Non-fishery competitor biomass | `groups.csv: partition_value` | **now from** Opitz (1996) balanced 50-box model | local invertebrate surveys to update | M |
+| C5 | P/B for unassessed groups | `groups.csv: pb`, `pb_cv` | **now** geometric mean of Opitz (1996) P/B and FishBase M (Then et al. 2015) | SEDAR-specific M where available | L |
+| C6 | Diet composition by trophic-level pool | `diet.csv` | **now** matched to FishBase trophic levels | stable isotopes for St. Croix | L |
 | C7 | Habitat preferences | `habitat_preference.csv` | expert-informed | NCRMP occupancy by habitat stratum; telemetry studies | M |
 | C8 | Refuge dependence on coral habitat quality | `groups.csv: refuge_dependence` | expert guesses (0–0.7) | NCRMP fish–rugosity relationships | M |
 | C9 | x_msy (MMSY fraction) by group | `groups.csv: x_msy` | 0.5 (0.4 conch) | literature on reef MSY/M·B₀ ratios; sensitivity runs | M |
@@ -48,9 +48,9 @@ Already real: lobster OFL/ABC/ACL, queen triggerfish OFL/ABC/ACL, Parrotfish 2, 
 
 | # | Item | File / columns | Current value | Suggested source | Priority |
 |---|---|---|---|---|---|
-| D1 | Deeper-shelf habitat (NCCOS "Unknown", 388 km²) composition and productivity | `habitats.csv` (`deep_hardbottom`) | area from API; NPP 250 t C km⁻² yr⁻¹ PLACEHOLDER, area CV 0.5 | NCCOS 2017 "Insular Shelf, USVI" composite map (layer 134); mesophotic productivity studies | **H** |
+| D1 | Deeper-shelf habitat | `habitats.csv` (`deep_hardbottom`) | **resolved**: 41.4 km² at 30–100 m from ETOPO 2022 (the 388 km² NCCOS "Unknown" class was mostly off-shelf); NPP light-limited (~165 t C km⁻² yr⁻¹, CV 0.6). The 2017 NCCOS shelf map covers St. Thomas/St. John only | mesophotic surveys of Lang Bank for composition | M |
 | D2 | St. Croix-specific benthic net production by habitat | `habitats.csv: npp_value` | Caribbean literature values (Adey & Steneck 1985 is St. Croix) | local metabolism studies; Buck Island / East End measurements | M |
-| D3 | Food-web fraction of NPP by habitat | `food_web_fraction` | 0.2–0.5 assumed | Ecopath detritus/EE flows (Opitz 1996) | **H** |
+| D3 | Food-web fraction of NPP by habitat | `food_web_fraction` | 0.2–0.5 assumed (tested in the structural ensemble ×0.67/×1.5) | Ecopath detritus/EE flows (Opitz 1996) | **H** |
 | D4 | Trophic transfer efficiency | `tte` | 0.15 ± 20% (SEDAR103-DW-20 default) | sensitivity 0.10–0.20 | **H** |
 | D5 | Coral cover before 2000 | `env_covariates.csv: coral_cover` | PLACEHOLDER 1983–1999 (0.22 → 0.13 after Hugo/Marilyn) | historical St. Croix reef surveys (Buck Island NPS, Rogers et al.), TCRMP baseline | M |
 | D6 | Coral cover 2000–2024 (exact values) | `coral_cover` | approximate (TCRMP / NCRMP magnitudes) | TCRMP and NCRMP St. Croix benthic data | M |
@@ -62,7 +62,7 @@ All environmental covariates are now acquired from APIs (Section F). What remain
 
 | # | Item | File / columns | Current placeholder | Suggested source | Priority |
 |---|---|---|---|---|---|
-| E1 | Thermal sensitivities of groups | `env_response.csv: sensitivity`, `t_opt`, `t_width` | legacy-model values (e.g., lobster −0.20 °C⁻¹) | thermal-performance literature; species distribution models | M |
+| E1 | Thermal sensitivities of groups | `env_response.csv` | **now** AquaMaps temperature preferences (FishBase); lobster and conch have none (SeaLifeBase pending) | physiological thermal-performance studies | M |
 | E2 | Hurricane loss magnitudes (NPP, coral, trap effort, lobster production) and recovery half-lives | `disturbances.csv` templates | 25% NPP, 15% coral, 60% trap loss, half-lives 1.5–2 years | post-Hugo/Marilyn/Maria damage surveys; trap-loss reports; disaster-assistance records | M |
 | E3 | Future bleaching frequency and DHW magnitude | `scenarios.csv` (`cov_set dhw`) | assumed event years | Coral Reef Watch / CMIP6-based bleaching projections (e.g., van Hooidonk et al.) | M |
 | E4 | Pelagic NPP absolute level | `habitats.csv: npp_value` (pelagic) | 85 g C m⁻² yr⁻¹ (SEDAR103-DW-20 regional magnitude); the computed shelf ensemble is ~130–240 (shelf chlorophyll is likely biased high by bottom reflectance) | St. Croix-domain extraction of the Ryan-Keogh et al. (2023) ensemble | M |

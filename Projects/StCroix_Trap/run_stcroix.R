@@ -49,6 +49,36 @@ cat("\n=== Benchmark comparison ===\n")
 print(benchmark_comparison(res)[, c("group", "metric", "value_lb", "MMSY_p50_lb", "ratio_MMSYp50_to_benchmark")],
       row.names = FALSE)
 
+# ---- robustness and out-of-sample validation ---------------------------------
+tdir <- file.path(out_dir, "tables"); fdir <- file.path(out_dir, "figures")
+dir.create(fdir, showWarnings = FALSE, recursive = TRUE)
+sv <- function(p, f, w = 10, h = 6) ggplot2::ggsave(file.path(fdir, f), p, width = w, height = h, dpi = 200, bg = "#fcfcfb")
+diag <- sir_diagnostics(res)
+write.csv(diag$summary, file.path(tdir, "sir_diagnostics_summary.csv"), row.names = FALSE)
+write.csv(diag$shrinkage, file.path(tdir, "posterior_shrinkage.csv"), row.names = FALSE)
+cat("\n=== SIR diagnostics ===\n"); print(diag$summary)
+sa <- sensitivity_analysis(res)
+write.csv(sa, file.path(tdir, "global_sensitivity.csv"), row.names = FALSE)
+for (o in unique(sa$output)[1:3]) sv(plot_sensitivity(sa, o), sprintf("fig11_sensitivity_%s.png", o), 9, 6)
+stt <- self_test(res, n_rep = 100)
+write.csv(stt$summary, file.path(tdir, "self_test_summary.csv"), row.names = FALSE)
+cat("\n=== Self-test ===\n"); print(stt$summary)
+val <- tryCatch(validate_out_of_sample(res), error = function(e) NULL)
+if (!is.null(val)) {
+  write.csv(val$summary, file.path(tdir, "validation_out_of_sample.csv"), row.names = FALSE)
+  write.csv(val$observations, file.path(tdir, "validation_predictions.csv"), row.names = FALSE)
+  sv(plot_validation(val), "fig12_validation.png", 11, 5)
+  cat("\n=== Out-of-sample validation (held-out indices) ===\n"); print(val$summary)
+}
+lb <- loo_benchmarks(res)
+write.csv(lb, file.path(tdir, "validation_loo_benchmarks.csv"), row.names = FALSE)
+sv(plot_loo_benchmarks(lb), "fig13_loo_benchmarks.png", 9, 3.5)
+cat("\n=== Leave-one-benchmark-out ===\n"); print(lb)
+eo <- ecosystem_overfishing_indices(res)
+write.csv(eo, file.path(tdir, "ecosystem_overfishing_indices.csv"), row.names = FALSE)
+sv(plot_eco_indices(eo), "fig14_eco_indices.png", 9, 6)
+cat("\n=== Ecosystem-overfishing indices (2022-2024) ===\n"); print(utils::tail(eo, 3))
+
 # ---- figures -----------------------------------------------------------------
 save_standard_plots(res, file.path(out_dir, "figures"))
 res$pars <- NULL   # parameter draws are large; drop before saving

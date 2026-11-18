@@ -107,12 +107,12 @@ write.csv(cov, file.path(out, "env_covariates.csv"), row.names = FALSE)
 idx <- rbind(
   data.frame(year = 2012:2021, index = "SEDAR57_lobster_trap_CPUE", group = "spiny_lobster",
              value = round(exp(rnorm(10, 0, 0.15)) * c(1.0, 0.95, 0.9, 0.9, 0.95, 0.85, 0.75, 0.9, 1.0, 1.05), 3),
-             cv = 0.35, lambda = 0.5, data_status = "PLACEHOLDER", reference = "Replace with SEDAR 57 Update St. Croix trap CPUE"),
+             cv = 0.35, lambda = 0.5, role = "validate", data_status = "PLACEHOLDER", reference = "Replace with SEDAR 57 Update St. Croix trap CPUE"),
   data.frame(year = 1985:2019, index = "SEDAR80_QT_trap_CPUE", group = "queen_triggerfish",
              value = round(exp(rnorm(35, 0, 0.15)) * seq(0.9, 1.1, length.out = 35), 3),
-             cv = 0.35, lambda = 0.5, data_status = "PLACEHOLDER", reference = "Replace with SEDAR 80 St. Croix commercial trap index"),
+             cv = 0.35, lambda = 0.5, role = "validate", data_status = "PLACEHOLDER", reference = "Replace with SEDAR 80 St. Croix commercial trap index"),
   data.frame(year = seq(2013, 2023, 2), index = "NCRMP_parrotfish_density", group = "parrotfish_1;parrotfish_2",
              value = round(exp(rnorm(6, 0, 0.1)) * c(1.0, 1.05, 0.95, 0.8, 0.9, 0.85), 3),
-             cv = 0.35, lambda = 0.5, data_status = "PLACEHOLDER", reference = "Replace with NCRMP St. Croix Scaridae biomass density"))
+             cv = 0.35, lambda = 0.5, role = "validate", data_status = "PLACEHOLDER", reference = "Replace with NCRMP St. Croix Scaridae biomass density"))
 write.csv(idx, file.path(out, "indices.csv"), row.names = FALSE)
 message("Placeholder time series written to ", out)

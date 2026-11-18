@@ -80,6 +80,7 @@
   if (ncol(nb)) tot <- tot + rowSums(nb)
   cf <- catch_feasibility_nll(res)
   if (!is.null(cf)) tot <- tot + rowSums(cf)
+  if (!is.null(s1$log_is_correction)) tot <- tot - s1$log_is_correction
   tot
 }
 

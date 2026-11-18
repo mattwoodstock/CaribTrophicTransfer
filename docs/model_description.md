@@ -300,3 +300,60 @@ Each effect recovers exponentially with its own half-life.
 * **Catch-driven history.** Historical dynamics are driven by landings, so landings quality matters. Use `catch_expansion` and its CV, or subsets of validated trip tickets (e.g., MER Consultants Sampling and Catch Validation Project).
 * **MMSY is conditional.** MMSY reflects prevailing conditions and must be re-estimated when indicators trigger (Section 9; SEDAR103-DW-20 Section C).
 * **Uncertain inputs.** Many inputs are literature-based. Run the sensitivity of key results to TTE, food-web fraction and partition weights, which are the main levers on absolute scale. The SIR benchmarks and the `data_status` flag on every input help identify weak points.
+
+## 13. Evidence-based priors
+
+| Input | Source | How it is derived |
+|---|---|---|
+| FMP fish partition priors (biomass density) | Opitz (1996) Table 3.6: species biomass in Virgin Islands reef environments | Summed to St. Croix FMP complexes, then multiplied by Opitz's own mass-balance adjustment for reef fish (balanced / raw biomass of fish groups 1–27 = 123.9 / 519.3 = 0.239). Large Scaridae as a check: 18.0 g m⁻² derived vs 18.98 balanced |
+| Lobster and non-fishery biomass, P/B | Opitz (1996) Table 3.22 (balanced 50-box Caribbean reef model) | Matched groups; biomass-weighted P/B |
+| P/B of FMP fish | Opitz (1996) balanced P/B and FishBase empirical M (Then et al. 2015 growth estimator; L∞ from Lmax via Froese & Binohlan 2000) | Geometric mean; CV = max(0.25, \|log ratio\| / 2), so disagreement between sources widens the prior |
+| Diet / trophic level | FishBase trophic levels | Diet vectors shifted up the trophic-level pools until the implied TL equals the FishBase TL |
+| Thermal responses | AquaMaps temperature preferences (via FishBase) | Gaussian performance curve: t_opt = preferred mean, width = (max − min) / 2; no SST response for deepwater snappers |
+| Transfer efficiency | SEDAR103-DW-20 default 15%; Opitz (1996) Table 3.27 TL II–IV efficiencies of 10–17% | Prior 0.15 ± 20% |
+| Deeper-shelf habitat | ETOPO 2022 bathymetry (30–100 m) | Area 41.4 km² (not the 388 km² NCCOS "Unknown" class) |
+| Deeper-shelf NPP | Light at depth from OC-CCI Kd490 (Morel et al. 2007 KdPAR) and satellite PAR, saturating P–I curve | Colonized-pavement NPP scaled by tanh(I(z)/Ik) / tanh(I(10 m)/Ik), Monte Carlo over Kd490, PAR and Ik |
+
+Where a prior conflicts with the data, the SIR exposes it (`landings_shortfall`, `prior_reference_points()$P_infeasible_landings`, `posterior_shrinkage.csv`).
+
+## 14. Sampling the posterior: adaptive importance sampling
+
+With many harvested groups, each draw must support every group's landings simultaneously, so the feasible region of plain prior sampling is small and SIR weights degenerate. `run_ttm()` therefore supports `sir_adaptive_rounds`:
+
+1. Round 0 draws from the prior.
+2. After each round, a proposal for every group's log partition value is fitted to that group's **own** likelihood components (its catch feasibility and its own benchmarks). This is a factorized proposal, with the spread inflated 1.5×.
+3. Later rounds draw partition values from the proposal. All other inputs are still drawn from their priors.
+4. Final importance weights use the joint likelihood times prior / mixture-of-proposals, the deterministic-mixture "balance heuristic" (Owen & Zhou 2000). The posterior is therefore unchanged in expectation; only the sampling efficiency improves.
+
+`sir_diagnostics()` reports:
+
+* effective sample size;
+* number of unique resampled draws;
+* the largest weight and the share of the top 10 weights;
+* a Pareto-k tail estimate (values > 0.7 mean the importance sampling is unreliable);
+* posterior shrinkage, 1 − var_post / var_prior, for every sampled input. Shrinkage shows which inputs the data inform and which remain prior-dominated, which addresses identifiability directly.
+
+## 15. Out-of-sample validation
+
+Calibration and validation data are separated explicitly:
+
+* `indices.csv: role` is `fit` (used in SIR) or `validate` (held out);
+* `settings: holdout_from_year` holds out all index observations from that year onward (forecast skill);
+* benchmarks with `use_in_sir = FALSE` are held out.
+
+| Function | Validation design | Metrics |
+|---|---|---|
+| `validate_out_of_sample()` | Held-out index observations. If the series has fitting years, catchability is estimated from them and future values are forecast; whole held-out series are compared as scale-free anomalies | 50% and 90% predictive coverage, RMSE (log), MASE vs a naive forecast (< 1 beats naive), anomaly correlation |
+| `loo_benchmarks()` | Leave-one-assessment-benchmark-out (e.g., predict the SEDAR 80 OFL from a calibration that excludes it) | PIT, inside-90% flag, predicted/benchmark ratio |
+| `retrospective_peel()` | Truncate fitting indices 3, 6, 9 years | relative change in posterior median MMSY (Mohn's-rho analogue) |
+
+Because the Stage-1 draws are retained, every design re-weights the same simulations, so the validation adds no new simulation cost.
+
+## 16. Robustness analyses
+
+| Function | Question answered |
+|---|---|
+| `sensitivity_analysis()` | Which inputs drive MMSY? Standardized rank regression coefficients (SRRC) with the rank-model R², plus partial rank correlation coefficients (PRCC), on all prior draws |
+| `self_test()` | Does the estimator recover the truth? Pseudo-data are simulated from a known draw and re-estimated, giving bias (median relative error), MARE and 50/90% interval coverage |
+| `run_structural_ensemble()` | How much do structural choices matter? Variants: x_msy 0.3/0.4; TTE 10/20%; no fishing feedback; no thermal effects; food-web fraction ×0.67/×1.5; satellite pelagic NPP. Reported per variant and pooled with equal weight |
+| `ecosystem_overfishing_indices()` | Whole-system fishing intensity independent of species partitioning: Ryther index (catch / km²) and Fogarty ratio (catch / primary production), with Link & Watson (2019) thresholds |

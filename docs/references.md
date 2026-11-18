@@ -78,3 +78,20 @@
 
 * Jean-Michel, L., et al. (2021). The Copernicus Global 1/12° Oceanic and Sea Ice GLORYS12 Reanalysis. Front. Earth Sci. 9: 698876.
 * Ross, A. C., et al. (2023). A high-resolution ocean model for the Northwest Atlantic (MOM6-NWA12). Geosci. Model Dev. 16: 6943–6985.
+
+## Robustness, validation and evidence synthesis
+
+* Cochran, W. G. (1977). Sampling Techniques, 3rd ed. Wiley. *(stratified estimator for NCRMP data)*
+* Froese, R., Binohlan, C. (2000). Empirical relationships to estimate asymptotic length, length at first maturity and length at maximum yield per recruit in fishes. J. Fish Biol. 56: 758–773.
+* Froese, R., Pauly, D. (eds) (2024). FishBase, version 24.07 (www.fishbase.org); tables accessed via the rfishbase data release on Hugging Face (datasets/cboettig/fishbase).
+* Kaschner, K., et al. (2019). AquaMaps: predicted range maps for aquatic species (temperature preferences via FishBase).
+* Link, J. S., Watson, R. A. (2019). Global ecosystem overfishing: clear delineation within real limits to production. Science Advances 5: eaav0474.
+* McAllister, M. K., Ianelli, J. N. (1997). Bayesian stock assessment using catch-age data and the sampling-importance resampling algorithm. Can. J. Fish. Aquat. Sci. 54: 284–300.
+* Mohn, R. (1999). The retrospective problem in sequential population analysis. ICES J. Mar. Sci. 56: 473–488.
+* Morel, A., Huot, Y., Gentili, B., Werdell, P. J., Hooker, S. B., Franz, B. A. (2007). Examining the consistency of products derived from various ocean color sensors in open ocean (Case 1) waters. Remote Sens. Environ. 111: 69–88. *(Kd(PAR) from Kd(490))*
+* NOAA NCEI (2022). ETOPO 2022 15 Arc-Second Global Relief Model. doi:10.25921/fd45-gt74.
+* Owen, A., Zhou, Y. (2000). Safe and effective importance sampling. J. Am. Stat. Assoc. 95: 135–143.
+* Saltelli, A., et al. (2008). Global Sensitivity Analysis: The Primer. Wiley.
+* Sathyendranath, S., et al. (2019). An ocean-colour time series for use in climate studies: the experience of the Ocean-Colour Climate Change Initiative (OC-CCI). Sensors 19: 4285.
+* Then, A. Y., Hoenig, J. M., Hall, N. G., Hewitt, D. A. (2015). Evaluating the predictive performance of empirical estimators of natural mortality rate using information on over 200 fish species. ICES J. Mar. Sci. 72: 82–92.
+* Vehtari, A., Simpson, D., Gelman, A., Yao, Y., Gabry, J. (2015/2024). Pareto smoothed importance sampling. arXiv:1507.02646; J. Mach. Learn. Res. 25: 1–58.
