@@ -258,7 +258,7 @@ save_standard_plots <- function(res, dir) {
 #' @param labels facet labels
 #' @export
 plot_environment <- function(proj, variables = c("sst", "dhw", "npp_pelagic_index", "coral_cover"),
-                             labels = c("SST (°C, annual mean)", "Degree heating weeks (annual max)",
+                             labels = c("SST (degC, annual mean)", "Degree heating weeks (annual max)",
                                         "Pelagic NPP index (VGPM ensemble)", "Coral cover (proportion)")) {
   .need_gg()
   ec <- proj$env_covariates
@@ -272,7 +272,7 @@ plot_environment <- function(proj, variables = c("sst", "dhw", "npp_pelagic_inde
     ggplot2::geom_point(colour = ttm_palette()[1], size = 1.2) +
     ggplot2::facet_wrap(~panel, scales = "free_y", ncol = 2) +
     ggplot2::labs(x = NULL, y = NULL, title = "Environmental drivers acquired from public APIs",
-                  subtitle = "Lines: annual values; bands: observation uncertainty (±1 SD) propagated in the Monte Carlo") +
+                  subtitle = "Lines: annual values; bands: observation uncertainty (+/- 1 SD) propagated in the Monte Carlo") +
     .theme_ttm()
   p1
 }

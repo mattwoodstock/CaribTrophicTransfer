@@ -26,3 +26,11 @@ Regenerate the auto-generated St. Croix tables after editing inputs:
 ```bash
 Rscript docs/build_input_tables.R
 ```
+
+## Presentation
+
+`docs/presentation/CaribTTM_StCroix_Trap.pptx` is a 28-slide deck in two parts. Part 1 covers the model processes and data needs; Part 2 presents the St. Croix case study. Rebuild it from the latest run outputs with:
+
+```bash
+NODE_PATH=<dir with pptxgenjs, react-icons, react, react-dom, sharp>/node_modules node docs/presentation/build_deck.js
+```

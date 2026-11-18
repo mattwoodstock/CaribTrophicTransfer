@@ -88,26 +88,24 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   // ---- layouts -------------------------------------------------------------
   pres.defineSlideMaster({
     title: "TITLE_DARK", background: { color: HEX.dk1 },
-    placeholders: [
-      { placeholder: { options: { name: "title", type: "title", x: 0.8, y: 2.3, w: 11.7, h: 1.6, fontFace: THEME.headFontFace, fontSize: 44, bold: true, color: C.background1, valign: "bottom" }, text: "" } },
-      { placeholder: { options: { name: "body", type: "body", x: 0.8, y: 4.05, w: 11.7, h: 1.4, fontFace: THEME.bodyFontFace, fontSize: 20, color: "CADFE3", valign: "top" }, text: "" } },
+    objects: [
+      { placeholder: { options: { name: "title", type: "title", x: 0.8, y: 2.3, w: 11.7, h: 1.6, fontFace: THEME.headFontFace, fontSize: 44, bold: true, color: C.background1, valign: "bottom", align: "left" }, text: "" } },
+      { placeholder: { options: { name: "body", type: "body", x: 0.8, y: 4.05, w: 11.7, h: 1.4, fontFace: THEME.bodyFontFace, fontSize: 20, color: "CADFE3", valign: "top", align: "left" }, text: "" } },
     ],
   });
   pres.defineSlideMaster({
     title: "SECTION_DARK", background: { color: HEX.dk2 },
-    placeholders: [
-      { placeholder: { options: { name: "title", type: "title", x: 0.8, y: 2.9, w: 11.7, h: 1.2, fontFace: THEME.headFontFace, fontSize: 40, bold: true, color: C.background1, valign: "middle" }, text: "" } },
-      { placeholder: { options: { name: "body", type: "body", x: 0.8, y: 4.15, w: 11.7, h: 1.0, fontFace: THEME.bodyFontFace, fontSize: 18, color: "CADFE3", valign: "top" }, text: "" } },
+    objects: [
+      { placeholder: { options: { name: "title", type: "title", x: 0.8, y: 2.9, w: 11.7, h: 1.2, fontFace: THEME.headFontFace, fontSize: 40, bold: true, color: C.background1, valign: "middle", align: "left" }, text: "" } },
+      { placeholder: { options: { name: "body", type: "body", x: 0.8, y: 4.15, w: 11.7, h: 1.0, fontFace: THEME.bodyFontFace, fontSize: 18, color: "CADFE3", valign: "top", align: "left" }, text: "" } },
     ],
   });
   pres.defineSlideMaster({
     title: "CONTENT", background: { color: HEX.lt1 },
+    slideNumber: { x: 12.3, y: 7.05, w: 0.6, h: 0.3, fontFace: THEME.bodyFontFace, fontSize: 10, color: "6B7F87", align: "right" },
     objects: [
       { text: { text: "CaribTTM  |  SEDAR 103 trophic frontier framework", options: { x: 0.5, y: 7.05, w: 8, h: 0.3, fontFace: THEME.bodyFontFace, fontSize: 10, color: "6B7F87" } } },
-    ],
-    slideNumber: { x: 12.3, y: 7.05, w: 0.6, h: 0.3, fontFace: THEME.bodyFontFace, fontSize: 10, color: "6B7F87", align: "right" },
-    placeholders: [
-      { placeholder: { options: { name: "title", type: "title", x: 0.5, y: 0.3, w: 12.3, h: 0.85, fontFace: THEME.headFontFace, fontSize: 32, bold: true, color: C.text1, valign: "middle", margin: 0 }, text: "" } },
+      { placeholder: { options: { name: "title", type: "title", x: 0.5, y: 0.3, w: 12.3, h: 0.85, fontFace: THEME.headFontFace, fontSize: 28, bold: true, color: C.text1, valign: "middle", align: "left", margin: 0 }, text: "" } },
     ],
   });
 
@@ -119,7 +117,7 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
     cogs: fa.FaCogs, layers: fa.FaLayerGroup, thermo: fa.FaThermometerHalf, map: fa.FaMapMarkedAlt, anchor: fa.FaAnchor,
     warn: fa.FaExclamationTriangle, check: fa.FaCheckCircle, sun: fa.FaSun, diagram: fa.FaProjectDiagram, edit: fa.FaUserEdit,
     table: fa.FaTable, clip: fa.FaClipboardList, globe: fa.FaGlobeAmericas, seed: fa.FaSeedling, lock: fa.FaLock,
-    flask: fa.FaFlask, recycle: fa.FaRecycle, target: fa.FaBullseye, coral: gi.GiCoral, lobster: gi.GiLobster,
+    flask: fa.FaFlask, recycle: fa.FaRecycle, target: fa.FaBullseye, coral: gi.GiCoral,
     net: gi.GiFishingNet, wave: gi.GiWaveCrest, hurricane: wi.WiHurricane,
   };
   for (const k in iconList) ICON[k] = await icon(iconList[k]);
@@ -175,7 +173,7 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   s.addNotes("CaribTTM implements Step 1 of the SEDAR103-DW-20 framework: ecosystem- and guild-level MMSY caps. Part 1 describes how the model works and what data it needs. Part 2 applies it to the St. Croix trap fishery with real public data and clearly flagged placeholders.");
 
   // WHY
-  s = content("Single-species ACLs fit poorly on small, multispecies island fisheries", "Introduction");
+  s = content("Single-species ACLs fit poorly on multispecies island fisheries", "Introduction");
   const why = [
     ["anchor", "Finite shelf area", "Small insular platforms with fixed habitat and finite productivity"],
     ["net", "Multispecies gear", "Traps catch dozens of species at once; single-species controls are hard to apply"],
@@ -186,8 +184,8 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
     const x = 0.5 + i * 3.1;
     card(s, x, 1.55, 2.9, 3.6);
     iconCircle(s, w[0], x + 0.3, 1.85, 0.7, i % 2 ? HEX.accent2 : HEX.accent1);
-    txt(s, w[1], { x: x + 0.3, y: 2.75, w: 2.4, h: 0.5, fontSize: 18, bold: true, fontFace: THEME.headFontFace });
-    txt(s, w[2], { x: x + 0.3, y: 3.3, w: 2.4, h: 1.7, fontSize: 14, color: "34474F" });
+    txt(s, w[1], { x: x + 0.3, y: 2.75, w: 2.4, h: 0.75, fontSize: 18, bold: true, fontFace: THEME.headFontFace });
+    txt(s, w[2], { x: x + 0.3, y: 3.6, w: 2.4, h: 1.45, fontSize: 14, color: "34474F" });
   });
   txt(s, "CaribTTM converts what can be measured (habitat maps, satellite ocean data, published productivity rates, landings) into biological caps on the energy available to each FMP complex.", { x: 0.5, y: 5.55, w: 12.3, h: 0.9, fontSize: 16, italic: true, color: HEX.dk2 });
 
@@ -231,8 +229,8 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
     const x = 0.5 + i * 2.5;
     card(s, x, 1.55, 2.25, 2.9);
     iconCircle(s, a[0], x + 0.8, 1.75, 0.65, i === 4 ? HEX.accent2 : HEX.accent1);
-    txt(s, a[1], { x: x + 0.15, y: 2.55, w: 1.95, h: 0.45, fontSize: 16, bold: true, align: "center", fontFace: THEME.headFontFace });
-    txt(s, a[2], { x: x + 0.15, y: 3.05, w: 1.95, h: 1.3, fontSize: 12, align: "center", color: "34474F" });
+    txt(s, a[1], { x: x + 0.1, y: 2.5, w: 2.05, h: 0.4, fontSize: 15, bold: true, align: "center", fontFace: THEME.headFontFace });
+    txt(s, a[2], { x: x + 0.15, y: 3.0, w: 1.95, h: 1.35, fontSize: 12, align: "center", color: "34474F" });
     if (i < 4) arrow(s, x + 2.27, 3.0, x + 2.48, 3.0);
   });
   const drivers = [
@@ -251,7 +249,7 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   txt(s, "Annual time step, 1983-2045 in the case study; every arrow carries uncertainty", { x: 0.5, y: 6.25, w: 12.3, h: 0.4, fontSize: 14, italic: true, color: HEX.dk2 });
 
   // PRIMARY PRODUCTION
-  s = content("Primary production is resolved by habitat and converted to a common currency", S1);
+  s = content("Primary production is resolved by habitat in one currency", S1);
   card(s, 0.5, 1.45, 6.2, 5.3);
   txt(s, "Energy entering each habitat (t wet weight / yr)", { x: 0.75, y: 1.6, w: 5.8, h: 0.4, fontSize: 16, bold: true, fontFace: THEME.headFontFace });
   txt(s, "P1h = Area x NPP x index(t) x disturbance(t) x quality^e x food-web fraction x C:WW", { x: 0.75, y: 2.05, w: 5.8, h: 0.75, fontSize: 15, color: HEX.accent1, bold: true });
@@ -277,7 +275,7 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   txt(s, "Sources: Adey & Steneck 1985; Naumann et al. 2013; Juman 2005; Wanders 1976; Gattuso et al. 1998; SEDAR103-DW-20 App. A", { x: 7.0, y: 5.05, w: 5.8, h: 0.6, fontSize: 11, color: "6B7F87" });
 
   // ENERGY POOLS
-  s = content("Energy moves up trophic-level pools; fishing removes it from the pool it came from", S1);
+  s = content("Energy climbs trophic pools; catch is removed where it was produced", S1);
   const tl = [["TL4", "Piscivores' prey production"], ["TL3", "Invertivores and small fish"], ["TL2", "Grazers, detritivores, zooplankton"], ["TL1", "Algae, seagrass, phytoplankton, detritus"]];
   ["Benthic (per habitat)", "Pelagic"].forEach((lab, j) => {
     const x0 = 0.6 + j * 3.6;
@@ -360,7 +358,7 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   ], { x: 7.1, y: 3.6, w: 5.45, h: 3.0, fontSize: 14 });
 
   // PERTURBATIONS
-  s = content("Oceanographic, habitat, disturbance and fishery conditions enter as drivers", S1);
+  s = content("Ocean, habitat, disturbance and fishery conditions drive the model", S1);
   const pert = [
     ["thermo", "Covariate responses", "Linear, log-linear, threshold or thermal-performance curves on production or K"],
     ["hurricane", "Hurricanes", "Immediate loss of NPP, coral, trap effort and production with exponential recovery"],
@@ -408,7 +406,7 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   ], { x: 6.9, y: 4.45, w: 5.9, h: 2.3, fontSize: 13 });
 
   // DATA ACQUISITION
-  s = content("Inputs with a public API are acquired automatically; user values always win", S1);
+  s = content("Public-API inputs are acquired automatically; user values win", S1);
   const apiRows = [
     ["Input", "Source (API)", "Uncertainty"],
     ["SST", "Coral Reef Watch monthly; Pathfinder (ERDDAP)", "spatial SD"],
@@ -433,7 +431,7 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   ], { x: 9.15, y: 2.6, w: 3.45, h: 4.0, fontSize: 14 });
 
   // OUTPUTS FOR SPF
-  s = content("Outputs are written as SPF-ready tables for the collaborators' frontier analysis", S1);
+  s = content("Outputs are SPF-ready tables for the frontier analysis", S1);
   const outs = [
     ["target", "Group reference points", "MMSY quantiles (t, lb), OFL proxy, P* target, B/BMSY, EU, P(overfishing), status"],
     ["layers", "Guild and complex MMSY", "Draw-level sums keep covariance among groups"],
@@ -526,7 +524,7 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   ], { x: 9.05, y: 1.6, w: 3.5, h: 4.9, fontSize: 14 });
 
   // SIR
-  s = content("SIR anchors the scale on two assessed stocks and rejects infeasible draws", S2);
+  s = content("SIR anchors scale on assessed stocks and rejects infeasible draws", S2);
   figure(s, "fig08_sir.png", 0.5, 1.35, 8.3, 4.6, "Prior vs SIR posterior MMSY");
   card(s, 9.1, 1.35, 3.7, 5.3);
   stat(s, fmt(NPRIOR), "prior Monte Carlo draws", 9.35, 1.55, 3.3);
@@ -561,7 +559,7 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   txt(s, "Guild sums are computed draw by draw, so uncertainty reflects shared energy among groups.", { x: 9.45, y: 4.6, w: 3.2, h: 1.9, fontSize: 13, color: "34474F" });
 
   // SCENARIOS
-  s = content("Scenario stoplight: catch relative to MMSY at the end of the projection", S2);
+  s = content("Scenario stoplight: catch relative to MMSY in 2043-2045", S2);
   figure(s, "fig03_scenario_status.png", 0.5, 1.3, 9.0, 5.6, "Scenario status heat map");
   card(s, 9.8, 1.35, 3.0, 5.3);
   bullets(s, [
