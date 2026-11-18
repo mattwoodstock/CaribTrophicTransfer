@@ -7,3 +7,4 @@
 Projects/*/output/*.rds
 docs/_book/
 docs/.quarto/
+Projects/*/output/run_log.txt
