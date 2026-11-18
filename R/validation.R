@@ -189,7 +189,7 @@ loo_benchmarks <- function(res) {
 #' @export
 retrospective_peel <- function(res, peels = c(3, 6, 9)) {
   idx <- .fit_indices(res$proj); bm <- .sir_bm(res$proj); s1 <- res$stage1
-  g <- res$proj$groups; grp <- g$group[g$group_type == "fmp" & g$harvest_allowed]
+  g <- res$proj$groups; grp <- intersect(focus_groups(res$proj), g$group[g$harvest_allowed])
   base_w <- { n <- .total_nll(res, idx, bm); w <- exp(-(n - min(n))); w / sum(w) }
   base <- vapply(grp, function(gi) .wquantile(s1$MMSY_ref[, gi], base_w, 0.5), numeric(1))
   ty <- if (is.null(idx)) NA else max(idx$year)

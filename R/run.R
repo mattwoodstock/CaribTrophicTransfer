@@ -50,7 +50,7 @@ run_ttm <- function(proj, n_draws = proj$settings$n_draws, scenarios = scenario_
   if (is.null(sir)) sir <- (!is.null(proj$indices) || !is.null(proj$benchmarks) ||
                            isTRUE(st$sir_catch_feasibility)) && isTRUE(st$sir_resample > 0)
   rounds <- if (sir && isTRUE(st$sir_adaptive_rounds > 0)) as.integer(st$sir_adaptive_rounds) else 0L
-  pv_groups <- g$group[g$partition_cv > 0 & g$partition_method != "fixed_biomass"]
+  pv_groups <- g$group[g$partition_cv > 0 & g$partition_method != "fixed_biomass" & g$group %in% focus_groups(proj)]
   s_pr <- sqrt(log(1 + g[pv_groups, "partition_cv"]^2))
   prior_mu <- log(g[pv_groups, "partition_value"]) - s_pr^2 / 2
   proposals <- list(list(mu = prior_mu, sd = s_pr, n = n_draws))
@@ -81,28 +81,42 @@ run_ttm <- function(proj, n_draws = proj$settings$n_draws, scenarios = scenario_
   }
   log_prior <- function(x) rowSums(stats::dnorm(log(x), rep(prior_mu, each = nrow(x)), rep(s_pr, each = nrow(x)), log = TRUE))
   d <- 0L
+  cores <- if (is.null(st$cores) || is.na(st$cores)) 1L else as.integer(st$cores)
+  if (.Platform$OS.type == "windows") cores <- 1L
+  old_kind <- RNGkind()[1]; RNGkind("L'Ecuyer-CMRG"); set.seed(st$seed)
+  stream <- get(".Random.seed", envir = .GlobalEnv)
+  on.exit(RNGkind(old_kind), add = TRUE)
   for (rd in 0:rounds) {
     pp <- proposals[[rd + 1L]]
     if (verbose) message(if (rd == 0) "Stage 1: Baseline, " else sprintf("Stage 1 (adaptive round %d): ", rd),
-                         n_draws, " draws")
-    for (j in seq_len(n_draws)) {
-      d <- d + 1L
-      if (verbose && (j %% max(1, n_draws %/% 5) == 0)) message("  draw ", j, "/", n_draws)
-      seeds[[d]] <- get(".Random.seed", envir = .GlobalEnv)
+                         n_draws, " draws", if (cores > 1) sprintf(" on %d cores", cores) else "")
+    # reproducible per-draw RNG streams (independent of the number of cores)
+    idx_d <- d + seq_len(n_draws)
+    for (dd in idx_d) { seeds[[dd]] <- stream; stream <- parallel::nextRNGStream(stream) }
+    one_draw <- function(dd) {
+      assign(".Random.seed", seeds[[dd]], envir = .GlobalEnv)
       par <- draw_parameters(proj, stochastic = TRUE)
       if (rd > 0 && length(pv_groups))
         par$partition_value[pv_groups] <- exp(stats::rnorm(length(pv_groups), pp$mu, pp$sd))
-      part_vals[d, ] <- par$partition_value[pv_groups]
       base <- simulate_ttm(proj, par, .drv_for(proj, drvs, "Baseline", par, per_draw))
-      qs[[d]] <- base$q
-      stage1$B[d, , ] <- base$B
-      pv <- .param_vector(par, proj)
-      if (is.null(stage1$params)) stage1$params <- matrix(NA_real_, N, length(pv), dimnames = list(NULL, names(pv)))
-      stage1$params[d, names(pv)] <- pv
-      for (m in c("MMSY", "MMSY0", "K", "K0", "B", "C", "P"))
-        stage1[[paste0(m, "_ref")]][d, ] <- colMeans(base[[m]][ref_y, , drop = FALSE])
-      TL[d, ] <- base$TL; bfrac[d, ] <- base$bfrac; shortfall[d, ] <- base$catch_shortfall
+      list(pv_part = par$partition_value[pv_groups], q = base$q, B = base$B, params = .param_vector(par, proj),
+           ref = lapply(setNames(nm = c("MMSY", "MMSY0", "K", "K0", "B", "C", "P")),
+                        function(m) colMeans(base[[m]][ref_y, , drop = FALSE])),
+           TL = base$TL, bfrac = base$bfrac, shortfall = base$catch_shortfall)
     }
+    outs <- if (cores > 1) parallel::mclapply(idx_d, one_draw, mc.cores = cores, mc.preschedule = TRUE)
+            else lapply(idx_d, one_draw)
+    for (k in seq_along(idx_d)) {
+      dd <- idx_d[k]; o <- outs[[k]]
+      if (inherits(o, "try-error")) stop("Draw ", dd, " failed: ", o)
+      part_vals[dd, ] <- o$pv_part; qs[[dd]] <- o$q; stage1$B[dd, , ] <- o$B
+      if (is.null(stage1$params)) stage1$params <- matrix(NA_real_, N, length(o$params), dimnames = list(NULL, names(o$params)))
+      stage1$params[dd, names(o$params)] <- o$params
+      for (m in names(o$ref)) stage1[[paste0(m, "_ref")]][dd, ] <- o$ref[[m]]
+      TL[dd, ] <- o$TL; bfrac[dd, ] <- o$bfrac; shortfall[dd, ] <- o$shortfall
+    }
+    rm(outs)
+    d <- max(idx_d)
     if (rd < rounds) {   # fit the next proposal to the current importance-weighted posterior
       tmp <- list(proj = proj, stage1 = lapply(stage1, function(a) if (is.matrix(a)) a[seq_len(d), , drop = FALSE] else a[seq_len(d), , , drop = FALSE]),
                   catch_shortfall = shortfall[seq_len(d), , drop = FALSE])
@@ -127,9 +141,14 @@ run_ttm <- function(proj, n_draws = proj$settings$n_draws, scenarios = scenario_
         if (!is.null(cf) && paste0("feasibility_", gi) %in% colnames(cf)) own <- own + cf[, paste0("feasibility_", gi)]
         if (ncol(nb)) { jj <- grepl(paste0("(^|;)", gi, "(;|_)"), colnames(nb)); if (any(jj)) own <- own + rowSums(nb[, jj, drop = FALSE]) }
         wk <- exp(-(own - min(own))); wk <- wk / sum(wk)
-        mu[k] <- sum(lx[, k] * wk); sdv[k] <- sqrt(sum(wk * (lx[, k] - mu[k])^2))
+        if (1 / sum(wk^2) > 0.5 * length(wk)) {   # prior already adequate for this group: do not adapt
+          mu[k] <- prior_mu[k]; sdv[k] <- s_pr[k] / 1.5
+        } else {
+          mu[k] <- sum(lx[, k] * wk); sdv[k] <- sqrt(sum(wk * (lx[, k] - mu[k])^2))
+        }
       }
       proposals[[rd + 2L]] <- list(mu = mu, sd = pmax(0.1, 1.5 * sdv), n = n_draws)
+      if (verbose) message("  groups adapted: ", paste(pv_groups[abs(mu - prior_mu) > 1e-9], collapse = ", "))
       if (verbose) message(sprintf("  joint importance ESS after round %d: %.1f", rd, 1 / sum(w^2)))
     }
   }
@@ -167,6 +186,30 @@ run_ttm <- function(proj, n_draws = proj$settings$n_draws, scenarios = scenario_
   out$pars <- pars          # parameter sets of the stored (kept) draws
   out$keep <- keep
   out$row_of_draw <- match(seq_len(n_draws), keep)
+  out
+}
+
+#' Groups that constrain the calibration
+#'
+#' `settings$sir_feasibility_groups`: "all" (every harvested group), "trap"
+#' (groups with `trap_relevant = TRUE` and harvest allowed) or a
+#' `;`-separated list. Groups with SIR benchmarks are always included.
+#' Other harvested groups remain in the food web (energy competitors whose
+#' landings are still removed) but do not constrain the posterior, so sampling
+#' effort concentrates on the fishery of interest.
+#' @param proj a `ttm_project`
+#' @export
+focus_groups <- function(proj) {
+  g <- proj$groups; st <- proj$settings
+  sel <- if (is.null(st$sir_feasibility_groups) || is.na(st$sir_feasibility_groups)) "all" else st$sir_feasibility_groups
+  harv <- g$group[g$harvest_allowed & g$group_type == "fmp"]
+  out <- switch(sel,
+    all = harv,
+    trap = g$group[g$trap_relevant & g$harvest_allowed],
+    intersect(strsplit(sel, ";")[[1]], g$group))
+  bm <- proj$benchmarks
+  if (!is.null(bm) && "use_in_sir" %in% names(bm))
+    out <- union(out, unlist(strsplit(bm$group[as.logical(bm$use_in_sir) %in% TRUE], ";")))
   out
 }
 
@@ -240,14 +283,15 @@ benchmark_nll <- function(res) {
 #' (Kimura & Tagart 1982; Walters et al. 2006) and catch-MSY (Martell & Froese
 #' 2013): observed removals bound productivity from below. Penalty per group:
 #' 0.5 * (log(1 - shortfall) / cv)^2 with cv = `settings$catch_feasibility_cv`.
-#' Enabled with `settings$sir_catch_feasibility = TRUE`.
+#' Enabled with `settings$sir_catch_feasibility = TRUE`. Only the groups in
+#' [focus_groups()] (`settings$sir_feasibility_groups`) are constrained.
 #' @param res `ttm_results`
 #' @export
 catch_feasibility_nll <- function(res) {
   st <- res$proj$settings
   if (!isTRUE(st$sir_catch_feasibility) || is.null(res$catch_shortfall)) return(NULL)
   sf <- res$catch_shortfall
-  sf <- sf[, colSums(!is.na(sf)) > 0, drop = FALSE]
+  sf <- sf[, colSums(!is.na(sf)) > 0 & colnames(sf) %in% focus_groups(res$proj), drop = FALSE]
   if (!ncol(sf)) return(NULL)
   cv <- if (is.null(st$catch_feasibility_cv)) 0.1 else st$catch_feasibility_cv
   out <- 0.5 * (log(pmax(1 - sf, 1e-6)) / cv)^2

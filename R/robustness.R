@@ -40,10 +40,10 @@
 sensitivity_analysis <- function(res, outputs = NULL, top = 15) {
   X <- res$stage1$params
   if (is.null(X)) stop("No parameter matrix stored; rerun run_ttm() with this package version")
-  g <- res$proj$groups; fmp <- g$group[g$group_type == "fmp" & g$harvest_allowed]
+  g <- res$proj$groups; fmp <- intersect(focus_groups(res$proj), g$group[g$harvest_allowed])
   if (is.null(outputs)) {
-    outputs <- list(total_FMP_MMSY = function(s) rowSums(s$MMSY_ref[, fmp, drop = FALSE]))
-    for (gi in intersect(c("spiny_lobster", "queen_triggerfish", "parrotfish_2", "grunts", "snappers_shallow"), fmp))
+    outputs <- list(total_focus_MMSY = function(s) rowSums(s$MMSY_ref[, fmp, drop = FALSE]))
+    for (gi in intersect(c("spiny_lobster", "queen_triggerfish", "parrotfish_2", "grunts", "snappers_shallow", "groupers_shallow"), fmp))
       outputs[[paste0("MMSY_", gi)]] <- local({ gg <- gi; function(s) s$MMSY_ref[, gg] })
   }
   keep <- apply(X, 2, function(z) all(is.finite(z)) && stats::sd(z) > 0)
@@ -119,9 +119,10 @@ sir_diagnostics <- function(res) {
 self_test <- function(res, n_rep = 100, groups = NULL, seed = 11) {
   set.seed(seed)
   s1 <- res$stage1; proj <- res$proj; g <- proj$groups
-  if (is.null(groups)) groups <- g$group[g$group_type == "fmp" & g$harvest_allowed]
+  if (is.null(groups)) groups <- intersect(focus_groups(proj), g$group[g$harvest_allowed])
+  fg <- intersect(focus_groups(proj), colnames(res$catch_shortfall))
   feas <- if (is.null(res$catch_shortfall)) rep(TRUE, nrow(s1$MMSY_ref)) else
-    apply(res$catch_shortfall, 1, function(z) all(is.na(z) | z < 0.01))
+    apply(res$catch_shortfall[, fg, drop = FALSE], 1, function(z) all(is.na(z) | z < 0.05))
   cand <- which(feas)
   idx <- .fit_indices(proj)
   bm <- proj$benchmarks; bm <- if (!is.null(bm) && "use_in_sir" %in% names(bm)) bm[as.logical(bm$use_in_sir) %in% TRUE, ] else NULL

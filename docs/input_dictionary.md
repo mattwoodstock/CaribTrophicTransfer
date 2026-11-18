@@ -47,7 +47,7 @@ Two columns, `key` and `value` (plus optional `notes`).
 | `substeps` | – | 12 | 12 | sub-annual integration steps |
 | `c_to_ww` | g WW g C⁻¹ | 9 | 9 | carbon to wet-weight conversion (Pauly & Christensen 1995) |
 | `c_to_ww_cv` | CV | 0.1 | 0.1 | uncertainty |
-| `n_draws` | – | 500 | 4000 | Monte Carlo draws per sampling round (total = n_draws × (1 + adaptive rounds)) |
+| `n_draws` | – | 500 | 12000 | Monte Carlo draws per sampling round (total = n_draws × (1 + adaptive rounds) = 48,000) |
 | `seed` | – | 1 | 103 | random seed |
 | `diet_concentration` | – | 50 | 40 | Dirichlet concentration for diet uncertainty (higher = less uncertainty; 0 = fixed) |
 | `catch_expansion` | × | 1.0 | 1.5 | reported-to-total landings multiplier |
@@ -73,6 +73,8 @@ Two columns, `key` and `value` (plus optional `notes`).
 | `coral_growth_cv` | CV | 0 | 0.3 | CV on coral growth |
 | `use_acquired` | logical | TRUE | TRUE | merge API-acquired data (`data/acquired/`) where the user left blanks/placeholders |
 | `sir_adaptive_rounds` | – | 0 | 3 | adaptive importance-sampling rounds (factorized proposal on partition priors) |
+| `sir_feasibility_groups` | all / trap / list | all | trap | groups whose landings constrain calibration; other harvested groups stay in the food web as energy competitors (landings still removed) but do not constrain the posterior |
+| `cores` | – | 1 | 4 | parallel cores for Stage-1 draws (Unix); results identical to serial |
 | `disturbance_loss_cv` | CV | 0 | 0.5 | common multiplier on disturbance loss magnitudes (uncertain hurricane impacts) |
 | `holdout_from_year` | year | NA | NA | index observations from this year on are held out of calibration |
 | `ryther_low`, `ryther_high` | t km⁻² yr⁻¹ | 1, 3 | 1, 3 | Ryther-index thresholds (Link & Watson 2019; verify) |

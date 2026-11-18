@@ -7,7 +7,7 @@ ref_years,3,Years averaged for reference points (2022-2024)
 substeps,12,Monthly Euler steps for biomass dynamics
 c_to_ww,9,g wet weight per g C (Pauly & Christensen 1995)
 c_to_ww_cv,0.1,
-n_draws,4000,Monte Carlo draws per sampling round (prior + adaptive rounds)
+n_draws,12000,Monte Carlo draws per sampling round (prior + adaptive rounds)
 seed,103,Random seed (SEDAR 103)
 diet_concentration,40,Dirichlet concentration for diet uncertainty
 catch_expansion,1.5,Reported-to-total landings expansion (PR logbook expansion ~2.0; USVI unquantified - SEDAR103-DW-20)
@@ -43,3 +43,5 @@ ryther_high,3,
 fogarty_low,0.22,Fogarty ratio thresholds (per mil; Link & Watson 2019)
 fogarty_high,0.92,
 sir_adaptive_rounds,3,Adaptive importance-sampling rounds (proposal refit on partition priors; exact mixture correction)
+sir_feasibility_groups,trap,Calibration focuses on the trap fishery: only trap-relevant groups (and assessed stocks) constrain the posterior
+cores,4,Parallel cores for Stage-1 draws

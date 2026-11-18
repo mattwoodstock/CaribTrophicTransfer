@@ -56,3 +56,12 @@ test_that("adaptive importance sampling adds rounds with finite corrections", {
   expect_equal(sum(res$stage1$log_is_correction[1:30] == res$stage1$log_is_correction[1]) < 30, TRUE)
   expect_true(res$sir$ess >= 1)
 })
+
+test_that("parallel Stage 1 is reproducible and identical to serial", {
+  skip_on_os("windows")
+  p <- ttm_example_project(n_draws = 12); p$settings$sir_resample <- 12
+  p$settings$cores <- 1; a <- suppressWarnings(run_ttm(p, verbose = FALSE))
+  p$settings$cores <- 2; b <- suppressWarnings(run_ttm(p, verbose = FALSE))
+  expect_equal(a$stage1$MMSY_ref, b$stage1$MMSY_ref)
+  expect_equal(get_metric(a, "MMSY"), get_metric(b, "MMSY"))
+})

@@ -57,6 +57,8 @@ ttm_default_settings <- function() {
     bleach_mort_cv        = 0.3,
     sir_resample          = 0,      # 0 = no SIR; otherwise number of resamples
     sir_adaptive_rounds   = 0,      # adaptive importance-sampling rounds (proposal refit on partition priors)
+    sir_feasibility_groups = "all", # groups constraining calibration: all, trap, or a ;-separated list
+    cores                 = 1,      # parallel cores for Stage-1 draws (Unix; mclapply)
     sir_catch_feasibility = TRUE,   # SRA-style penalty when landings exceed what the stock supports
     catch_feasibility_cv  = 0.1,
     bbmsy_overfished      = 0.5,    # B/BMSY below which a group is flagged Overfished

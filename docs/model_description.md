@@ -325,6 +325,12 @@ With many harvested groups, each draw must support every group's landings simult
 3. Later rounds draw partition values from the proposal. All other inputs are still drawn from their priors.
 4. Final importance weights use the joint likelihood times prior / mixture-of-proposals, the deterministic-mixture "balance heuristic" (Owen & Zhou 2000). The posterior is therefore unchanged in expectation; only the sampling efficiency improves.
 
+Only groups whose prior conflicts with their own data are adapted: a group keeps its prior when its own-likelihood weights already have an effective sample size above half the draws. This avoids needless importance-correction variance.
+
+**Fishery focus.** `sir_feasibility_groups` limits which groups constrain the calibration. In the St. Croix case it is `trap`: the 13 trap-relevant FMP groups (at least 25% of landings from fish or lobster traps) plus the assessed stocks. Queen conch, deepwater snappers, pelagics, yellowtail snapper and jacks remain in the food web, consuming energy, and their landings are still removed. They do not constrain the posterior, so sampling effort concentrates on the trap fishery. Dive and hook-and-line removals of trap species (e.g., about 55% of lobster) are retained, because they determine total mortality.
+
+**Parallel sampling.** Stage-1 draws run in parallel (`cores`) using independent L'Ecuyer-CMRG random-number streams per draw. Results are identical for any number of cores (unit-tested).
+
 `sir_diagnostics()` reports:
 
 * effective sample size;
