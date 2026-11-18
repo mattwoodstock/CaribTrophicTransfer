@@ -64,6 +64,12 @@ ttm_default_settings <- function() {
     effort_cv             = 0,      # default observation CV of each effort record
     pref_cv               = 0,      # CV on habitat preferences
     coral_growth_cv       = 0,
+    disturbance_loss_cv   = 0,      # CV of a common multiplier on disturbance loss magnitudes
+    holdout_from_year     = NA,     # index observations from this year onward are held out (validation)
+    ryther_low            = 1,      # Ryther index thresholds (t km-2 yr-1; Link & Watson 2019 - verify)
+    ryther_high           = 3,
+    fogarty_low           = 0.22,   # Fogarty ratio thresholds (per mil; Link & Watson 2019)
+    fogarty_high          = 0.92,
     use_acquired          = TRUE,   # merge API-acquired data (data/acquired/) where user left blanks
     domain_lon_min        = NA,     # domain bounding box used by data acquisition
     domain_lon_max        = NA,

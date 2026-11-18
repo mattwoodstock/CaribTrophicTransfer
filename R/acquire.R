@@ -348,15 +348,19 @@ fetch_nccos_habitat_areas <- function(bbox, layer = 6, group_field = "DESCRIPTOR
 #' Default mapping of NCCOS 2002 USVI/PR habitat descriptors to model habitats
 #'
 #' Regular expressions are matched in order against the DESCRIPTOR attribute.
-#' Unmatched classes (e.g., Land, Artificial) are dropped.
+#' Unmatched classes (Land, Artificial, Unknown) are dropped. "Unknown" in the
+#' 2002 USVI map is largely water deeper than the shelf break inside the
+#' mapping polygons (ETOPO: only ~49 km2 of the St. Croix shelf lies at
+#' 30-100 m), so deeper shelf is derived from bathymetry instead
+#' (method `deep_shelf_light`).
 #' @export
 nccos_class_map <- function() {
   data.frame(
     pattern = c("^Reef/Colonized Pavement", "^Reef/", "^Hardbottom/Uncolonized|^Hardbottom/Reef Rubble",
-                "^Seagrass", "^Macroalgae", "^Sand|^Mud", "^Mangrove", "^Unknown"),
+                "^Seagrass", "^Macroalgae", "^Sand|^Mud", "^Mangrove"),
     habitat = c("colonized_pavement", "coral_reef", "sand", "seagrass", "macroalgae", "sand",
-                "mangrove", "deep_hardbottom"),
-    area_cv = c(0.15, 0.15, 0.3, 0.15, 0.25, 0.25, 0.2, 0.5),
+                "mangrove"),
+    area_cv = c(0.15, 0.15, 0.3, 0.15, 0.25, 0.25, 0.2),
     stringsAsFactors = FALSE)
 }
 
@@ -487,8 +491,9 @@ hurricane_disturbances <- function(tracks, bbox, years, template, radius_km = 20
 #'
 #' `data_sources.csv` columns: `target`, `method`, `enabled`, and method
 #' arguments in `args` as `key=value` pairs separated by `;`.
-#' Supported methods: `erddap`, `npp_ensemble`, `opendap`, `copernicus`,
-#' `nccos_habitat`, `hurdat2`.
+#' Supported methods: `erddap`, `npp_ensemble`, `vgpm_ensemble`, `cmip6_delta`,
+#' `deep_shelf_light`, `ncrmp_fish`, `opendap`, `copernicus`, `nccos_habitat`,
+#' `hurdat2`.
 #' @param project_dir project directory
 #' @param only optional subset of targets
 #' @param verbose print progress
@@ -501,7 +506,7 @@ acquire_project_data <- function(project_dir, only = NULL, verbose = TRUE) {
   if (!is.null(only)) src <- src[src$target %in% only, , drop = FALSE]
   adir <- file.path(ddir, "acquired"); dir.create(adir, showWarnings = FALSE)
   rd <- function(f) { p <- file.path(adir, f); if (file.exists(p)) utils::read.csv(p, stringsAsFactors = FALSE) else NULL }
-  cov <- rd("env_covariates.csv"); hab <- rd("habitats.csv"); dist <- rd("disturbances.csv")
+  cov <- rd("env_covariates.csv"); hab <- rd("habitats.csv"); dist <- rd("disturbances.csv"); idxa <- rd("indices.csv")
   logs <- rd("acquisition_log.csv")
   years <- seq(proj$settings$hist_start, proj$settings$hist_end)
   for (i in seq_len(nrow(src))) {
@@ -606,6 +611,42 @@ acquire_project_data <- function(project_dir, only = NULL, verbose = TRUE) {
         })) -> cv
         list(cov = cv)
       },
+      deep_shelf_light = {
+        bt <- fetch_bathymetry(bbox, stride = as.integer(.pick(a$stride, 1)))
+        res_deg <- as.numeric(.pick(a$cell_arcsec, 15)) * as.integer(.pick(a$stride, 1)) / 3600
+        cell_km2 <- (res_deg * 111.32)^2 * cos(mean(bbox[c("lat_min", "lat_max")]) * pi / 180)
+        zr <- c(as.numeric(.pick(a$depth_min, 30)), as.numeric(.pick(a$depth_max, 100)))
+        dz <- bt$depth[bt$depth > zr[1] & bt$depth <= zr[2]]
+        if (is.null(cov) || !all(c("kd490") %in% cov$variable)) stop("deep_shelf_light needs kd490 acquired first")
+        kd <- mean(cov$value[cov$variable == "kd490"], na.rm = TRUE)
+        vmf <- file.path(adir, "vgpm_monthly_inputs.csv")
+        p0 <- if (file.exists(vmf)) mean(utils::read.csv(vmf)$par, na.rm = TRUE) else as.numeric(.pick(a$par0, 45))
+        ll <- light_limited_npp(dz, as.numeric(.pick(a$npp_ref, 793)), kd, p0, as.numeric(.pick(a$ik, 4)),
+                                as.numeric(.pick(a$z_ref, 10)))
+        utils::write.csv(data.frame(band = c("0-30", "30-100", "100-200"),
+                                    area_km2 = c(sum(bt$depth > 0 & bt$depth <= 30), sum(bt$depth > 30 & bt$depth <= 100),
+                                                 sum(bt$depth > 100 & bt$depth <= 200)) * cell_km2),
+                         file.path(adir, "shelf_depth_bands.csv"), row.names = FALSE)
+        list(hab = data.frame(habitat = .pick(a$habitat, "deep_hardbottom"), area_km2 = round(length(dz) * cell_km2, 2),
+                              area_cv = as.numeric(.pick(a$area_cv, 0.3)), npp_value = round(ll$mean, 1),
+                              npp_unit = "t_C_km2_yr", npp_cv = round(ll$cv, 3),
+                              classes = sprintf("ETOPO 2022 %g-%g m; median depth %.0f m; Kd490 %.3f; PAR0 %.1f", zr[1], zr[2],
+                                                stats::median(dz), kd, p0),
+                              source = "API: ETOPO 2022 bathymetry + OC-CCI Kd490 + PAR (light-limited P-I)"))
+      },
+      ncrmp_fish = {
+        src_f <- .pick(a$file, a$url)
+        if (is.null(src_f)) stop("ncrmp_fish needs file= or url=")
+        if (!is.null(a$file) && !grepl("^https?://", src_f)) src_f <- file.path(ddir, src_f)
+        if (grepl("^https?://", src_f)) src_f <- .http_get(src_f)
+        fish <- read_ncrmp_fish(src_f, area_m2 = as.numeric(.pick(a$area_m2, 177)))
+        smap <- utils::read.csv(file.path(ddir, .pick(a$species_map, "../data-raw/fishbase/ncrmp_species_map.csv")))
+        strata <- if (!is.null(a$strata)) utils::read.csv(file.path(ddir, a$strata)) else NULL
+        dens <- ncrmp_stratified_biomass(fish, smap, strata)
+        utils::write.csv(dens, file.path(adir, "ncrmp_biomass_density.csv"), row.names = FALSE)
+        io <- ncrmp_to_inputs(dens, role = .pick(a$role, "validate"))
+        list(idx = io$indices)
+      },
       opendap = {
         x <- fetch_opendap_series(a$url, a$variable, bbox, yrs, .pick(a$time_agg, "mean"),
                                   .pick(a$lon_name, "lon"), .pick(a$lat_name, "lat"), .pick(a$time_name, "time"),
@@ -667,11 +708,16 @@ acquire_project_data <- function(project_dir, only = NULL, verbose = TRUE) {
       } else hab <- res$hab
     }
     if (!is.null(res$dist)) dist <- res$dist
+    if (!is.null(res$idx)) {
+      if (!is.null(idxa)) idxa <- idxa[!idxa$index %in% unique(res$idx$index), , drop = FALSE]
+      idxa <- rbind(idxa, res$idx)
+    }
     logs <- rbind(logs, data.frame(time = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z"), target = r$target,
                                    method = r$method, args = r$args, status = status))
   }
   wr <- function(x, f) if (!is.null(x)) utils::write.csv(x, file.path(adir, f), row.names = FALSE, na = "")
-  wr(cov, "env_covariates.csv"); wr(hab, "habitats.csv"); wr(dist, "disturbances.csv"); wr(logs, "acquisition_log.csv")
+  wr(cov, "env_covariates.csv"); wr(hab, "habitats.csv"); wr(dist, "disturbances.csv"); wr(idxa, "indices.csv")
+  wr(logs, "acquisition_log.csv")
   invisible(list(env_covariates = cov, habitats = hab, disturbances = dist, log = logs))
 }
 
@@ -744,6 +790,17 @@ acquire_project_data <- function(project_dir, only = NULL, verbose = TRUE) {
     proj$disturbances <- rbind(ud, add[, names(ud), drop = FALSE])
     prov$disturbances <- sprintf("%d acquired events added (user-specified years kept: %s)", nrow(add),
                                  paste(user_years, collapse = ", "))
+  }
+  # indices: acquired series added unless the user supplies an index of the same name
+  ai <- rd("indices.csv")
+  if (!is.null(ai)) {
+    ui <- proj$indices
+    if (is.null(ui)) ui <- ai[0, ]
+    add <- ai[!ai$index %in% unique(ui$index), , drop = FALSE]
+    for (nm in setdiff(names(add), names(ui))) ui[[nm]] <- if (nrow(ui)) NA else logical(0)
+    for (nm in setdiff(names(ui), names(add))) add[[nm]] <- if (nrow(add)) NA else logical(0)
+    proj$indices <- rbind(ui, add[, names(ui), drop = FALSE])
+    prov$indices <- sprintf("%d acquired index rows added (%s)", nrow(add), paste(unique(add$index), collapse = ", "))
   }
   proj$provenance <- prov
   proj

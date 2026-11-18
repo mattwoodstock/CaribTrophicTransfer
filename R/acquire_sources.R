@@ -282,3 +282,58 @@ cmip6_delta_projection <- function(obs, models, experiment, cmip_var, bbox, proj
   rownames(out) <- NULL
   out
 }
+
+# ---- Bathymetry and light-limited benthic production ---------------------------
+
+#' Bathymetry grid from NCEI ETOPO 2022 (ERDDAP)
+#' @param bbox bounding box
+#' @param server ERDDAP server (default PIFSC OceanWatch)
+#' @param dataset_id ETOPO dataset (15, 30 or 60 arc-second)
+#' @param stride grid stride
+#' @return data frame lon, lat, depth (m, positive down; land negative)
+#' @export
+fetch_bathymetry <- function(bbox, server = "https://oceanwatch.pifsc.noaa.gov/erddap",
+                             dataset_id = "ETOPO_2022_v1_15s", stride = 1) {
+  b <- .bbox(bbox)
+  m <- erddap_meta(server, dataset_id)
+  lon <- c(b[["lon_min"]], b[["lon_max"]]); if (m$lon_0360) lon <- lon %% 360
+  lat <- if (m$lat_descending) c(b[["lat_max"]], b[["lat_min"]]) else c(b[["lat_min"]], b[["lat_max"]])
+  q <- sprintf("[(%s):%d:(%s)][(%s):%d:(%s)]", lat[1], stride, lat[2], lon[1], stride, lon[2])
+  f <- .http_get(paste0(server, "/griddap/", dataset_id, ".csv?z", utils::URLencode(q, reserved = TRUE)))
+  x <- utils::read.csv(f, skip = 2, header = FALSE)
+  names(x) <- c("lat", "lon", "z")
+  x$lon <- ifelse(x$lon > 180, x$lon - 360, x$lon)
+  data.frame(lon = x$lon, lat = x$lat, depth = -x$z)
+}
+
+#' Light-limited benthic net primary production by depth
+#'
+#' Scales a reference shallow-habitat NPP to deeper bottoms using the light
+#' reaching the seafloor: I(z) = PAR0 exp(-Kd_PAR z), with Kd_PAR from Kd490
+#' (Morel et al. 2007: Kd_PAR = 0.0864 + 0.884 Kd490 - 0.00137 / Kd490) and a
+#' saturating photosynthesis-irradiance curve P = Pmax tanh(I / Ik). The
+#' relative production f(z) = tanh(I(z)/Ik) / tanh(I(z_ref)/Ik) is averaged over
+#' the depth distribution of the habitat (from bathymetry) and Monte Carlo
+#' over uncertain Kd490, PAR and Ik.
+#' @param depths numeric vector of bottom depths (m) of the habitat cells
+#' @param npp_ref reference NPP at depth `z_ref` (any unit; output same unit)
+#' @param kd490 mean Kd490 (m-1) and `kd490_cv`
+#' @param par0 surface PAR (mol photons m-2 d-1) and `par0_cv`
+#' @param ik saturation irradiance (mol photons m-2 d-1) and `ik_cv`
+#' @param z_ref reference depth of `npp_ref`
+#' @param n Monte Carlo samples
+#' @return list with mean, cv, quantiles of the scaled NPP and the depth summary
+#' @export
+light_limited_npp <- function(depths, npp_ref, kd490, par0, ik = 4, z_ref = 10,
+                              kd490_cv = 0.25, par0_cv = 0.1, ik_cv = 0.4, n = 2000) {
+  depths <- depths[is.finite(depths) & depths > 0]
+  sims <- vapply(seq_len(n), function(i) {
+    k490 <- rlnorm_cv(1, kd490, kd490_cv); p0 <- rlnorm_cv(1, par0, par0_cv); ikk <- rlnorm_cv(1, ik, ik_cv)
+    kpar <- 0.0864 + 0.884 * k490 - 0.00137 / k490
+    f <- tanh(p0 * exp(-kpar * depths) / ikk) / tanh(p0 * exp(-kpar * z_ref) / ikk)
+    npp_ref * mean(f)
+  }, numeric(1))
+  list(mean = mean(sims), cv = stats::sd(sims) / mean(sims),
+       q = stats::quantile(sims, c(0.05, 0.5, 0.95)),
+       depth_summary = stats::quantile(depths, c(0.05, 0.25, 0.5, 0.75, 0.95)))
+}

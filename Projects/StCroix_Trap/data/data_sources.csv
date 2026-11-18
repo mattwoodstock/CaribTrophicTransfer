@@ -11,3 +11,4 @@ sst_cmip6,cmip6_delta,TRUE,obs_variable=sst;cmip_var=tos;type=additive;experimen
 npp_cmip6,cmip6_delta,TRUE,obs_variable=npp_pelagic_index;cmip_var=intpp;type=ratio;experiments=ssp245|ssp585;models=cesm2|access-esm1-5;baseline=2005:2014,CMIP6 integrated NPP projections (delta method) -> npp_pelagic_index_ssp245 / _ssp585
 bottom_temp,copernicus,FALSE,dataset_id=cmems_mod_glo_phy_my_0.083deg_P1M-m;variable=bottomT;units=degC,GLORYS12 bottom temperature (needs copernicusmarine CLI + free account)
 sst_mom6_hindcast,opendap,FALSE,url=REPLACE_WITH_CEFI_OPENDAP_URL;variable=tos;lon_name=lon;lat_name=lat;units=degC,MOM6-NWA12 (NOAA CEFI; PSL THREDDS rate-limited from the development container)
+deep_shelf,deep_shelf_light,TRUE,depth_min=30;depth_max=100;npp_ref=793;z_ref=10;ik=4;area_cv=0.3;habitat=deep_hardbottom,Deeper-shelf area from ETOPO 2022 bathymetry (PIFSC) and light-limited NPP from OC-CCI Kd490 + PAR (run after kd490 and npp_pelagic_index)

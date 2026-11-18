@@ -1,14 +1,18 @@
 group,variable,type,target,baseline,sensitivity,sensitivity_cv,t_opt,t_width,threshold,data_status,reference
-spiny_lobster,sst,linear,production,,-0.20,0.5,,,,PLACEHOLDER,Per degC anomaly (legacy TTM thermal sensitivity)
-queen_conch,sst,linear,production,,-0.15,0.5,,,,PLACEHOLDER,
-parrotfish_1,sst,linear,production,,-0.15,0.5,,,,PLACEHOLDER,
-parrotfish_2,sst,linear,production,,-0.15,0.5,,,,PLACEHOLDER,
-surgeonfishes,sst,linear,production,,-0.10,0.5,,,,PLACEHOLDER,
-queen_triggerfish,sst,linear,production,,-0.05,0.5,,,,PLACEHOLDER,
-grunts,sst,linear,production,,-0.10,0.5,,,,PLACEHOLDER,
-snappers_shallow,sst,linear,production,,-0.08,0.5,,,,PLACEHOLDER,
-yellowtail_snapper,sst,linear,production,,-0.08,0.5,,,,PLACEHOLDER,
-groupers_shallow,sst,thermal_performance,production,,,,27.5,2.0,,PLACEHOLDER,Example Gaussian thermal performance curve
-snappers_deep,sst,linear,production,,-0.03,0.5,,,,PLACEHOLDER,
-pelagics,sst,linear,production,,-0.02,0.5,,,,PLACEHOLDER,
 pelagics,npp_pelagic_index,loglinear,K,,0.5,0.5,,,,PLACEHOLDER,Example: pelagic forage availability
+angelfishes,sst,thermal_performance,production,,,0,27.028,2.04,,derived: FishBase/AquaMaps temperature preference,AquaMaps (via FishBase v24.07) TempPref min/mean/max = 24.0/27.0/28.1 degC; width = (max-min)/2
+boxfishes,sst,thermal_performance,production,,,0,25.749,2.53,,derived: FishBase/AquaMaps temperature preference,AquaMaps (via FishBase v24.07) TempPref min/mean/max = 22.9/25.7/28.0 degC; width = (max-min)/2
+goatfishes,sst,thermal_performance,production,,,0,26.554,2.37,,derived: FishBase/AquaMaps temperature preference,AquaMaps (via FishBase v24.07) TempPref min/mean/max = 23.3/26.6/28.0 degC; width = (max-min)/2
+groupers_shallow,sst,thermal_performance,production,,,0,27.018,1.76,,derived: FishBase/AquaMaps temperature preference,AquaMaps (via FishBase v24.07) TempPref min/mean/max = 24.5/27.0/28.0 degC; width = (max-min)/2
+grunts,sst,thermal_performance,production,,,0,26.909,1.55,,derived: FishBase/AquaMaps temperature preference,AquaMaps (via FishBase v24.07) TempPref min/mean/max = 24.9/26.9/28.0 degC; width = (max-min)/2
+jacks,sst,thermal_performance,production,,,0,26.79,2.44,,derived: FishBase/AquaMaps temperature preference,AquaMaps (via FishBase v24.07) TempPref min/mean/max = 23.1/26.8/28.0 degC; width = (max-min)/2
+parrotfish_1,sst,thermal_performance,production,,,0,27.3,2.2,,derived: FishBase/AquaMaps temperature preference,AquaMaps (via FishBase v24.07) TempPref min/mean/max = 23.7/27.3/28.1 degC; width = (max-min)/2
+parrotfish_2,sst,thermal_performance,production,,,0,27.447,1.03,,derived: FishBase/AquaMaps temperature preference,AquaMaps (via FishBase v24.07) TempPref min/mean/max = 26.2/27.4/28.2 degC; width = (max-min)/2
+pelagics,sst,thermal_performance,production,,,0,26.05,5.1,,derived: FishBase/AquaMaps temperature preference,AquaMaps (via FishBase v24.07) TempPref min/mean/max = 18.1/26.1/28.4 degC; width = (max-min)/2
+porgies,sst,thermal_performance,production,,,0,26.381,2.47,,derived: FishBase/AquaMaps temperature preference,AquaMaps (via FishBase v24.07) TempPref min/mean/max = 22.9/26.4/27.9 degC; width = (max-min)/2
+queen_triggerfish,sst,thermal_performance,production,,,0,25.9,2.75,,derived: FishBase/AquaMaps temperature preference,AquaMaps (via FishBase v24.07) TempPref min/mean/max = 22.5/25.9/28.0 degC; width = (max-min)/2
+snappers_shallow,sst,thermal_performance,production,,,0,25.938,2.72,,derived: FishBase/AquaMaps temperature preference,AquaMaps (via FishBase v24.07) TempPref min/mean/max = 22.4/25.9/27.8 degC; width = (max-min)/2
+squirrelfishes,sst,thermal_performance,production,,,0,27.262,2.11,,derived: FishBase/AquaMaps temperature preference,AquaMaps (via FishBase v24.07) TempPref min/mean/max = 23.9/27.3/28.1 degC; width = (max-min)/2
+surgeonfishes,sst,thermal_performance,production,,,0,27.22,1.96,,derived: FishBase/AquaMaps temperature preference,AquaMaps (via FishBase v24.07) TempPref min/mean/max = 24.1/27.2/28.1 degC; width = (max-min)/2
+wrasses_hogfish,sst,thermal_performance,production,,,0,26.8,2.16,,derived: FishBase/AquaMaps temperature preference,AquaMaps (via FishBase v24.07) TempPref min/mean/max = 23.7/26.8/28.0 degC; width = (max-min)/2
+yellowtail_snapper,sst,thermal_performance,production,,,0,25.9,3.1,,derived: FishBase/AquaMaps temperature preference,AquaMaps (via FishBase v24.07) TempPref min/mean/max = 21.7/25.9/27.9 degC; width = (max-min)/2

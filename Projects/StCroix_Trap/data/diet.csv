@@ -1,30 +1,30 @@
-group,B_TL1,B_TL2,B_TL3,B_TL4,P_TL1,P_TL2,P_TL3,P_TL4,reference
-spiny_lobster,0.10,0.70,0.20,0,0,0,0,0,Randall 1967; Opitz 1996 (mollusks echinoderms crustaceans)
-queen_conch,1.00,0,0,0,0,0,0,0,Algae/detritus grazer
-parrotfish_1,1.00,0,0,0,0,0,0,0,Herbivore/detritivore
-parrotfish_2,1.00,0,0,0,0,0,0,0,Herbivore/detritivore
-surgeonfishes,1.00,0,0,0,0,0,0,0,Herbivore
-queen_triggerfish,0,0.85,0.15,0,0,0,0,0,Urchins crabs mollusks (Randall 1967)
-grunts,0,0.80,0.10,0,0,0.10,0,0,Nocturnal benthic invertivores (seagrass foraging)
-snappers_shallow,0,0.30,0.50,0,0,0,0.20,0,Crustaceans + fish
-yellowtail_snapper,0,0.20,0.30,0,0,0.30,0.20,0,Plankton + benthic prey
-snappers_deep,0,0,0.40,0,0,0.20,0.40,0,Fish + pelagic invertebrates
-groupers_shallow,0,0.30,0.60,0,0,0,0.10,0,Crabs + reef fish
-squirrelfishes,0,0.70,0,0,0,0.30,0,0,Nocturnal crustacean feeders
-goatfishes,0,1.00,0,0,0,0,0,0,Infaunal invertivores
-boxfishes,0.20,0.80,0,0,0,0,0,0,Benthic invertebrates + algae
-angelfishes,0.10,0.90,0,0,0,0,0,0,Sponges (TL2 benthic)
-wrasses_hogfish,0,1.00,0,0,0,0,0,0,Mollusks crustaceans
-jacks,0,0,0.50,0,0,0,0.50,0,Piscivores
-porgies,0,1.00,0,0,0,0,0,0,Benthic invertebrates
-pelagics,0,0,0,0,0,0,0.60,0.40,Dolphinfish/wahoo: small pelagics squid
-zooplankton,0.10,0,0,0,0.90,0,0,0,Phytoplankton + benthic detritus
-benthic_grazers,1.00,0,0,0,0,0,0,0,
-benthic_detritivores_filter,0.70,0,0,0,0.30,0,0,0,
-small_reef_fish,0.30,0.40,0,0,0,0.30,0,0,
-small_pelagics,0,0,0,0,0,1.00,0,0,
-other_reef_predators,0,0.20,0.60,0,0,0,0.20,0,
-sharks_apex,0,0,0.30,0.30,0,0,0.20,0.20,
-benthic_predatory_inverts,0.2,0.6,0.2,0,0,0,0,0,
-other_invertivore_fishes,0,0.9,0,0,0,0.1,0,0,
-squids_pelagic_predators,0,0,0,0,0,0.5,0.5,0,
+"group","B_TL1","B_TL2","B_TL3","B_TL4","P_TL1","P_TL2","P_TL3","P_TL4","reference"
+"spiny_lobster",0.1,0.7,0.2,0,0,0,0,0,"Randall 1967; Opitz 1996 (mollusks echinoderms crustaceans)"
+"queen_conch",1,0,0,0,0,0,0,0,"Algae/detritus grazer"
+"parrotfish_1",1,0,0,0,0,0,0,0,"Herbivore/detritivore"
+"parrotfish_2",1,0,0,0,0,0,0,0,"Herbivore/detritivore"
+"surgeonfishes",0.832,0.168,0,0,0,0,0,0,"Herbivore; shifted to FishBase TL 2.17 (was 2.00)"
+"queen_triggerfish",0,0.281,0.619,0.1,0,0,0,0,"Urchins crabs mollusks (Randall 1967); shifted to FishBase TL 3.82 (was 3.15)"
+"grunts",0,0.494,0.367,0.038,0,0.062,0.038,0,"Nocturnal benthic invertivores (seagrass foraging); shifted to FishBase TL 3.48 (was 3.10)"
+"snappers_shallow",0,0.137,0.391,0.272,0,0,0.091,0.109,"Crustaceans + fish; shifted to FishBase TL 4.24 (was 3.70)"
+"yellowtail_snapper",0,0.094,0.247,0.159,0,0.141,0.253,0.106,"Plankton + benthic prey; shifted to FishBase TL 4.03 (was 3.50)"
+"snappers_deep",0,0,0.352,0.048,0,0.176,0.376,0.048,"Fish + pelagic invertebrates; shifted to FishBase TL 3.92 (was 3.80)"
+"groupers_shallow",0,0.151,0.451,0.298,0,0,0.05,0.05,"Crabs + reef fish; shifted to FishBase TL 4.20 (was 3.70)"
+"squirrelfishes",0,0.349,0.351,0,0,0.15,0.15,0,"Nocturnal crustacean feeders; shifted to FishBase TL 3.50 (was 3.00)"
+"goatfishes",0,0.69,0.31,0,0,0,0,0,"Infaunal invertivores; shifted to FishBase TL 3.31 (was 3.00)"
+"boxfishes",0.114,0.542,0.344,0,0,0,0,0,"Benthic invertebrates + algae; shifted to FishBase TL 3.23 (was 2.80)"
+"angelfishes",0.08,0.743,0.176,0,0,0,0,0,"Sponges (TL2 benthic); shifted to FishBase TL 3.10 (was 2.90)"
+"wrasses_hogfish",0,0.349,0.651,0,0,0,0,0,"Mollusks crustaceans; shifted to FishBase TL 3.65 (was 3.00)"
+"jacks",0,0,0.358,0.142,0,0,0.358,0.142,"Piscivores; shifted to FishBase TL 4.28 (was 4.00)"
+"porgies",0,0.564,0.436,0,0,0,0,0,"Benthic invertebrates; shifted to FishBase TL 3.44 (was 3.00)"
+"pelagics",0,0,0,0,0,0,0.6,0.4,"Dolphinfish/wahoo: small pelagics squid"
+"zooplankton",0.1,0,0,0,0.9,0,0,0,"Phytoplankton + benthic detritus"
+"benthic_grazers",1,0,0,0,0,0,0,0,""
+"benthic_detritivores_filter",0.7,0,0,0,0.3,0,0,0,""
+"small_reef_fish",0.3,0.4,0,0,0,0.3,0,0,""
+"small_pelagics",0,0,0,0,0,1,0,0,""
+"other_reef_predators",0,0.2,0.6,0,0,0,0.2,0,""
+"sharks_apex",0,0,0.3,0.3,0,0,0.2,0.2,""
+"benthic_predatory_inverts",0.2,0.6,0.2,0,0,0,0,0,""
+"other_invertivore_fishes",0,0.9,0,0,0,0.1,0,0,""
+"squids_pelagic_predators",0,0,0,0,0,0.5,0.5,0,""

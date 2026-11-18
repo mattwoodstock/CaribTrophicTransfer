@@ -111,6 +111,7 @@ draw_parameters <- function(proj, stochastic = TRUE) {
     par$pref[] <- proj$pref_matrix * rlnorm_cv(length(proj$pref_matrix), 1, st$pref_cv)
   par$immigration <- setNames(rlnorm_cv(ng, g$immigration_t, cv0(g$immigration_cv)), g$group)
   par$coral_growth <- rlnorm_cv(1, st$coral_growth, cv0(st$coral_growth_cv))
+  par$dist_loss_mult <- rlnorm_cv(1, 1, cv0(if (is.null(st$disturbance_loss_cv)) 0 else st$disturbance_loss_cv))
   par$process_dev_seed <- if (stochastic) sample.int(.Machine$integer.max, 1) else NA
   par$stochastic <- stochastic
   par

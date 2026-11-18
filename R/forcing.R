@@ -160,6 +160,9 @@ build_drivers <- function(proj, scenario = "Baseline", par = NULL) {
   dist <- proj$disturbances
   if (!is.null(dist) && !is.null(par$dist_intensity_mult))
     dist$intensity <- dist$intensity * par$dist_intensity_mult
+  if (!is.null(dist) && !is.null(par$dist_loss_mult) && par$dist_loss_mult != 1)
+    for (cc in c("p1_loss", "quality_loss", "effort_loss", "production_loss"))
+      dist[[cc]] <- pmin(0.95, dist[[cc]] * par$dist_loss_mult)
   if (!is.null(dist)) {
     hist_dist <- dist[!is.na(dist$year), , drop = FALSE]
     if (nrow(hist_dist)) apply_dist(hist_dist)

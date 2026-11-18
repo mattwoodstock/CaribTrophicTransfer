@@ -70,6 +70,9 @@ run_ttm <- function(proj, n_draws = proj$settings$n_draws, scenarios = scenario_
     base <- simulate_ttm(proj, par, .drv_for(proj, drvs, "Baseline", par, per_draw))
     qs[[d]] <- base$q
     stage1$B[d, , ] <- base$B
+    pv <- .param_vector(par, proj)
+    if (is.null(stage1$params)) stage1$params <- matrix(NA_real_, n_draws, length(pv), dimnames = list(NULL, names(pv)))
+    stage1$params[d, names(pv)] <- pv
     for (m in c("MMSY", "MMSY0", "K", "K0", "B", "C", "P"))
       stage1[[paste0(m, "_ref")]][d, ] <- colMeans(base[[m]][ref_y, , drop = FALSE])
     TL[d, ] <- base$TL; bfrac[d, ] <- base$bfrac; shortfall[d, ] <- base$catch_shortfall
@@ -117,6 +120,7 @@ run_ttm <- function(proj, n_draws = proj$settings$n_draws, scenarios = scenario_
 #' @export
 has_driver_uncertainty <- function(proj) {
   ec <- proj$env_covariates; dd <- proj$disturbances
+  isTRUE(proj$settings$disturbance_loss_cv > 0) ||
   (!is.null(ec) && "sd" %in% names(ec) && any(ec$sd > 0, na.rm = TRUE)) ||
     (!is.null(dd) && "intensity_cv" %in% names(dd) && any(dd$intensity_cv > 0, na.rm = TRUE))
 }
@@ -127,6 +131,8 @@ has_driver_uncertainty <- function(proj) {
 
 #' Index log-likelihood for every draw
 #'
+#' Only fitting observations are used (index rows with `role = "fit"` and
+#' years before `settings$holdout_from_year`; see [validate_out_of_sample()]).
 #' For each index series, simulated biomass of the matching group(s) (sum if
 #' several groups separated by ";") is compared with the observed index under
 #' a lognormal error model with analytical catchability:
@@ -136,27 +142,9 @@ has_driver_uncertainty <- function(proj) {
 #' @return matrix draws x index of negative log-likelihoods
 #' @export
 index_nll <- function(res) {
-  idx <- res$proj$indices
-  if (is.null(idx) || !nrow(idx)) stop("No indices.csv in project")
-  B <- res$stage1$B
-  years <- as.integer(dimnames(B)[[2]])
-  idx <- idx[idx$year %in% years, , drop = FALSE]
-  names_i <- unique(idx$index)
-  nll <- matrix(0, dim(B)[1], length(names_i), dimnames = list(NULL, names_i))
-  for (nm in names_i) {
-    x <- idx[idx$index == nm, ]
-    grp <- strsplit(x$group[1], ";")[[1]]
-    sig <- sqrt(log(1 + pmax(x$cv, res$proj$settings$index_min_cv)^2))
-    wv <- 1 / sig^2
-    yi <- as.character(x$year)
-    for (d in seq_len(dim(B)[1])) {
-      b <- rowSums(matrix(B[d, yi, grp, drop = FALSE], nrow = length(yi)))
-      lr <- log(x$value) - log(pmax(b, 1e-12))
-      lq <- sum(wv * lr) / sum(wv)
-      nll[d, nm] <- sum(log(sig) + 0.5 * wv * (lr - lq)^2)
-    }
-  }
-  nll
+  idx <- .fit_indices(res$proj)
+  if (is.null(idx) || !nrow(idx)) stop("No fitting index observations")
+  .index_nll_rows(res$stage1$B, idx, res$proj$settings$index_min_cv)
 }
 
 #' Benchmark (assessment reference point) log-likelihood for every draw
@@ -223,9 +211,9 @@ catch_feasibility_nll <- function(res) {
 apply_sir <- function(res, n_resample = length(res$draws)) {
   if (is.null(n_resample) || n_resample <= 0) n_resample <- length(res$draws)
   comps <- list()
-  if (!is.null(res$proj$indices) && nrow(res$proj$indices)) {
+  idx <- .fit_indices(res$proj)
+  if (!is.null(idx) && nrow(idx)) {
     nll <- index_nll(res)
-    idx <- res$proj$indices
     lam <- if ("lambda" %in% names(idx)) tapply(idx$lambda, idx$index, function(z) z[1])[colnames(nll)] else
       rep(1, ncol(nll))
     comps$indices <- sweep(nll, 2, lam, "*")
@@ -244,6 +232,8 @@ apply_sir <- function(res, n_resample = length(res$draws)) {
   pick <- sample(seq_along(wts), n_resample, replace = TRUE, prob = wts)
   res$sir <- list(nll = nll_all, weights = wts, ess = ess, resampled = pick,
                   n_unique = length(unique(pick)))
+  ws <- sort(wts, decreasing = TRUE); m <- max(5, floor(0.2 * length(ws)))
+  res$sir$pareto_k_hat <- mean(log(ws[seq_len(m - 1)]) - log(ws[m]))
   res$draws <- pick
   res$weights <- rep(1 / n_resample, n_resample)
   if (ess < 20) warning(sprintf("SIR effective sample size is low (%.1f); increase n_draws or review priors/CVs", ess))
