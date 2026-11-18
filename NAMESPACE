@@ -1,0 +1,5 @@
+# Generated manually (no roxygen run needed)
+exportPattern("^[a-zA-Z]")
+S3method(print, ttm_project)
+S3method(print, ttm_results)
+importFrom(stats, setNames)

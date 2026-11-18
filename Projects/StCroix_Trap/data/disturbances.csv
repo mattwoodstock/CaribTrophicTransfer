@@ -1,0 +1,3 @@
+year,event,intensity,habitat,p1_loss,quality_loss,half_life_yr,gear,effort_loss,effort_half_life_yr,group,production_loss,data_status,notes
+,major_hurricane,1.0,coral_reef;colonized_pavement;seagrass;macroalgae;mangrove,0.25,0.15,2,trap_fish;trap_lobster,0.6,1.5,spiny_lobster,0.2,template,Template used by scenarios (year supplied by scenario)
+,major_hurricane_other_gears,1.0,none,0,0,1,dive;hook_line,0.3,1,,0,template,Template used by scenarios

@@ -1,0 +1,30 @@
+group,fmp_complex,guild,group_type,include,harvest_allowed,trap_relevant,data_tier,pb,pb_cv,x_msy,x_msy_cv,partition_method,partition_value,partition_cv,B0_fixed_t,B0_fixed_cv,init_depletion,init_depletion_cv,refuge_dependence,immigration_t,process_sd,energy_density_kJ_g,data_status,reference
+spiny_lobster,Spiny lobster,Invertivores,fmp,TRUE,TRUE,TRUE,1,0.8,0.2,0.5,0.2,biomass,1.0,0.5,,,0.5,0.25,0.5,0,0.15,4.5,P/B literature; biomass prior PLACEHOLDER; prior re-centred by catch-feasibility check,M ~0.34 (SEDAR 57); assessed stock (SEDAR 57 Update)
+queen_conch,Queen conch,Herbivores,fmp,TRUE,TRUE,FALSE,2,0.6,0.25,0.4,0.25,biomass,3,0.5,,,0.4,0.3,0,0,0.15,4.0,PLACEHOLDER; prior re-centred by catch-feasibility check,Low x_msy reflects depensation/Allee effects
+parrotfish_1,Parrotfish 1 (blue midnight rainbow),Herbivores,fmp,TRUE,FALSE,TRUE,3,1.0,0.25,0.5,0.2,biomass,0.8,0.5,,,0.8,0.15,0.5,0,0.1,4.5,PLACEHOLDER,Harvest prohibited in St. Croix FMP (ABC = 0)
+parrotfish_2,Parrotfish 2,Herbivores,fmp,TRUE,TRUE,TRUE,2,1.0,0.25,0.5,0.2,biomass,2.5,0.5,,,0.6,0.25,0.5,0,0.1,4.5,PLACEHOLDER (NCRMP density would replace),St. Croix FMP Parrotfish 2 complex (stoplight redband redtail queen princess etc.)
+surgeonfishes,Surgeonfish,Herbivores,fmp,TRUE,TRUE,TRUE,3,1.0,0.25,0.5,0.2,biomass,3,0.5,,,0.7,0.2,0.4,0,0.1,4.5,PLACEHOLDER,
+queen_triggerfish,Triggerfish (queen triggerfish),Invertivores,fmp,TRUE,TRUE,TRUE,1,0.6,0.25,0.5,0.2,biomass,0.25,0.5,,,0.6,0.25,0.3,0,0.12,4.5,P/B literature; biomass prior PLACEHOLDER; prior re-centred by catch-feasibility check,SEDAR 80 assessed; trap-dominated fishery
+grunts,Grunts,Invertivores,fmp,TRUE,TRUE,TRUE,3,1.0,0.25,0.5,0.2,biomass,3,0.5,,,0.6,0.2,0.6,0,0.1,4.5,PLACEHOLDER,
+snappers_shallow,Snapper 3 (lane gray mutton schoolmaster),Mesopredators,fmp,TRUE,TRUE,TRUE,3,0.7,0.25,0.5,0.2,biomass,1.0,0.5,,,0.5,0.25,0.5,0,0.12,5.0,PLACEHOLDER,
+yellowtail_snapper,Snapper 4 (yellowtail),Mesopredators,fmp,TRUE,TRUE,FALSE,2,0.8,0.25,0.5,0.2,biomass,0.8,0.5,,,0.6,0.25,0.3,0,0.12,5.0,PLACEHOLDER,SEDAR 84 St. Croix yellowtail snapper
+snappers_deep,Snapper 1 & 2 (deepwater),Piscivores,fmp,TRUE,TRUE,FALSE,3,0.4,0.25,0.5,0.2,biomass,2,0.5,,,0.5,0.25,0.1,0,0.12,5.0,PLACEHOLDER; prior re-centred by catch-feasibility check,Hook-and-line fishery; minor trap bycatch
+groupers_shallow,Groupers (red hind coney graysby),Piscivores,fmp,TRUE,TRUE,TRUE,2,0.5,0.25,0.5,0.2,biomass,1.0,0.5,,,0.4,0.25,0.7,0,0.15,5.0,PLACEHOLDER,Lang Bank red hind seasonal closure Dec-Feb
+squirrelfishes,Squirrelfish,Invertivores,fmp,TRUE,TRUE,TRUE,3,0.9,0.25,0.5,0.2,biomass,1.0,0.5,,,0.7,0.2,0.6,0,0.1,4.5,PLACEHOLDER,
+goatfishes,Goatfish,Invertivores,fmp,TRUE,TRUE,TRUE,3,1.0,0.25,0.5,0.2,biomass,0.5,0.5,,,0.7,0.2,0.2,0,0.1,4.5,PLACEHOLDER,
+boxfishes,Boxfish,Invertivores,fmp,TRUE,TRUE,TRUE,3,0.8,0.25,0.5,0.2,biomass,0.3,0.5,,,0.7,0.2,0.2,0,0.1,4.0,PLACEHOLDER,
+angelfishes,Angelfish,Invertivores,fmp,TRUE,TRUE,TRUE,3,0.7,0.25,0.5,0.2,biomass,0.5,0.5,,,0.7,0.2,0.5,0,0.1,4.5,PLACEHOLDER,Spongivores
+wrasses_hogfish,Wrasses (hogfish),Invertivores,fmp,TRUE,TRUE,TRUE,3,0.8,0.25,0.5,0.2,biomass,0.5,0.5,,,0.5,0.25,0.3,0,0.1,4.5,PLACEHOLDER,
+jacks,Jacks,Piscivores,fmp,TRUE,TRUE,FALSE,3,0.9,0.25,0.5,0.2,biomass,0.8,0.5,,,0.6,0.25,0,0,0.15,5.5,PLACEHOLDER,
+porgies,Porgies,Invertivores,fmp,TRUE,TRUE,TRUE,3,0.8,0.25,0.5,0.2,biomass,0.2,0.5,,,0.7,0.2,0.1,0,0.1,4.5,PLACEHOLDER,
+pelagics,Pelagics (dolphinfish wahoo),Pelagic piscivores,fmp,TRUE,TRUE,FALSE,3,1.5,0.3,0.5,0.2,biomass,0.3,0.5,,,0.7,0.2,0,25,0.2,6.0,PLACEHOLDER,Highly migratory; immigration term represents regional supply (Greater Caribbean model)
+zooplankton,,Non-fishery,nonfishery,TRUE,FALSE,FALSE,3,30,0.3,0.5,0.1,biomass,6,0.5,,,0.95,0.03,0,0,0.05,3.0,literature-typical,
+benthic_grazers,,Non-fishery,nonfishery,TRUE,FALSE,FALSE,3,3.0,0.3,0.5,0.1,biomass,60,0.5,,,0.95,0.03,0.2,0,0.05,3.0,literature-typical,Urchins gastropods herbivorous crabs
+benthic_detritivores_filter,,Non-fishery,nonfishery,TRUE,FALSE,FALSE,3,2.0,0.3,0.5,0.1,biomass,100,0.5,,,0.95,0.03,0,0,0.05,3.0,literature-typical,Infauna polychaetes sponges filter feeders
+small_reef_fish,,Non-fishery,nonfishery,TRUE,FALSE,FALSE,3,2.5,0.3,0.5,0.1,biomass,10,0.5,,,0.95,0.03,0.5,0,0.05,4.5,literature-typical,Damselfishes gobies blennies cardinalfishes
+small_pelagics,,Non-fishery,nonfishery,TRUE,FALSE,FALSE,3,2.0,0.3,0.5,0.1,biomass,2,0.5,,,0.95,0.03,0,0,0.05,5.0,literature-typical,Clupeids ballyhoo flyingfish
+other_reef_predators,,Non-fishery,nonfishery,TRUE,FALSE,FALSE,3,0.8,0.3,0.5,0.1,biomass,6,0.5,,,0.95,0.03,0.3,0,0.05,5.0,literature-typical,Lizardfish morays barracuda lionfish trumpetfish scorpionfish
+sharks_apex,,Non-fishery,nonfishery,TRUE,FALSE,FALSE,3,0.2,0.3,0.5,0.1,biomass,0.2,0.5,,,0.95,0.03,0,0,0.05,5.0,literature-typical,Reef sharks large predators
+benthic_predatory_inverts,,Non-fishery,nonfishery,TRUE,FALSE,FALSE,3,2.0,0.3,0.5,0.1,biomass,20,0.5,,,0.95,0.03,0.2,0,0.05,4.5,literature-typical,Crabs octopus predatory gastropods shrimps sea stars
+other_invertivore_fishes,,Non-fishery,nonfishery,TRUE,FALSE,FALSE,3,1.2,0.3,0.5,0.1,biomass,8,0.5,,,0.95,0.03,0.2,0,0.05,4.5,literature-typical,Pufferfishes mojarras small wrasses flounders (non-FMP)
+squids_pelagic_predators,,Non-fishery,nonfishery,TRUE,FALSE,FALSE,3,2.5,0.3,0.5,0.1,biomass,3,0.5,,,0.95,0.03,0,0,0.05,4.5,literature-typical,Squids needlefish small tunas (non-FMP)

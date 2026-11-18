@@ -1,0 +1,12 @@
+group,metric,value_lb,use_in_sir,sir_cv,year,data_status,reference
+spiny_lobster,OFL,163823,TRUE,0.4,2024,published,SEDAR 57 Update; Federal Register 2024-09227 (St. Croix FMP)
+spiny_lobster,ABC,144478,FALSE,,2024,published,SEDAR 57 Update; Federal Register 2024-09227
+spiny_lobster,ACL,137254,FALSE,,2024,published,Framework action (2024-2026) St. Croix spiny lobster ACL
+queen_triggerfish,OFL,22773,TRUE,0.4,2025,published,SEDAR 80; CFMC SSC April 2024 meeting summary
+queen_triggerfish,ABC,18808,FALSE,,2025,published,SEDAR 80; CFMC SSC April 2024 (Tier 3b)
+queen_triggerfish,ACL,18808,FALSE,,2026,published,Framework Action 3 final rule (Federal Register 2026-05251)
+parrotfish_2,ACL,72365,FALSE,,2022,published,St. Croix FMP final rule (Federal Register 2022-19409)
+snappers_shallow,ACL,14156,FALSE,,2022,published,St. Croix FMP final rule (Snapper 3)
+snappers_deep,ACL,69366,FALSE,,2022,published,St. Croix FMP: Snapper 1 (61455) + Snapper 2 (7911)
+queen_conch,ACL,50000,FALSE,,2021,published,NOAA ACL monitoring page (St. Croix FMP)
+pelagics,ACL,86633,FALSE,,2021,published,NOAA ACL monitoring page (dolphinfish only)

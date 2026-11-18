@@ -2,3 +2,8 @@
 .Rhistory
 .RData
 .Ruserdata
+
+# CaribTTM outputs
+Projects/*/output/*.rds
+docs/_book/
+docs/.quarto/

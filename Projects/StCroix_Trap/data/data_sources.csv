@@ -1,0 +1,10 @@
+target,method,enabled,args,notes
+sst,erddap,TRUE,key=crw_sst;stride_time=7;stride_space=3,NOAA Coral Reef Watch CoralTemp SST (annual mean of weekly samples) - NESDIS ERDDAP
+dhw,erddap,TRUE,key=crw_dhw_max;stride_time=7;stride_space=3,NOAA Coral Reef Watch Degree Heating Weeks (annual maximum) - NESDIS ERDDAP
+kd490,erddap,TRUE,key=viirs_kd490;stride_space=2;years=2012:2024,VIIRS SNPP Kd490 water clarity (annual mean) - optional benthic light covariate
+chla,erddap,TRUE,key=viirs_chla;stride_space=2;years=2012:2024;bbox=-65.2;17.4;-64.2;18.1,VIIRS SNPP chlorophyll-a over shelf + buffer
+npp_pelagic_index,npp_ensemble,TRUE,bbox=-65.2;17.4;-64.2;18.1;stride_space=2;habitat=pelagic,Satellite NPP ensemble (MODIS VGPM + VIIRS SNPP + VIIRS NOAA-20) - PFEG ERDDAP
+habitat_areas,nccos_habitat,TRUE,layer=6;group_field=DESCRIPTOR,NCCOS USVI 2002 benthic habitat map (ArcGIS REST)
+hurricanes,hurdat2,TRUE,template=major_hurricane;template_other=major_hurricane_other_gears;radius_km=200;core_km=50;decay_km=60;intensity_cv=0.3,NHC HURDAT2 Atlantic best tracks
+bottom_temp,copernicus,FALSE,dataset_id=cmems_mod_glo_phy_my_0.083deg_P1M-m;variable=bottomT;units=degC,GLORYS12 bottom temperature (needs copernicusmarine CLI + free account)
+sst_mom6_hindcast,opendap,FALSE,url=REPLACE_WITH_CEFI_OPENDAP_URL;variable=tos;lon_name=lon;lat_name=lat;units=degC,MOM6-NWA12 (NOAA CEFI portal; copy the OPeNDAP URL of the desired file)

@@ -1,0 +1,29 @@
+project:
+  type: book
+  output-dir: _book
+
+book:
+  title: "CaribTTM: Island-Based Trophic Transfer Model"
+  subtitle: "User manual, model description and St. Croix trap fishery case study"
+  author: "Matt Woodstock, Mandy Karnauskas, and contributors"
+  chapters:
+    - index.md
+    - user_manual.md
+    - input_dictionary.md
+    - model_description.md
+    - case_study_stcroix.md
+    - stcroix_input_values.md
+    - references.md
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    number-sections: false
+    html-math-method: mathjax
+  pdf:
+    documentclass: scrreprt
+    toc: true
+
+execute:
+  enabled: false

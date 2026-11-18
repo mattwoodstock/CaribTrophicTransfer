@@ -1,0 +1,26 @@
+# CaribTTM Documentation {.unnumbered}
+
+`CaribTTM` is the trophic transfer model (TTM) of the integrated trophic frontier framework for U.S. Caribbean fisheries (SEDAR103-DW-20). It estimates **guild- and group-level multispecies MSY (MMSY)** from benthic habitat-specific and pelagic primary production. The estimates are made under prevailing oceanographic, habitat, disturbance and fishery conditions, with uncertainty propagated by Monte Carlo and conditioned on data with SIR. It produces the biological inputs, including gear-specific MMSY, effort ceilings and choke groups, needed by the stochastic production frontier (SPF) and the management strategy evaluation.
+
+| Chapter | Contents |
+|---|---|
+| [User Manual](user_manual.md) | installation, quick start, workflow, running the model, ocean-model inputs, outputs and SPF hand-off, troubleshooting |
+| [Input Data Dictionary](input_dictionary.md) | every input file and column, units, defaults, and St. Croix values |
+| [Model Description](model_description.md) | equations, capabilities, MMSY rationale, uncertainty, assumptions |
+| [St. Croix Case Study](case_study_stcroix.md) | application to the St. Croix trap fishery: data, results, caveats, data-replacement checklist |
+| [St. Croix Input Values](stcroix_input_values.md) | full input tables (auto-generated) |
+| [References](references.md) | literature cited |
+
+## Building the documentation
+
+The chapters are plain Markdown and render directly on GitHub. To build an HTML/PDF book with [Quarto](https://quarto.org):
+
+```bash
+cd docs && quarto render
+```
+
+Regenerate the auto-generated St. Croix tables after editing inputs:
+
+```bash
+Rscript docs/build_input_tables.R
+```

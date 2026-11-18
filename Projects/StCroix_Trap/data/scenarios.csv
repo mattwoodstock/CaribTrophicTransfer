@@ -1,0 +1,16 @@
+scenario,driver,target,start_year,end_year,value,notes
+Warming,cov_trend,sst,2025,2045,0.03,~SSP5-8.5 rate; replace with MOM6-NWA12 projection in env_covariates.csv
+Warming,cov_set,dhw,2030,2030,12,Severe bleaching year
+Warming,cov_set,dhw,2036,2036,12,Severe bleaching year
+Warming,cov_set,dhw,2042,2042,14,Severe bleaching year
+Warming,npp_trend,pelagic,2025,2045,-0.005,0.5%/yr decline in pelagic NPP
+Major_hurricane_2030,disturbance,major_hurricane,2030,2030,1,
+Major_hurricane_2030,disturbance,major_hurricane_other_gears,2030,2030,1,
+Trap_effort_plus30,effort_mult,trap_fish;trap_lobster,2025,2045,1.3,Unmanaged trap effort surge
+Trap_reduction_minus25,effort_mult,trap_fish;trap_lobster,2025,2045,0.75,Trap reduction program (cf. St. Thomas)
+Coral_disease_SCTLD,coral_disease,coral_reef,2025,2032,0.08,Continued SCTLD-driven coral loss
+Combined_stress,cov_trend,sst,2025,2045,0.03,
+Combined_stress,cov_set,dhw,2030,2030,12,
+Combined_stress,disturbance,major_hurricane,2033,2033,1,
+Combined_stress,disturbance,major_hurricane_other_gears,2033,2033,1,
+Combined_stress,effort_mult,trap_fish;trap_lobster,2025,2045,1.3,

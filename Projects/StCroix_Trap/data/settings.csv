@@ -1,0 +1,38 @@
+key,value,notes
+project_name,St. Croix trap fishery case study,Shown in outputs
+hist_start,2000,First historical year (landings-driven)
+hist_end,2024,Last historical year; reference points use the final ref_years
+proj_end,2045,Final projection year (effort-driven)
+ref_years,3,Years averaged for reference points (2022-2024)
+substeps,12,Monthly Euler steps for biomass dynamics
+c_to_ww,9,g wet weight per g C (Pauly & Christensen 1995)
+c_to_ww_cv,0.1,
+n_draws,5000,Monte Carlo draws
+seed,103,Random seed (SEDAR 103)
+diet_concentration,40,Dirichlet concentration for diet uncertainty
+catch_expansion,1.5,Reported-to-total landings expansion (PR logbook expansion ~2.0; USVI unquantified - SEDAR103-DW-20)
+catch_expansion_cv,0.25,
+fishing_feedback,TRUE,Remove previous-year catch from TL pools
+pstar,0.40,Percentile of MMSY used as management target (SEDAR103-DW-20 example)
+gear_alloc_method,catch_share,catch_share or slide
+q_years,3,Years used to estimate projection catchability
+coral_growth,0.10,Coral cover intrinsic growth (yr-1)
+coral_max_cover,0.30,Coral cover carrying capacity (proportion)
+bleach_dhw_threshold,4,DHW (degC-weeks) where bleaching mortality starts
+bleach_mort_per_dhw,0.03,Proportional coral loss per DHW above threshold
+bleach_mort_cv,0.3,
+dhw_variable,dhw,Covariate name holding annual max DHW
+sir_resample,2000,Number of SIR resamples (0 = off)
+index_min_cv,0.2,Minimum CV applied to index observations
+sir_catch_feasibility,TRUE,Stock-reduction-analysis penalty when simulated stock cannot support observed landings
+catch_feasibility_cv,0.1,
+bbmsy_overfished,0.5,B/BMSY threshold for Overfished status (MSST proxy)
+domain_lon_min,-65.0,St. Croix shelf bounding box (data acquisition)
+domain_lon_max,-64.4,
+domain_lat_min,17.6,
+domain_lat_max,17.95,
+use_acquired,TRUE,Merge API-acquired data in data/acquired/ (user values take precedence)
+landings_cv,0.2,Observation CV of each landings record (self-reported trip tickets)
+effort_cv,0.1,Observation CV of each effort record
+pref_cv,0.2,CV on habitat preferences
+coral_growth_cv,0.3,

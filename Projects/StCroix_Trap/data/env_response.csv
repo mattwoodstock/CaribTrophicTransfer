@@ -1,0 +1,14 @@
+group,variable,type,target,baseline,sensitivity,sensitivity_cv,t_opt,t_width,threshold,data_status,reference
+spiny_lobster,sst,linear,production,,-0.20,0.5,,,,PLACEHOLDER,Per degC anomaly (legacy TTM thermal sensitivity)
+queen_conch,sst,linear,production,,-0.15,0.5,,,,PLACEHOLDER,
+parrotfish_1,sst,linear,production,,-0.15,0.5,,,,PLACEHOLDER,
+parrotfish_2,sst,linear,production,,-0.15,0.5,,,,PLACEHOLDER,
+surgeonfishes,sst,linear,production,,-0.10,0.5,,,,PLACEHOLDER,
+queen_triggerfish,sst,linear,production,,-0.05,0.5,,,,PLACEHOLDER,
+grunts,sst,linear,production,,-0.10,0.5,,,,PLACEHOLDER,
+snappers_shallow,sst,linear,production,,-0.08,0.5,,,,PLACEHOLDER,
+yellowtail_snapper,sst,linear,production,,-0.08,0.5,,,,PLACEHOLDER,
+groupers_shallow,sst,thermal_performance,production,,,,27.5,2.0,,PLACEHOLDER,Example Gaussian thermal performance curve
+snappers_deep,sst,linear,production,,-0.03,0.5,,,,PLACEHOLDER,
+pelagics,sst,linear,production,,-0.02,0.5,,,,PLACEHOLDER,
+pelagics,npp_pelagic_index,loglinear,K,,0.5,0.5,,,,PLACEHOLDER,Example: pelagic forage availability

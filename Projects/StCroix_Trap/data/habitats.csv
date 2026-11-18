@@ -1,0 +1,9 @@
+habitat,type,area_km2,area_cv,npp_value,npp_unit,npp_cv,food_web_fraction,food_web_fraction_cv,tte,tte_cv,quality_model,quality_covariate,quality_ref,init_quality,p1_quality_elasticity,npp_covariate,data_status,reference
+coral_reef,benthic,,,1500,t_C_km2_yr,0.5,0.35,0.3,0.15,0.2,coral,coral_cover,0.08,0.14,0,,area from NCCOS API; NPP published range,NPP: Caribbean reef net production 986-4108 t C (Adey & Steneck 1985 St. Croix); 1200-3000 (Ramachandran Nair & Pillai 1972)
+colonized_pavement,benthic,,,181,mmol_O2_m2_d,0.4,0.35,0.3,0.15,0.2,none,,1,1,0,,area from NCCOS API; NPP published,Turf/macroalgae-dominated hardbottom; lagoon-wide Pn 181 +/- 28 mmol O2 m-2 d-1 (Naumann et al. 2013)
+seagrass,benthic,,,4.2,g_DW_m2_d,0.5,0.35,0.3,0.15,0.2,none,,1,1,0,,area from NCCOS API; NPP published,Thalassia production 4.2 g DW m-2 d-1 (Juman 2005); CARICOMP <200->2000 g DW m-2 yr-1 (van Tussenbroek et al. 2014)
+macroalgae,benthic,,,582,mmol_O2_m2_d,0.5,0.25,0.3,0.15,0.2,none,,1,1,0,,area from NCCOS API; NPP published,Caribbean macroalgal beds Pn 582 mmol O2 m-2 d-1 (Wanders 1976 via Naumann et al. 2013)
+sand,benthic,,,7,mmol_O2_m2_d,0.6,0.5,0.3,0.15,0.2,none,,1,1,0,,area from NCCOS API; NPP published,Microphytobenthos Pn 7 +/- 4 mmol O2 m-2 d-1 (Naumann et al. 2013)
+mangrove,benthic,,,400,mmol_O2_m2_d,0.3,0.2,0.4,0.15,0.2,none,,1,1,0,,area from NCCOS API; NPP published,Caribbean mangrove Pn 400 +/- 83 mmol O2 m-2 d-1 (Gattuso et al. 1998); food_web_fraction = litter export
+deep_hardbottom,benthic,,,250,t_C_km2_yr,0.6,0.35,0.3,0.15,0.2,none,,1,1,0,,area from NCCOS API; NPP PLACEHOLDER,Mesophotic (30-100 m) hardbottom incl. Lang Bank; light-limited production assumed ~1/6 of shallow reef
+pelagic,pelagic,1500,0.2,85,g_C_m2_yr,0.25,0.4,0.3,0.15,0.2,none,,1,1,0,npp_pelagic_index,area PLACEHOLDER; NPP derived,Shelf + 10 km buffer; regional satellite NPP ensemble (SEDAR103-DW-20 App. A; Ryan-Keogh et al. 2023) ~70-100 g C m-2 yr-1

@@ -1,0 +1,35 @@
+Package: CaribTTM
+Type: Package
+Title: Island-Based Trophic Transfer Model for Data-Limited U.S. Caribbean Fisheries
+Version: 0.2.0
+Authors@R: c(
+    person("Matt", "Woodstock", role = c("aut", "cre")),
+    person("Mandy", "Karnauskas", role = "aut"),
+    person("Juan", "Agar", role = "ctb"),
+    person("Daniel", "Solis", role = "ctb"),
+    person("Ryan", "Vandermeulen", role = "ctb"))
+Description: A data-limited, habitat-resolved trophic transfer model (TTM) that
+    converts benthic (habitat-specific) and pelagic (satellite or ocean-model)
+    net primary production into trophic-level energy pools, partitions that
+    energy among Fishery Management Plan (FMP) stock complexes and non-fishery
+    functional groups, and projects guild- and group-level multispecies maximum
+    sustainable yield (MMSY) through time under oceanographic, habitat,
+    disturbance (hurricanes, bleaching, disease) and fishery conditions.
+    Uncertainty is propagated by Monte Carlo sampling and optionally conditioned
+    on abundance indices with Sampling-Importance-Resampling (SIR). Outputs
+    include gear-specific MMSY allocations, choke-group diagnostics, and
+    tables formatted for stochastic production frontier (SPF) analyses, as
+    described in SEDAR103-DW-20.
+License: file LICENSE
+Encoding: UTF-8
+Depends: R (>= 4.1)
+Imports:
+    stats,
+    utils
+Suggests:
+    ggplot2,
+    testthat (>= 3.0.0),
+    ncdf4,
+    terra
+Config/testthat/edition: 3
+RoxygenNote: 7.3.1
