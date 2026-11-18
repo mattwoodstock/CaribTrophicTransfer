@@ -77,7 +77,7 @@ cat("\n=== Leave-one-benchmark-out ===\n"); print(lb)
 eo <- ecosystem_overfishing_indices(res)
 write.csv(eo, file.path(tdir, "ecosystem_overfishing_indices.csv"), row.names = FALSE)
 sv(plot_eco_indices(eo), "fig14_eco_indices.png", 9, 6)
-cat("\n=== Ecosystem-overfishing indices (2022-2024) ===\n"); print(utils::tail(eo, 3))
+cat("\n=== Ecosystem-overfishing indices (2022-2024) ===\n"); print(eo[eo$year %in% 2022:2024, ], row.names = FALSE)
 
 # ---- figures -----------------------------------------------------------------
 save_standard_plots(res, file.path(out_dir, "figures"))

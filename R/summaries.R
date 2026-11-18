@@ -106,10 +106,13 @@ reference_points <- function(res, scenario = "Baseline", years = NULL) {
       stringsAsFactors = FALSE)
   })
   rp <- do.call(rbind, rows)
+  calibrated <- if (is.null(res$sir)) rep(TRUE, nrow(rp)) else rp$group %in% focus_groups(res$proj)
+  rp$calibrated <- calibrated
   rp$status <- with(rp, ifelse(!harvest_allowed, "Prohibited",
+                       ifelse(!calibrated, "Outside focus (uncalibrated)",
                        ifelse(B_over_BMSY < st$bbmsy_overfished, "Overfished",
                        ifelse(catch_t > OFL_proxy_t, "Overfishing",
-                       ifelse(catch_t > target_t, "Caution", "Below target")))))
+                       ifelse(catch_t > target_t, "Caution", "Below target"))))))
   lb <- grep("_t$", names(rp), value = TRUE)
   for (nm in lb) rp[[sub("_t$", "_lb", nm)]] <- t_to_lb(rp[[nm]])
   rp
@@ -162,10 +165,15 @@ aggregate_mmsy <- function(res, by = "guild", scenario = "Baseline", years = NUL
 #' @param years reference years
 #' @param method allocation rule
 #' @param stat which MMSY quantity to allocate: "MMSY" (prevailing) or "MMSY0"
+#' @param focus_only if TRUE (default) and the run used SIR, only SIR-calibrated focus groups
+#'   (see `sir_feasibility_groups`) can be choke groups; uncalibrated groups are excluded
 #' @export
 gear_allocation <- function(res, scenario = "Baseline", years = NULL,
-                            method = res$proj$settings$gear_alloc_method, stat = "MMSY") {
+                            method = res$proj$settings$gear_alloc_method, stat = "MMSY",
+                            focus_only = TRUE) {
   proj <- res$proj; g <- proj$groups; gears <- proj$gear_names
+  # choke candidates: SIR-calibrated (focus) groups only, unless focus_only = FALSE
+  cand <- if (focus_only && !is.null(res$sir)) g$group %in% focus_groups(proj) else rep(TRUE, nrow(g))
   if (!length(gears)) stop("No gears defined (gears.csv / landings.csv)")
   yy <- .ref_years(res, years)
   MMSY <- apply(get_metric(res, stat, scenario)[, yy, , drop = FALSE], c(1, 3), mean)
@@ -201,7 +209,7 @@ gear_allocation <- function(res, scenario = "Baseline", years = NULL,
   ceil <- do.call(rbind, lapply(gears, function(ge) {
     m <- numeric(nd); choke <- character(nd)
     for (d in seq_len(nd)) {
-      cc <- Cg[d, ge, ]; ok <- cc > 1e-9 & g$harvest_allowed
+      cc <- Cg[d, ge, ]; ok <- cc > 1e-9 & g$harvest_allowed & cand
       if (!any(ok)) { m[d] <- NA; choke[d] <- NA; next }
       rr <- alloc[d, ge, ok] / cc[ok]
       m[d] <- min(rr); choke[d] <- g$group[ok][which.min(rr)]
@@ -279,7 +287,10 @@ benchmark_comparison <- function(res, scenario = "Baseline") {
 #'
 #' Files written to `dir`:
 #' * `spf_group_reference_points.csv` - group MMSY quantiles, OFL proxy, target,
-#'   B/BMSY, EU, status (t and lb)
+#'   B/BMSY, EU, status (t and lb) for `scenario` over the reference years
+#'   (the last `ref_years` historical years)
+#' * `spf_scenario_reference_points.csv` - the same for every scenario over the
+#'   final three projection years (scenarios diverge only after `hist_end`)
 #' * `spf_guild_mmsy.csv` - guild and FMP-complex aggregates
 #' * `spf_gear_targeting_matrix.csv` - catch composition W_g,i and catch shares
 #' * `spf_gear_mmsy.csv` - gear x group MMSY allocation
@@ -294,8 +305,15 @@ benchmark_comparison <- function(res, scenario = "Baseline") {
 write_spf_inputs <- function(res, dir, scenario = "Baseline") {
   dir.create(dir, recursive = TRUE, showWarnings = FALSE)
   w <- function(x, f) if (!is.null(x)) utils::write.csv(x, file.path(dir, f), row.names = FALSE)
-  rp <- do.call(rbind, lapply(res$scenarios, function(s) reference_points(res, s)))
-  w(rp, "spf_group_reference_points.csv")
+  ry <- .ref_years(res)
+  rp <- reference_points(res, scenario)
+  w(cbind(years = paste(range(ry), collapse = "-"), rp), "spf_group_reference_points.csv")
+  st <- res$proj$settings
+  if (!is.null(st$proj_end) && st$proj_end > st$hist_end) {
+    py <- seq(max(st$hist_end + 1, st$proj_end - 2), st$proj_end)
+    rs <- do.call(rbind, lapply(res$scenarios, function(s) reference_points(res, s, py)))
+    w(cbind(years = paste(range(py), collapse = "-"), rs), "spf_scenario_reference_points.csv")
+  }
   gl <- rbind(aggregate_mmsy(res, "guild", scenario), aggregate_mmsy(res, "fmp_complex", scenario))
   w(gl, "spf_guild_mmsy.csv")
   if (length(res$proj$gear_names)) {
@@ -310,8 +328,11 @@ write_spf_inputs <- function(res, dir, scenario = "Baseline") {
   w(summarize_timeseries(res, "MMSY"), "spf_mmsy_timeseries.csv")
   w(ecosystem_indicators(res), "ecosystem_indicators.csv")
   w(benchmark_comparison(res, scenario), "benchmark_comparison.csv")
-  if (!is.null(res$sir))
-    w(data.frame(draw = seq_along(res$sir$weights), weight = res$sir$weights, res$sir$nll),
-      "sir_diagnostics.csv")
+  if (!is.null(res$sir)) {
+    # per-draw likelihood components, only for draws with non-negligible weight
+    keep <- which(res$sir$weights > 1e-6 * max(res$sir$weights))
+    d <- data.frame(draw = keep, weight = res$sir$weights[keep], res$sir$nll[keep, , drop = FALSE])
+    w(d[order(-d$weight), ], "sir_diagnostics.csv")
+  }
   invisible(list.files(dir, full.names = TRUE))
 }

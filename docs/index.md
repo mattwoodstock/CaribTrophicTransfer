@@ -9,6 +9,7 @@
 | [Data Acquisition & Uncertainty](data_acquisition.md) | automated API downloads (ERDDAP, OPeNDAP/MOM6, Copernicus/GLORYS, NCCOS habitat maps, HURDAT2), user-override rules, full list of propagated uncertainties |
 | [Model Description](model_description.md) | equations, capabilities, MMSY rationale, uncertainty, assumptions |
 | [St. Croix Case Study](case_study_stcroix.md) | application to the St. Croix trap fishery: data, results, caveats, data-replacement checklist |
+| [Review Readiness](review_readiness.md) | anticipated CIE critiques mapped to responses, evidence files and open items |
 | [Data Needs](data_needs.md) | every placeholder still to be replaced, grouped by data type, with priority and suggested source |
 | [St. Croix Input Values](stcroix_input_values.md) | full input tables (auto-generated) |
 | [References](references.md) | literature cited |

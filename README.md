@@ -56,6 +56,7 @@ Rscript Projects/StCroix_Trap/run_stcroix.R
 | [Data Acquisition & Uncertainty](docs/data_acquisition.md) | APIs, override rules, propagated uncertainties |
 | [Model Description](docs/model_description.md) | equations, capabilities, assumptions |
 | [St. Croix Case Study](docs/case_study_stcroix.md) | application, results and data-replacement checklist |
+| [Review Readiness](docs/review_readiness.md) | anticipated CIE critiques, evidence and open items |
 | [References](docs/references.md) | literature |
 
 Build the documentation as a book with `cd docs && quarto render`.

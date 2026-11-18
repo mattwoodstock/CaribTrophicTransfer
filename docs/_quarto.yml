@@ -13,6 +13,7 @@ book:
     - data_acquisition.md
     - model_description.md
     - case_study_stcroix.md
+    - review_readiness.md
     - data_needs.md
     - stcroix_input_values.md
     - references.md
