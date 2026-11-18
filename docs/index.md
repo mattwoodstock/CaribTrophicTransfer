@@ -6,6 +6,7 @@
 |---|---|
 | [User Manual](user_manual.md) | installation, quick start, workflow, running the model, ocean-model inputs, outputs and SPF hand-off, troubleshooting |
 | [Input Data Dictionary](input_dictionary.md) | every input file and column, units, defaults, and St. Croix values |
+| [Data Acquisition & Uncertainty](data_acquisition.md) | automated API downloads (ERDDAP, OPeNDAP/MOM6, Copernicus/GLORYS, NCCOS habitat maps, HURDAT2), user-override rules, full list of propagated uncertainties |
 | [Model Description](model_description.md) | equations, capabilities, MMSY rationale, uncertainty, assumptions |
 | [St. Croix Case Study](case_study_stcroix.md) | application to the St. Croix trap fishery: data, results, caveats, data-replacement checklist |
 | [St. Croix Input Values](stcroix_input_values.md) | full input tables (auto-generated) |

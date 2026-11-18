@@ -13,7 +13,7 @@ Conventions:
 | File | Required | Purpose |
 |---|---|---|
 | `settings.csv` | yes | run controls and global constants |
-| `habitats.csv` | yes | habitat areas, NPP, transfer efficiency, quality dynamics |
+| `habitats.csv` | yes | habitat areas, NPP, transfer efficiency, quality dynamics (blank area/NPP cells can be filled by API) |
 | `groups.csv` | yes | functional groups (FMP complexes and non-fishery groups) |
 | `diet.csv` | yes | diet over the trophic-level energy pools |
 | `habitat_preference.csv` | yes | group × benthic habitat affinity |
@@ -26,6 +26,8 @@ Conventions:
 | `indices.csv` | no | relative abundance indices (SIR) |
 | `benchmarks.csv` | no | management/assessment benchmarks (comparison, SIR) |
 | `scenarios.csv` | no | projection scenarios (Baseline is implicit) |
+| `data_sources.csv` | no | API acquisition tasks (see [Data Acquisition](data_acquisition.md)) |
+| `acquired/*.csv` | no | written by `acquire_project_data()`; merged under the user-override rules |
 
 \* Without landings, historical catch is zero and the projections have no catchability. Gear outputs require landings.
 
@@ -38,7 +40,7 @@ Two columns, `key` and `value` (plus optional `notes`).
 | key | Units | Default | St. Croix | Meaning |
 |---|---|---|---|---|
 | `project_name` | text | "TTM project" | St. Croix trap fishery case study | label |
-| `hist_start` | year | 2000 | 2000 | first year (landings-driven) |
+| `hist_start` | year | 2000 | 2010 | first year (landings-driven); the case study focuses on the last 15 years |
 | `hist_end` | year | 2024 | 2024 | last historical year |
 | `proj_end` | year | 2045 | 2045 | last projection year (effort-driven) |
 | `ref_years` | years | 3 | 3 | number of final historical years averaged for reference points (2022–2024) |
@@ -62,6 +64,15 @@ Two columns, `key` and `value` (plus optional `notes`).
 | `dhw_variable` | text | dhw | dhw | covariate holding annual max DHW |
 | `sir_resample` | – | 0 | 2000 | SIR resamples (0 = no SIR) |
 | `index_min_cv` | CV | 0.2 | 0.2 | minimum CV applied to index observations |
+| `sir_catch_feasibility` | logical | TRUE | TRUE | SRA-style penalty for draws that cannot support observed landings |
+| `catch_feasibility_cv` | CV | 0.1 | 0.1 | tolerance of the feasibility penalty (max annual shortfall) |
+| `bbmsy_overfished` | B/BMSY | 0.5 | 0.5 | threshold for "Overfished" status |
+| `landings_cv` | CV | 0 | 0.2 | default observation CV of each landings record |
+| `effort_cv` | CV | 0 | 0.1 | default observation CV of each effort record |
+| `pref_cv` | CV | 0 | 0.2 | CV on habitat preferences |
+| `coral_growth_cv` | CV | 0 | 0.3 | CV on coral growth |
+| `use_acquired` | logical | TRUE | TRUE | merge API-acquired data (`data/acquired/`) where the user left blanks/placeholders |
+| `domain_lon_min`, `domain_lon_max`, `domain_lat_min`, `domain_lat_max` | decimal degrees | – | −65.0, −64.4, 17.6, 17.95 | domain bounding box for data acquisition |
 
 ---
 
@@ -74,7 +85,7 @@ One row per habitat. At most one row has `type = pelagic`.
 | `habitat` | id | yes | – | habitat name (column name in habitat_preference.csv) |
 | `type` | benthic / pelagic | yes | – | pathway |
 | `area_km2` | km² | yes | – | mapped area (benthic) or integration area (pelagic) |
-| `area_cv` | CV | | 0 | area uncertainty (mapping error) |
+| `area_cv` | CV | | 0 | area uncertainty (mapping error); filled with the class-mapping CV by the API |
 | `npp_value` | see unit | yes | – | **net** primary production |
 | `npp_unit` | code | yes | – | one of `t_C_km2_yr, g_C_m2_yr, g_C_m2_d, kg_C_ha_yr, mg_C_m2_d, mmol_O2_m2_d, g_O2_m2_d, g_DW_m2_d, g_DW_m2_yr, t_DW_km2_yr, g_OM_m2_d, t_WW_km2_yr` |
 | `npp_cv` | CV | | 0.3 | NPP uncertainty |
@@ -89,17 +100,17 @@ One row per habitat. At most one row has `type = pelagic`.
 | `p1_quality_elasticity` | – | | 0 | exponent linking quality to NPP |
 | `npp_covariate` | covariate name | | – | annual NPP index (ratio to historical mean) |
 
-**St. Croix values.** The NPP column gives the value as entered. Areas are **placeholders**: replace them with the NCCOS habitat tabulation used in SEDAR103-DW-20 Fig. A2.
+**St. Croix values.** The NPP column gives the value as entered. Benthic `area_km2` cells are left **blank** in `habitats.csv` and filled from the NOAA NCCOS 2002 USVI benthic habitat map via the ArcGIS REST API (`acquire_project_data()`). Class areas are summed into model habitats with `nccos_class_map()`. The pelagic area (shelf + 10 km buffer) is user-specified.
 
 | habitat | area km² | NPP (as entered) | NPP t C km⁻² yr⁻¹ | f | TTE | source |
 |---|---|---|---|---|---|---|
-| coral_reef | 60 | 1500 t C km⁻² yr⁻¹ | 1500 | 0.35 | 0.15 | Adey & Steneck 1985 (St. Croix, Pn 986–4108); Ramachandran Nair & Pillai 1972 (1200–3000) |
-| colonized_pavement | 70 | 181 mmol O₂ m⁻² d⁻¹ | 793 | 0.35 | 0.15 | Naumann et al. 2013 (lagoon-wide Pn) |
-| seagrass | 35 | 4.2 g DW m⁻² d⁻¹ | 521 | 0.35 | 0.15 | Juman 2005 (*Thalassia*, Tobago); CARICOMP range |
-| macroalgae | 30 | 582 mmol O₂ m⁻² d⁻¹ | 2549 | 0.25 | 0.15 | Wanders 1976 |
-| sand | 80 | 7 mmol O₂ m⁻² d⁻¹ | 30.7 | 0.50 | 0.15 | Naumann et al. 2013 (microphytobenthos) |
-| mangrove | 1.5 | 400 mmol O₂ m⁻² d⁻¹ | 1752 | 0.20 | 0.15 | Gattuso et al. 1998 (litter export fraction) |
-| deep_hardbottom | 65 | 250 t C km⁻² yr⁻¹ | 250 | 0.35 | 0.15 | placeholder (light-limited mesophotic) |
+| coral_reef | 41.7 (API) | 1500 t C km⁻² yr⁻¹ | 1500 | 0.35 | 0.15 | Adey & Steneck 1985 (St. Croix, Pn 986–4108); Ramachandran Nair & Pillai 1972 (1200–3000) |
+| colonized_pavement | 192.0 (API) | 181 mmol O₂ m⁻² d⁻¹ | 793 | 0.35 | 0.15 | Naumann et al. 2013 (lagoon-wide Pn) |
+| seagrass | 59.4 (API) | 4.2 g DW m⁻² d⁻¹ | 521 | 0.35 | 0.15 | Juman 2005 (*Thalassia*, Tobago); CARICOMP range |
+| macroalgae | 13.1 (API) | 582 mmol O₂ m⁻² d⁻¹ | 2549 | 0.25 | 0.15 | Wanders 1976 |
+| sand | 12.7 (API) | 7 mmol O₂ m⁻² d⁻¹ | 30.7 | 0.50 | 0.15 | Naumann et al. 2013 (microphytobenthos) |
+| mangrove | 1.33 (API) | 400 mmol O₂ m⁻² d⁻¹ | 1752 | 0.20 | 0.15 | Gattuso et al. 1998 (litter export fraction) |
+| deep_hardbottom | 388.3 (API; NCCOS 'Unknown' deeper shelf) | 250 t C km⁻² yr⁻¹ | 250 | 0.35 | 0.15 | placeholder (light-limited mesophotic) |
 | pelagic | 1500 | 85 g C m⁻² yr⁻¹ | 85 | 0.40 | 0.15 | SEDAR103-DW-20 App. A ensemble (Ryan-Keogh et al. 2023) |
 
 The coral reef habitat uses `quality_model = coral` with `quality_covariate = coral_cover`, `quality_ref = 0.08` (≈ 2013 NCRMP cover) and `init_quality = 0.14`.
@@ -135,6 +146,7 @@ One row per functional group.
 | `init_depletion_cv` | CV | | 0.2 | |
 | `refuge_dependence` | exponent | | 0 | capacity ∝ habitat quality^ρ |
 | `immigration_t` | t yr⁻¹ | | 0 | external supply (connectivity model) |
+| `immigration_cv` | CV | | 0 | uncertainty on immigration |
 | `process_sd` | log-sd | | 0.1 | annual process error |
 | `energy_density_kJ_g` | kJ g⁻¹ WW | | 5 | for energy-based reporting |
 
@@ -195,8 +207,9 @@ Rows are groups; columns are benthic habitat names, with relative affinity 0–1
 | `gear` | id | |
 | `group` | id | group (map species to FMP groups before entry) |
 | `landings_lb` | lb whole weight yr⁻¹ | reported commercial (± recreational) landings |
+| `cv` | CV | optional observation CV of the record (default `settings: landings_cv`) |
 
-St. Croix: **PLACEHOLDER** series 2000–2024. Recent levels are listed in the case-study chapter. The one published anchor is queen conch 2021 = 30,535 lb. Replace with CCL/logbook landings mapped to FMP groups.
+St. Croix: **PLACEHOLDER** series (generated for 2000–2024; the model uses 2010–2024). Recent levels are listed in the case-study chapter. The one published anchor is queen conch 2021 = 30,535 lb. Replace with CCL/logbook landings mapped to FMP groups.
 
 ## effort.csv
 
@@ -204,19 +217,21 @@ St. Croix: **PLACEHOLDER** series 2000–2024. Recent levels are listed in the c
 |---|---|---|
 | `year`, `gear` | | |
 | `effort` | trips (or trap-hauls, dive-hours…) | effort used to scale projections and for slide-11 allocation |
+| `cv` | CV | optional observation CV (default `settings: effort_cv`) |
 
 St. Croix: **PLACEHOLDER** trips (trap_fish ≈ 2,200; trap_lobster ≈ 900; dive ≈ 1,600; hook_line ≈ 2,100 per year in recent years).
 
 ## env_covariates.csv
 
-Long format: `year, variable, value` (+ `units`, `source`). Future years (e.g., a MOM6 projection) are used directly when present.
+Long format: `year, variable, value` (+ optional `sd` observation standard deviation, `units`, `source`, `data_status`). Future years (e.g., a MOM6 projection) are used directly when present. Rows with `sd > 0` are perturbed in every Monte Carlo draw. Rows flagged `PLACEHOLDER` in `data_status` are replaced by API-acquired values of the same variable.
 
-| St. Croix variable | Units | Status | Use |
+| St. Croix variable | Units | Source | Use |
 |---|---|---|---|
-| `sst` | °C (annual mean) | PLACEHOLDER (replace with GLORYS12/OISST) | thermal responses |
-| `dhw` | °C-weeks (annual max) | PLACEHOLDER (replace with NOAA Coral Reef Watch) | coral bleaching |
-| `npp_pelagic_index` | ratio | PLACEHOLDER (replace with St. Croix NPP ensemble) | pelagic NPP index |
-| `coral_cover` | proportion | approximate (NCRMP ≈0.08 in 2013 → ≈0.04 in 2019; SCTLD from 2021) | reef habitat quality |
+| `sst` | °C (annual mean) | **API**: NOAA Coral Reef Watch CoralTemp (NESDIS ERDDAP), sd = spatial SD | thermal responses |
+| `dhw` | °C-weeks (annual max) | **API**: NOAA Coral Reef Watch DHW, sd = spatial SD | coral bleaching |
+| `npp_pelagic_index` (+ `_abs`) | ratio (g C m⁻² yr⁻¹) | **API**: satellite NPP ensemble (PFEG ERDDAP); placeholder fallback if the server is unavailable | pelagic NPP index |
+| `kd490`, `chla` | m⁻¹, mg m⁻³ | **API**: VIIRS SNPP (2012–) | optional covariates (water clarity, productivity) |
+| `coral_cover` | proportion | approximate (NCRMP ≈0.08 in 2013 → ≈0.04 in 2019; SCTLD from 2021), sd = 0.01 | reef habitat quality |
 
 ## env_response.csv
 
@@ -250,8 +265,9 @@ St. Croix: linear SST sensitivities carried over from the legacy model, e.g. lob
 | `effort_half_life_yr` | years | effort recovery half-life |
 | `group` | ids / `all` | groups with direct production loss |
 | `production_loss` | proportion | |
+| `intensity_cv` | CV | uncertainty of the event intensity (API events: 0.3) |
 
-St. Croix: Hurricane Omar (2008, intensity 0.4) and Hurricanes Irma & Maria (2017, intensity 1.0), with 25% NPP loss and 15% coral cover loss at full intensity, 2-year recovery half-life, and 60% trap effort loss (half-life 1.5 years). Templates `major_hurricane` and `major_hurricane_other_gears` are provided. Intensities and losses are **placeholders**.
+St. Croix: `disturbances.csv` holds only the templates `major_hurricane` and `major_hurricane_other_gears`. At full intensity these apply a 25% NPP loss, a 15% coral cover loss, a 2-year recovery half-life, a 60% trap effort loss (half-life 1.5 years) and a 20% lobster production loss; the loss magnitudes are **placeholders**. Historical events (2010–2024) are generated from NHC HURDAT2 best tracks by the API: Maria 2017 = 1.00, Irma 2017 = 0.54, Dorian 2019 = 0.30, Irene 2011 = 0.25, Earl 2010 = 0.16, plus weaker storms, each with `intensity_cv = 0.3`. Add a row for a specific year to override the API event.
 
 ## indices.csv
 
@@ -264,7 +280,7 @@ St. Croix: Hurricane Omar (2008, intensity 0.4) and Hurricanes Irma & Maria (201
 | `cv` | CV | observation CV (floored at `index_min_cv`) |
 | `lambda` | weight | likelihood weight |
 
-St. Croix: SEDAR 57 lobster trap CPUE (2012–2021), SEDAR 80 queen triggerfish trap CPUE (2000–2019), NCRMP parrotfish density (2013–2023). **All placeholders.** Replace with the published standardized series.
+St. Croix: SEDAR 57 lobster trap CPUE (2012–2021), SEDAR 80 queen triggerfish trap CPUE (2000–2019; 2010–2019 used), NCRMP parrotfish density (2013–2023). **All placeholders.** Replace with the published standardized series.
 
 ## benchmarks.csv
 

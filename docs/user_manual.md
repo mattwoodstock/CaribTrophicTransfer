@@ -37,6 +37,12 @@ write_ttm_templates("Projects/MyIsland/data")  # writes a complete runnable set 
 proj <- read_ttm_project("Projects/MyIsland")
 ```
 
+Download API-available inputs (SST, DHW, satellite NPP, habitat areas, hurricanes), then run:
+
+```r
+acquire_project_data("Projects/StCroix_Trap")   # writes Projects/StCroix_Trap/data/acquired/
+```
+
 St. Croix case study (from the repository root):
 
 ```bash
@@ -69,12 +75,12 @@ Add a number of draws for a quick test run, e.g. `Rscript Projects/StCroix_Trap/
 Recommended steps for a new island or region:
 
 1. **Define the domain.** Choose the island platform (FMP unit) and the pelagic integration area. For trap fisheries this is the insular shelf plus a buffer. For pelagic-dominated fisheries a larger EEZ polygon may be appropriate.
-2. **Habitats.** Tabulate mapped benthic habitat area (e.g., NCCOS benthic habitat maps) in an equal-area projection. Assign **net** primary production per habitat from the literature, in any supported unit (`npp_unit`).
-3. **Pelagic NPP.** Integrate the satellite NPP ensemble (Ryan-Keogh et al. 2023) or an ocean-model NPP over the pelagic polygon. Enter the long-term mean in `habitats.csv` and the annual index as an `npp_covariate`.
+2. **Habitats.** Leave `area_km2` blank to fill it from the NCCOS benthic habitat map API, or tabulate mapped area yourself in an equal-area projection. Assign **net** primary production per habitat from the literature, in any supported unit (`npp_unit`).
+3. **Pelagic NPP and oceanography.** Set the domain bounding box in `settings.csv` and list sources in `data_sources.csv`; then run `acquire_project_data()`. The satellite NPP ensemble provides the index (`npp_covariate`) and, if `npp_value` is blank, the long-term mean. See [Data Acquisition](data_acquisition.md).
 4. **Functional groups.** Use one row per FMP stock or stock complex. Add non-fishery groups that compete for the same pools (zooplankton, benthic grazers, detritivores, predatory invertebrates, small reef fish, other predators). Then set P/B, x_msy, partitioning information, refuge dependence and `data_tier`.
 5. **Diet and habitat preference.** Enter trophic-level diet fractions and habitat affinities.
 6. **Fishery data.** Map trip-ticket species to FMP groups and enter landings by year × gear × group (lb) and effort by gear.
-7. **Environment and disturbances.** Add covariates (Section 5) and response functions. Record historical hurricanes and other events, and define templates for scenarios.
+7. **Environment and disturbances.** Add covariates (API or Section 5) and response functions. Hurricanes are generated from HURDAT2; add rows for other events or to override a year, and define templates for scenarios.
 8. **Conditioning data.** Add relative indices (CPUE, survey densities) and assessment OFL/MSY benchmarks.
 9. **Scenarios.** Define the management and environmental scenarios to project.
 10. **Run, check, iterate.** Check the SIR effective sample size, catch-feasibility shortfalls (`landings_shortfall`), benchmark ratios, and the prior vs. posterior figure. Revise priors that the data reject.
@@ -90,6 +96,8 @@ Recommended steps for a new island or region:
 | `simulate_ttm(proj, par, drv)` | one deterministic simulation |
 | `run_ttm(proj, n_draws, scenarios, sir)` | full Monte Carlo + SIR + scenarios |
 | `apply_sir(res)`, `prior_results(res)` | (re)condition draws or revert to the prior |
+| `acquire_project_data(dir)` | download API inputs to `data/acquired/` |
+| `fetch_erddap_series()`, `fetch_npp_ensemble()`, `fetch_opendap_series()`, `fetch_copernicus_series()`, `fetch_nccos_habitat_areas()`, `fetch_hurdat2()` | individual API helpers |
 
 **Run time.** One simulation of the 29-group, 8-habitat St. Croix model over 46 years takes about 0.07 s. `run_ttm` simulates the Baseline for every prior draw, applies SIR, and then runs the other scenarios only for the retained draws. A 1,000-draw, 7-scenario run takes a few minutes. Use ≥ 5,000 draws for final analyses with SIR.
 

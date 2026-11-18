@@ -255,14 +255,16 @@ Every uncertain input is sampled independently in each draw:
 * C:WW
 * P/B, x_msy, partition values, B0_fixed and initial depletion
 * diet (Dirichlet with concentration `diet_concentration`)
-* catch expansion, bleaching mortality, environmental sensitivities
+* catch expansion, bleaching mortality, environmental sensitivities, coral growth, habitat preferences, immigration
 * process error
+* **observation error in data inputs**: covariate values (`sd`, e.g., the spatial or ensemble SD returned by the APIs), landings and effort records (`cv`), and disturbance intensities (`intensity_cv`). When these are present, the annual drivers are rebuilt for each draw. The complete list is in [Data Acquisition & Uncertainty](data_acquisition.md), Section 4.
 
 The sampling distributions are lognormal for positive quantities and beta for fractions, each defined by its mean and CV. All scenarios use the same parameter draw, so scenario contrasts are paired.
 
 **Sampling-Importance-Resampling (SIR)** optionally conditions the draws on data:
 
 * **Relative indices** (`indices.csv`): e.g., SEDAR 57 lobster trap CPUE, SEDAR 80 queen triggerfish trap CPUE, NCRMP densities. These use a lognormal likelihood with an analytical catchability, so they inform **trends** (depletion, productivity), not absolute scale.
+* **Catch feasibility** (stock reduction analysis; Kimura & Tagart 1982, Walters et al. 2006): draws in which the simulated stock could not support the observed (expanded) landings in some year are down-weighted. This places a lower bound on the productivity of every harvested group, assessed or not.
 * **Assessment benchmarks** (`benchmarks.csv`, `use_in_sir = TRUE`): e.g., the SEDAR 57 / SEDAR 80 OFLs. These anchor the **absolute scale** of MMSY for assessed groups. Because all groups share the energy pools, the anchoring also constrains the scale of the unassessed groups through the shared primary production, TTE and food-web fraction draws. ACLs include management buffers and should not be used in SIR; they are compared in `benchmark_comparison.csv`.
 
 Draws are weighted by $\exp(-\text{NLL})$ and resampled. The effective sample size (ESS) is reported. A low ESS means the priors conflict with the data or more draws are needed. `prior_results()` returns the unconditioned results for comparison.

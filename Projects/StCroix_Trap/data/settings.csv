@@ -1,6 +1,6 @@
 key,value,notes
 project_name,St. Croix trap fishery case study,Shown in outputs
-hist_start,2000,First historical year (landings-driven)
+hist_start,2010,First historical year (landings-driven); last ~15 years are the focus
 hist_end,2024,Last historical year; reference points use the final ref_years
 proj_end,2045,Final projection year (effort-driven)
 ref_years,3,Years averaged for reference points (2022-2024)

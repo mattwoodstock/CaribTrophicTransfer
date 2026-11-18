@@ -10,6 +10,7 @@ book:
     - index.md
     - user_manual.md
     - input_dictionary.md
+    - data_acquisition.md
     - model_description.md
     - case_study_stcroix.md
     - stcroix_input_values.md
