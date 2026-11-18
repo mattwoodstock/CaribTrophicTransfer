@@ -1,15 +1,21 @@
 scenario,driver,target,start_year,end_year,value,notes
-Warming,cov_trend,sst,2025,2045,0.03,~SSP5-8.5 rate; replace with MOM6-NWA12 projection in env_covariates.csv
-Warming,cov_set,dhw,2030,2030,12,Severe bleaching year
-Warming,cov_set,dhw,2036,2036,12,Severe bleaching year
-Warming,cov_set,dhw,2042,2042,14,Severe bleaching year
-Warming,npp_trend,pelagic,2025,2045,-0.005,0.5%/yr decline in pelagic NPP
+Climate_SSP245,cov_from,sst=sst_ssp245,2025,2045,,CMIP6 (CESM2 + ACCESS-ESM1-5) SST delta projection
+Climate_SSP245,cov_from,npp_pelagic_index=npp_pelagic_index_ssp245,2025,2045,,CMIP6 integrated NPP delta projection
+Climate_SSP245,cov_set,dhw,2032,2032,10,Bleaching year (PLACEHOLDER frequency/magnitude)
+Climate_SSP245,cov_set,dhw,2041,2041,10,Bleaching year (PLACEHOLDER)
+Climate_SSP585,cov_from,sst=sst_ssp585,2025,2045,,CMIP6 SST delta projection
+Climate_SSP585,cov_from,npp_pelagic_index=npp_pelagic_index_ssp585,2025,2045,,CMIP6 integrated NPP delta projection
+Climate_SSP585,cov_set,dhw,2028,2028,12,Bleaching year (PLACEHOLDER frequency/magnitude)
+Climate_SSP585,cov_set,dhw,2033,2033,14,Bleaching year (PLACEHOLDER)
+Climate_SSP585,cov_set,dhw,2038,2038,14,Bleaching year (PLACEHOLDER)
+Climate_SSP585,cov_set,dhw,2043,2043,16,Bleaching year (PLACEHOLDER)
 Major_hurricane_2030,disturbance,major_hurricane,2030,2030,1,
 Major_hurricane_2030,disturbance,major_hurricane_other_gears,2030,2030,1,
 Trap_effort_plus30,effort_mult,trap_fish;trap_lobster,2025,2045,1.3,Unmanaged trap effort surge
 Trap_reduction_minus25,effort_mult,trap_fish;trap_lobster,2025,2045,0.75,Trap reduction program (cf. St. Thomas)
-Coral_disease_SCTLD,coral_disease,coral_reef,2025,2032,0.08,Continued SCTLD-driven coral loss
-Combined_stress,cov_trend,sst,2025,2045,0.03,
+Coral_disease_SCTLD,coral_disease,coral_reef,2025,2032,0.08,Continued SCTLD-driven coral loss (PLACEHOLDER rate)
+Combined_stress,cov_from,sst=sst_ssp585,2025,2045,,
+Combined_stress,cov_from,npp_pelagic_index=npp_pelagic_index_ssp585,2025,2045,,
 Combined_stress,cov_set,dhw,2030,2030,12,
 Combined_stress,disturbance,major_hurricane,2033,2033,1,
 Combined_stress,disturbance,major_hurricane_other_gears,2033,2033,1,

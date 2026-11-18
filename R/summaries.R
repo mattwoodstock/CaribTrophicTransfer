@@ -101,7 +101,7 @@ reference_points <- function(res, scenario = "Baseline", years = NULL) {
       P_overfishing = mean(C[, gi] > MMSY[, gi]),
       P_overfished = mean(2 * B[, gi] / K[, gi] < st$bbmsy_overfished),
       landings_shortfall = if (is.null(res$catch_shortfall)) NA else
-        stats::median(res$catch_shortfall[res$draws, gi]),
+        round(stats::median(res$catch_shortfall[res$draws, gi]), 4),
       stringsAsFactors = FALSE)
   })
   rp <- do.call(rbind, rows)

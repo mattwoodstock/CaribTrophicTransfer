@@ -133,30 +133,15 @@ parse_erddap_csv <- function(file, variable) {
 #' @param time_agg aggregation within year ("mean", "max", "min", "sum")
 #' @param scale,offset transform applied to raw values
 #' @param verbose print progress
+#' @param chunk_years years per request (use > 1 for monthly products)
 #' @return data frame year, value, sd, n
 #' @export
 fetch_erddap_series <- function(server, dataset_id, variable, years, bbox, extra_dims = NULL,
                                 stride = c(time = 1, lat = 1, lon = 1), lat_descending = NA,
-                                time_agg = "mean", scale = 1, offset = 0, verbose = TRUE) {
-  if (is.na(lat_descending)) lat_descending <- erddap_lat_descending(server, dataset_id)
-  cov <- erddap_time_coverage(server, dataset_id)
-  out <- list()
-  for (y in years) {
-    t0 <- max(as.Date(sprintf("%d-01-01", y)), cov[1]); t1 <- min(as.Date(sprintf("%d-12-31", y)), cov[2])
-    if (t0 > t1) next
-    url <- erddap_griddap_url(server, dataset_id, variable, c(paste0(t0, "T00:00:00Z"), paste0(t1, "T23:59:59Z")),
-                              bbox, extra_dims, stride, lat_descending)
-    if (verbose) message("  ERDDAP ", dataset_id, " ", y)
-    f <- tryCatch(.http_get(url), error = function(e) { warning(conditionMessage(e)); NULL })
-    if (is.null(f)) next
-    g <- parse_erddap_csv(f, variable)
-    g <- g[as.integer(format(g$time, "%Y")) == y, , drop = FALSE]  # ERDDAP snaps bounds to nearest time
-    a <- annualize_grid(g, time_agg, scale, offset)
-    unlink(f)
-    if (nrow(a)) out[[length(out) + 1]] <- a
-  }
-  if (!length(out)) return(data.frame(year = integer(), value = numeric(), sd = numeric(), n = integer()))
-  do.call(rbind, out)
+                                time_agg = "mean", scale = 1, offset = 0, verbose = TRUE, chunk_years = 1) {
+  ts <- fetch_erddap_timeseries(server, dataset_id, variable, years, bbox, extra_dims, stride,
+                                chunk_years = chunk_years, scale = scale, offset = offset, verbose = verbose)
+  .annual_from_ts(ts, time_agg)
 }
 
 #' ERDDAP dataset metadata helpers
@@ -185,27 +170,37 @@ erddap_lat_descending <- function(server, dataset_id) {
 #' Pre-configured data sources
 #'
 #' ERDDAP datasets verified against the live services (November 2026).
-#' NESDIS CoastWatch (coastwatch.noaa.gov) hosts Coral Reef Watch SST/DHW and
-#' VIIRS ocean colour; PFEG CoastWatch (coastwatch.pfeg.noaa.gov) hosts OISST
-#' and the satellite NPP products. Use the `dataset_id` / `variable` columns as
+#' NOAA PIFSC OceanWatch (oceanwatch.pifsc.noaa.gov) hosts monthly Coral Reef
+#' Watch SST, CRW DHW, AVHRR Pathfinder SST, ESA OC-CCI ocean colour, SeaWiFS /
+#' MODIS PAR and CMIP6 projections (default sources). NESDIS CoastWatch
+#' (coastwatch.noaa.gov) hosts daily CRW SST/DHW and VIIRS ocean colour; PFEG
+#' CoastWatch (coastwatch.pfeg.noaa.gov) hosts OISST and pre-computed NPP. Use the `dataset_id` / `variable` columns as
 #' a template for additional products (any ERDDAP griddap dataset works).
 #' @export
 ocean_source_catalog <- function() {
   pfeg <- "https://coastwatch.pfeg.noaa.gov/erddap"; nesdis <- "https://coastwatch.noaa.gov/erddap"
+  pifsc <- "https://oceanwatch.pifsc.noaa.gov/erddap"
   data.frame(
-    key = c("crw_sst", "crw_dhw_max", "oisst_sst", "viirs_chla", "viirs_kd490",
+    key = c("crw_sst_monthly", "pathfinder_sst_monthly", "crw_dhw_max_pifsc", "occci_chla_monthly",
+            "occci_kd490_monthly", "crw_sst", "crw_dhw_max", "oisst_sst", "viirs_chla", "viirs_kd490",
             "modis_vgpm_npp", "viirs_snpp_npp", "viirs_noaa20_npp"),
     method = "erddap",
-    server = c(nesdis, nesdis, pfeg, nesdis, nesdis, pfeg, pfeg, pfeg),
-    dataset_id = c("noaacrwsstDaily", "noaacrwdhwDaily", "ncdcOisst21Agg_LonPM180",
+    server = c(pifsc, pifsc, pifsc, pifsc, pifsc, nesdis, nesdis, pfeg, nesdis, nesdis, pfeg, pfeg, pfeg),
+    dataset_id = c("CRW_sst_v3_1_monthly", "pf5-3-monthly", "CRW_dhw_v1_0", "esa-cci-chla-monthly-v6-0",
+                   "esa-cci-kd-monthly-v6-0", "noaacrwsstDaily", "noaacrwdhwDaily", "ncdcOisst21Agg_LonPM180",
                    "noaacwNPPVIIRSSQchlaMonthly", "noaacwNPPVIIRSSQkd490Monthly", "erdMH1ppmday",
                    "productivity_viirs_snpp_monthly", "productivity_viirs_noaa20_monthly"),
-    variable = c("analysed_sst", "degree_heating_week", "sst", "chlor_a", "kd_490",
+    variable = c("sea_surface_temperature", "sea_surface_temperature", "degree_heating_week", "chlor_a",
+                 "kd_490", "analysed_sst", "degree_heating_week", "sst", "chlor_a", "kd_490",
                  "productivity", "productivity", "productivity"),
-    extra_dims = c("", "", "zlev=0", "altitude=0", "altitude=0", "altitude=0", "", ""),
-    time_agg = c("mean", "max", "mean", "mean", "mean", "mean", "mean", "mean"),
-    units_out = c("degC", "degC-weeks", "degC", "mg m-3", "m-1", "mg C m-2 d-1", "mg C m-2 d-1", "mg C m-2 d-1"),
-    coverage = c("1985-present daily 5 km", "1985-present daily 5 km", "1981-present daily 0.25 deg",
+    extra_dims = c("", "", "", "", "", "", "", "zlev=0", "altitude=0", "altitude=0", "altitude=0", "", ""),
+    time_agg = c("mean", "mean", "max", "mean", "mean", "mean", "max", "mean", "mean", "mean", "mean", "mean", "mean"),
+    units_out = c("degC", "degC", "degC-weeks", "mg m-3", "m-1", "degC", "degC-weeks", "degC", "mg m-3", "m-1",
+                  "mg C m-2 d-1", "mg C m-2 d-1", "mg C m-2 d-1"),
+    chunk_years = c(10, 10, 3, 6, 6, 1, 1, 1, 6, 6, 6, 6, 6),
+    coverage = c("1985-present monthly 5 km", "1981-2018 monthly 4 km", "1985-present daily 5 km",
+                 "1997-present monthly 4 km", "1997-present monthly 4 km",
+                 "1985-present daily 5 km", "1985-present daily 5 km", "1981-present daily 0.25 deg",
                  "2012-present monthly 4 km", "2012-present monthly 4 km", "2003-present monthly 4 km",
                  "2012-2024 monthly 4 km", "2018-2025 monthly 4 km"),
     stringsAsFactors = FALSE)
@@ -525,7 +520,18 @@ acquire_project_data <- function(project_dir, only = NULL, verbose = TRUE) {
           stride = c(time = as.integer(.pick(a$stride_time, 1)), lat = as.integer(.pick(a$stride_space, 1)),
                      lon = as.integer(.pick(a$stride_space, 1))),
           time_agg = .pick(a$time_agg, cc$time_agg, "mean"), scale = as.numeric(.pick(a$scale, 1)),
-          offset = as.numeric(.pick(a$offset, 0)), verbose = verbose)
+          offset = as.numeric(.pick(a$offset, 0)), verbose = verbose,
+          chunk_years = as.integer(.pick(a$chunk_years, cc$chunk_years, 1)))
+        if (!is.null(a$fill_key)) {   # fill earlier/missing years from a second product (e.g., Pathfinder before CRW)
+          c2 <- cat[cat$key == a$fill_key, ]
+          x2 <- fetch_erddap_series(c2$server, c2$dataset_id, c2$variable, setdiff(yrs, x$year), bbox,
+                                    .parse_dims(c2$extra_dims), stride = c(time = 1, lat = 2, lon = 2),
+                                    time_agg = c2$time_agg, chunk_years = c2$chunk_years, verbose = verbose)
+          if (nrow(x2)) {
+            x2$sd <- pmax(x2$sd, stats::sd(x$value) * 0.25)
+            x <- rbind(x2, x); x <- x[order(x$year), ]
+          }
+        }
         list(cov = data.frame(year = x$year, variable = r$target, value = x$value, sd = x$sd,
                               units = .pick(a$units, cc$units_out, ""),
                               source = paste("ERDDAP", .pick(a$dataset_id, cc$dataset_id)),
@@ -561,6 +567,44 @@ acquire_project_data <- function(project_dir, only = NULL, verbose = TRUE) {
                               npp_unit = "g_C_m2_yr", npp_cv = round(stats::sd(e$value) / base + 0.1, 3),
                               classes = "", source = "API: satellite NPP ensemble (ERDDAP)"))
         }
+      },
+      vgpm_ensemble = {
+        e <- fetch_vgpm_ensemble(bbox, yrs, verbose = verbose)
+        base <- mean(e$value)
+        # index uncertainty: spread of each algorithm's own anomaly + spatial chl component
+        iv <- e$vgpm / mean(e$vgpm); ie <- e$eppley / mean(e$eppley)
+        mon <- attr(e, "monthly")
+        sp <- tapply(mon$rel_sd_chl, mon$year, mean)[as.character(e$year)] / sqrt(e$n_months)
+        idx_sd <- sqrt(apply(cbind(iv, ie), 1, stats::sd)^2 + sp^2)
+        utils::write.csv(attr(e, "monthly"), file.path(adir, "vgpm_monthly_inputs.csv"), row.names = FALSE)
+        list(cov = rbind(
+               data.frame(year = e$year, variable = r$target, value = (iv + ie) / 2, sd = as.numeric(idx_sd),
+                          units = "relative", source = paste("Computed:", e$products), data_status = "API (computed)"),
+               data.frame(year = e$year, variable = paste0(r$target, "_abs"), value = e$value, sd = e$sd,
+                          units = "g C m-2 yr-1", source = paste("Computed:", e$products), data_status = "API (computed)")),
+             hab = data.frame(habitat = .pick(a$habitat, "pelagic"), area_km2 = NA, area_cv = NA,
+                              npp_value = round(base, 2), npp_unit = "g_C_m2_yr",
+                              npp_cv = round(sqrt(mean(e$sd^2)) / base + 0.1, 3), classes = "",
+                              source = "API: computed VGPM/Eppley-VGPM ensemble"))
+      },
+      cmip6_delta = {
+        if (is.null(cov) || !a$obs_variable %in% cov$variable)
+          stop("cmip6_delta needs the observed covariate '", a$obs_variable, "' acquired first (list it earlier in data_sources.csv)")
+        obs <- cov[cov$variable == a$obs_variable, c("year", "value")]
+        exps <- strsplit(.pick(a$experiments, "ssp245|ssp585"), "\\|")[[1]]
+        mods <- strsplit(.pick(a$models, "cesm2|access-esm1-5"), "\\|")[[1]]
+        py <- seq(max(obs$year) + 1, as.integer(.pick(a$proj_end, proj$settings$proj_end)))
+        bl <- eval(parse(text = .pick(a$baseline, "2005:2014")))
+        do.call(rbind, lapply(exps, function(ex) {
+          pr <- cmip6_delta_projection(obs, mods, ex, a$cmip_var, bbox, py, bl, .pick(a$type, "additive"),
+                                       as.numeric(.pick(a$scale, 1)))
+          rbind(data.frame(year = obs$year, variable = paste0(a$obs_variable, "_", ex), value = obs$value,
+                           sd = cov$sd[cov$variable == a$obs_variable], units = "", source = "observed",
+                           data_status = "API"),
+                data.frame(year = pr$year, variable = paste0(a$obs_variable, "_", ex), value = pr$value, sd = pr$sd,
+                           units = "", source = paste("CMIP6 delta:", pr$models, ex), data_status = "API (CMIP6)"))
+        })) -> cv
+        list(cov = cv)
       },
       opendap = {
         x <- fetch_opendap_series(a$url, a$variable, bbox, yrs, .pick(a$time_agg, "mean"),

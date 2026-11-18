@@ -1,0 +1,47 @@
+"year","event","intensity","habitat","p1_loss","quality_loss","half_life_yr","gear","effort_loss","effort_half_life_yr","group","production_loss","data_status","notes","intensity_cv"
+1996,"Hurricane Bertha (AL021996)",0.191,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 94 km; max wind 75 kt",0.3
+2001,"Hurricane Dean (AL052001)",0.107,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 45 km; max wind 45 kt",0.3
+2015,"Hurricane Erika (AL052015)",0.068,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 77 km; max wind 45 kt",0.3
+2019,"Hurricane Dorian (AL052019)",0.301,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 11 km; max wind 65 kt",0.3
+2024,"Hurricane Ernesto (AL052024)",0.177,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 58 km; max wind 55 kt",0.3
+1998,"Hurricane Georges (AL071998)",0.544,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 32 km; max wind 90 kt",0.3
+2000,"Hurricane Debby (AL072000)",0.163,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 87 km; max wind 65 kt",0.3
+2010,"Hurricane Earl (AL072010)",0.159,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 146 km; max wind 115 kt",0.3
+2022,"Hurricane Fiona (AL072022)",0.055,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 129 km; max wind 55 kt",0.3
+1996,"Hurricane Hortense (AL081996)",0.054,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 162 km; max wind 70 kt",0.3
+2014,"Hurricane Gonzalo (AL082014)",0.08,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 165 km; max wind 90 kt",0.3
+2011,"Hurricane Irene (AL092011)",0.252,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 11 km; max wind 60 kt",0.3
+1989,"Hurricane Hugo (AL111989)",0.835,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 13 km; max wind 120 kt",0.3
+2004,"Hurricane Jeanne (AL112004)",0.197,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 65 km; max wind 60 kt",0.3
+2017,"Hurricane Irma (AL112017)",0.543,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 87 km; max wind 155 kt",0.3
+1995,"Hurricane Luis (AL131995)",0.112,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 171 km; max wind 120 kt",0.3
+2020,"Hurricane Laura (AL132020)",0.056,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 52 km; max wind 40 kt",0.3
+1999,"Hurricane Jose (AL141999)",0.18,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 70 km; max wind 60 kt",0.3
+1995,"Hurricane Marilyn (AL151995)",0.544,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 14 km; max wind 90 kt",0.3
+2008,"Hurricane Omar (AL152008)",0.36,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 97 km; max wind 115 kt",0.3
+2017,"Hurricane Maria (AL152017)",1,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 47 km; max wind 150 kt",0.3
+1999,"Hurricane Lenny (AL161999)",0.981,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 43 km; max wind 135 kt",0.3
+1984,"Hurricane Klaus (AL181984)",0.072,"coral_reef;colonized_pavement;seagrass;macroalgae;mangrove",0.25,0.15,2,"trap_fish;trap_lobster",0.6,1.5,"spiny_lobster",0.2,"API: NHC HURDAT2","closest approach 96 km; max wind 50 kt",0.3
+1996,"Hurricane Bertha (AL021996) (other gears)",0.191,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 94 km; max wind 75 kt",0.3
+2001,"Hurricane Dean (AL052001) (other gears)",0.107,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 45 km; max wind 45 kt",0.3
+2015,"Hurricane Erika (AL052015) (other gears)",0.068,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 77 km; max wind 45 kt",0.3
+2019,"Hurricane Dorian (AL052019) (other gears)",0.301,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 11 km; max wind 65 kt",0.3
+2024,"Hurricane Ernesto (AL052024) (other gears)",0.177,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 58 km; max wind 55 kt",0.3
+1998,"Hurricane Georges (AL071998) (other gears)",0.544,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 32 km; max wind 90 kt",0.3
+2000,"Hurricane Debby (AL072000) (other gears)",0.163,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 87 km; max wind 65 kt",0.3
+2010,"Hurricane Earl (AL072010) (other gears)",0.159,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 146 km; max wind 115 kt",0.3
+2022,"Hurricane Fiona (AL072022) (other gears)",0.055,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 129 km; max wind 55 kt",0.3
+1996,"Hurricane Hortense (AL081996) (other gears)",0.054,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 162 km; max wind 70 kt",0.3
+2014,"Hurricane Gonzalo (AL082014) (other gears)",0.08,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 165 km; max wind 90 kt",0.3
+2011,"Hurricane Irene (AL092011) (other gears)",0.252,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 11 km; max wind 60 kt",0.3
+1989,"Hurricane Hugo (AL111989) (other gears)",0.835,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 13 km; max wind 120 kt",0.3
+2004,"Hurricane Jeanne (AL112004) (other gears)",0.197,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 65 km; max wind 60 kt",0.3
+2017,"Hurricane Irma (AL112017) (other gears)",0.543,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 87 km; max wind 155 kt",0.3
+1995,"Hurricane Luis (AL131995) (other gears)",0.112,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 171 km; max wind 120 kt",0.3
+2020,"Hurricane Laura (AL132020) (other gears)",0.056,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 52 km; max wind 40 kt",0.3
+1999,"Hurricane Jose (AL141999) (other gears)",0.18,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 70 km; max wind 60 kt",0.3
+1995,"Hurricane Marilyn (AL151995) (other gears)",0.544,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 14 km; max wind 90 kt",0.3
+2008,"Hurricane Omar (AL152008) (other gears)",0.36,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 97 km; max wind 115 kt",0.3
+2017,"Hurricane Maria (AL152017) (other gears)",1,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 47 km; max wind 150 kt",0.3
+1999,"Hurricane Lenny (AL161999) (other gears)",0.981,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 43 km; max wind 135 kt",0.3
+1984,"Hurricane Klaus (AL181984) (other gears)",0.072,"none",0,0,1,"dive;hook_line",0.3,1,"",0,"API: NHC HURDAT2","closest approach 96 km; max wind 50 kt",0.3

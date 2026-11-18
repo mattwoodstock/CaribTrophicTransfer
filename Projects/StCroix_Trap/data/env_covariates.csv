@@ -1,87 +1,143 @@
-"year","variable","value","units","source","data_status"
-2000,"sst",27.552,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2001,"sst",27.712,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2002,"sst",27.591,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2003,"sst",27.841,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2004,"sst",27.663,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2005,"sst",28.244,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2006,"sst",27.75,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2007,"sst",27.765,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2008,"sst",27.748,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2009,"sst",27.738,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2010,"sst",28.365,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2011,"sst",27.921,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2012,"sst",27.863,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2013,"sst",27.897,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2014,"sst",27.758,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2015,"sst",27.924,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2016,"sst",27.65,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2017,"sst",27.956,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2018,"sst",28.049,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2019,"sst",28.462,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2020,"sst",28.21,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2021,"sst",28.116,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2022,"sst",28.022,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2023,"sst",29.047,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2024,"sst",28.739,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER"
-2000,"dhw",1.39,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2001,"dhw",0.94,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2002,"dhw",1.73,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2003,"dhw",1.58,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2004,"dhw",0.46,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2005,"dhw",12,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2006,"dhw",2.72,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2007,"dhw",0.88,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2008,"dhw",0.67,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2009,"dhw",1.38,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2010,"dhw",6,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2011,"dhw",0.2,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2012,"dhw",2.03,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2013,"dhw",1.06,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2014,"dhw",1,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2015,"dhw",1.71,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2016,"dhw",0.76,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2017,"dhw",3,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2018,"dhw",1.47,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2019,"dhw",6,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2020,"dhw",4,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2021,"dhw",0.9,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2022,"dhw",0.19,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2023,"dhw",16,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2024,"dhw",10,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER"
-2000,"npp_pelagic_index",0.914,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2001,"npp_pelagic_index",1.064,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2002,"npp_pelagic_index",0.878,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2003,"npp_pelagic_index",1.087,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2004,"npp_pelagic_index",0.926,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2005,"npp_pelagic_index",0.965,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2006,"npp_pelagic_index",0.922,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2007,"npp_pelagic_index",1.008,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2008,"npp_pelagic_index",1.053,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2009,"npp_pelagic_index",1.35,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2010,"npp_pelagic_index",1.041,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2011,"npp_pelagic_index",1.057,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2012,"npp_pelagic_index",0.959,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2013,"npp_pelagic_index",0.993,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2014,"npp_pelagic_index",1.226,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2015,"npp_pelagic_index",1.037,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2016,"npp_pelagic_index",1.07,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2017,"npp_pelagic_index",0.969,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2018,"npp_pelagic_index",0.893,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2019,"npp_pelagic_index",0.915,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2020,"npp_pelagic_index",1.186,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2021,"npp_pelagic_index",1.3,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2022,"npp_pelagic_index",0.924,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2023,"npp_pelagic_index",0.967,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2024,"npp_pelagic_index",0.983,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER"
-2000,"coral_cover",0.15,"proportion","APPROXIMATE (NCRMP ~8% in 2013 to ~4% in 2019; TCRMP; SCTLD from 2021)","approximate"
-2004,"coral_cover",0.14,"proportion","APPROXIMATE (NCRMP ~8% in 2013 to ~4% in 2019; TCRMP; SCTLD from 2021)","approximate"
-2006,"coral_cover",0.1,"proportion","APPROXIMATE (NCRMP ~8% in 2013 to ~4% in 2019; TCRMP; SCTLD from 2021)","approximate"
-2009,"coral_cover",0.1,"proportion","APPROXIMATE (NCRMP ~8% in 2013 to ~4% in 2019; TCRMP; SCTLD from 2021)","approximate"
-2013,"coral_cover",0.08,"proportion","APPROXIMATE (NCRMP ~8% in 2013 to ~4% in 2019; TCRMP; SCTLD from 2021)","approximate"
-2015,"coral_cover",0.075,"proportion","APPROXIMATE (NCRMP ~8% in 2013 to ~4% in 2019; TCRMP; SCTLD from 2021)","approximate"
-2017,"coral_cover",0.065,"proportion","APPROXIMATE (NCRMP ~8% in 2013 to ~4% in 2019; TCRMP; SCTLD from 2021)","approximate"
-2019,"coral_cover",0.045,"proportion","APPROXIMATE (NCRMP ~8% in 2013 to ~4% in 2019; TCRMP; SCTLD from 2021)","approximate"
-2021,"coral_cover",0.045,"proportion","APPROXIMATE (NCRMP ~8% in 2013 to ~4% in 2019; TCRMP; SCTLD from 2021)","approximate"
-2023,"coral_cover",0.035,"proportion","APPROXIMATE (NCRMP ~8% in 2013 to ~4% in 2019; TCRMP; SCTLD from 2021)","approximate"
-2024,"coral_cover",0.03,"proportion","APPROXIMATE (NCRMP ~8% in 2013 to ~4% in 2019; TCRMP; SCTLD from 2021)","approximate"
+"year","variable","value","units","source","data_status","sd"
+1983,"sst",27.218,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1984,"sst",27.227,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1985,"sst",27.169,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1986,"sst",27.306,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1987,"sst",27.322,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1988,"sst",27.526,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1989,"sst",27.398,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1990,"sst",27.608,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1991,"sst",27.375,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1992,"sst",27.286,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1993,"sst",27.33,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1994,"sst",27.486,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1995,"sst",27.226,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1996,"sst",27.733,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1997,"sst",27.566,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1998,"sst",27.686,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1999,"sst",27.388,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2000,"sst",27.737,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2001,"sst",27.73,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2002,"sst",27.574,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2003,"sst",27.711,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2004,"sst",27.631,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2005,"sst",28.353,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2006,"sst",27.593,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2007,"sst",27.451,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2008,"sst",27.739,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2009,"sst",27.93,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2010,"sst",28.095,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2011,"sst",27.824,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2012,"sst",27.91,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2013,"sst",27.909,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2014,"sst",27.767,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2015,"sst",27.792,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2016,"sst",27.889,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2017,"sst",28.102,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2018,"sst",28.033,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2019,"sst",28.223,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2020,"sst",28.057,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2021,"sst",28.106,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2022,"sst",28.04,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2023,"sst",28.891,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2024,"sst",28.63,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1983,"dhw",1.1,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1984,"dhw",0.76,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1985,"dhw",1.85,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1986,"dhw",0.75,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1987,"dhw",1.72,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1988,"dhw",1.58,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1989,"dhw",1.3,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1990,"dhw",0.96,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1991,"dhw",0.38,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1992,"dhw",0.59,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1993,"dhw",1.78,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1994,"dhw",1.73,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1995,"dhw",0.41,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1996,"dhw",2.26,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1997,"dhw",0.38,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1998,"dhw",0,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1999,"dhw",0,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2000,"dhw",0.26,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2001,"dhw",1.16,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2002,"dhw",1.28,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2003,"dhw",1.25,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2004,"dhw",0.64,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2005,"dhw",12,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2006,"dhw",1.83,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2007,"dhw",1.28,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2008,"dhw",0.5,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2009,"dhw",1.71,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2010,"dhw",6,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2011,"dhw",0.59,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2012,"dhw",0,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2013,"dhw",0.74,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2014,"dhw",0,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2015,"dhw",1.69,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2016,"dhw",1.78,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2017,"dhw",3,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2018,"dhw",0.33,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2019,"dhw",6,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2020,"dhw",4,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2021,"dhw",1.95,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2022,"dhw",1.79,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2023,"dhw",16,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2024,"dhw",10,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1983,"npp_pelagic_index",0.966,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1984,"npp_pelagic_index",1.006,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1985,"npp_pelagic_index",0.961,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1986,"npp_pelagic_index",0.999,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1987,"npp_pelagic_index",0.992,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1988,"npp_pelagic_index",1.141,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1989,"npp_pelagic_index",0.896,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1990,"npp_pelagic_index",1.051,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1991,"npp_pelagic_index",1.02,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1992,"npp_pelagic_index",0.949,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1993,"npp_pelagic_index",0.965,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1994,"npp_pelagic_index",1.081,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1995,"npp_pelagic_index",1,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1996,"npp_pelagic_index",1.066,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1997,"npp_pelagic_index",1.008,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1998,"npp_pelagic_index",0.889,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1999,"npp_pelagic_index",0.986,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2000,"npp_pelagic_index",1.182,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2001,"npp_pelagic_index",0.919,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2002,"npp_pelagic_index",1.128,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2003,"npp_pelagic_index",1.071,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2004,"npp_pelagic_index",1.054,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2005,"npp_pelagic_index",1.019,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2006,"npp_pelagic_index",1.081,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2007,"npp_pelagic_index",1.035,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2008,"npp_pelagic_index",1.062,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2009,"npp_pelagic_index",1.35,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2010,"npp_pelagic_index",0.935,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2011,"npp_pelagic_index",1.068,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2012,"npp_pelagic_index",0.915,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2013,"npp_pelagic_index",0.982,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2014,"npp_pelagic_index",1.18,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2015,"npp_pelagic_index",0.959,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2016,"npp_pelagic_index",1.014,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2017,"npp_pelagic_index",1.227,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2018,"npp_pelagic_index",1.188,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2019,"npp_pelagic_index",0.935,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2020,"npp_pelagic_index",0.984,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2021,"npp_pelagic_index",1.3,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2022,"npp_pelagic_index",1.052,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2023,"npp_pelagic_index",0.944,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2024,"npp_pelagic_index",0.981,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1983,"coral_cover",0.22,"proportion","PLACEHOLDER (pre-TCRMP; post-Hugo/Marilyn losses assumed)","PLACEHOLDER",0.03
+1989,"coral_cover",0.2,"proportion","PLACEHOLDER (pre-TCRMP; post-Hugo/Marilyn losses assumed)","PLACEHOLDER",0.03
+1990,"coral_cover",0.16,"proportion","PLACEHOLDER (pre-TCRMP; post-Hugo/Marilyn losses assumed)","PLACEHOLDER",0.03
+1995,"coral_cover",0.15,"proportion","PLACEHOLDER (pre-TCRMP; post-Hugo/Marilyn losses assumed)","PLACEHOLDER",0.03
+1996,"coral_cover",0.13,"proportion","PLACEHOLDER (pre-TCRMP; post-Hugo/Marilyn losses assumed)","PLACEHOLDER",0.03
+2000,"coral_cover",0.15,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+2004,"coral_cover",0.14,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+2006,"coral_cover",0.1,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+2009,"coral_cover",0.1,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+2013,"coral_cover",0.08,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+2015,"coral_cover",0.075,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+2017,"coral_cover",0.065,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+2019,"coral_cover",0.045,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+2021,"coral_cover",0.045,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+2023,"coral_cover",0.035,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+2024,"coral_cover",0.03,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01

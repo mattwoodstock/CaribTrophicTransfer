@@ -8,14 +8,14 @@ Values flagged `PLACEHOLDER` must be replaced with real data before management u
 | key | value | notes |
 | --- | --- | --- |
 | project_name | St. Croix trap fishery case study | Shown in outputs |
-| hist_start | 2000 | First historical year (landings-driven) |
+| hist_start | 1983 | First historical year: start of the commercial landings series used in SEDAR 80 (1983-2019); public satellite SST from 1981 (Pathfinder) / 1985 (CRW) |
 | hist_end | 2024 | Last historical year; reference points use the final ref_years |
 | proj_end | 2045 | Final projection year (effort-driven) |
 | ref_years | 3 | Years averaged for reference points (2022-2024) |
 | substeps | 12 | Monthly Euler steps for biomass dynamics |
 | c_to_ww | 9 | g wet weight per g C (Pauly & Christensen 1995) |
 | c_to_ww_cv | 0.1 |  |
-| n_draws | 1000 | Monte Carlo draws |
+| n_draws | 5000 | Monte Carlo draws |
 | seed | 103 | Random seed (SEDAR 103) |
 | diet_concentration | 40 | Dirichlet concentration for diet uncertainty |
 | catch_expansion | 1.5 | Reported-to-total landings expansion (PR logbook expansion ~2.0; USVI unquantified - SEDAR103-DW-20) |
@@ -30,23 +30,32 @@ Values flagged `PLACEHOLDER` must be replaced with real data before management u
 | bleach_mort_per_dhw | 0.03 | Proportional coral loss per DHW above threshold |
 | bleach_mort_cv | 0.3 |  |
 | dhw_variable | dhw | Covariate name holding annual max DHW |
-| sir_resample | 1000 | Number of SIR resamples (0 = off) |
+| sir_resample | 2000 | Number of SIR resamples (0 = off) |
 | index_min_cv | 0.2 | Minimum CV applied to index observations |
 | sir_catch_feasibility | TRUE | Stock-reduction-analysis penalty when simulated stock cannot support observed landings |
 | catch_feasibility_cv | 0.1 |  |
 | bbmsy_overfished | 0.5 | B/BMSY threshold for Overfished status (MSST proxy) |
+| domain_lon_min | -65.0 | St. Croix shelf bounding box (data acquisition) |
+| domain_lon_max | -64.4 |  |
+| domain_lat_min | 17.6 |  |
+| domain_lat_max | 17.95 |  |
+| use_acquired | TRUE | Merge API-acquired data in data/acquired/ (user values take precedence) |
+| landings_cv | 0.2 | Observation CV of each landings record (self-reported trip tickets) |
+| effort_cv | 0.1 | Observation CV of each effort record |
+| pref_cv | 0.2 | CV on habitat preferences |
+| coral_growth_cv | 0.3 |  |
 
 ## habitats.csv
 
 | habitat | type | area_km2 | area_cv | npp_value | npp_unit | npp_cv | food_web_fraction | food_web_fraction_cv | tte | tte_cv | quality_model | quality_covariate | quality_ref | init_quality | p1_quality_elasticity | npp_covariate | data_status | reference |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| coral_reef | benthic | 60 | 0.2 | 1500 | t_C_km2_yr | 0.5 | 0.35 | 0.3 | 0.15 | 0.2 | coral | coral_cover | 0.08 | 0.14 | 0 |  | area PLACEHOLDER; NPP published range | Area: replace with NCCOS GIS tabulation (SEDAR103-DW-20 Fig. A2). NPP: Caribbean reef net production 986-4108 t C (Adey & Steneck 1985 St. Croix); 1200-3000 (Ramachandran Nair & Pillai 1972) |
-| colonized_pavement | benthic | 70 | 0.2 | 181 | mmol_O2_m2_d | 0.4 | 0.35 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | area PLACEHOLDER; NPP published | Turf/macroalgae-dominated hardbottom; lagoon-wide Pn 181 +/- 28 mmol O2 m-2 d-1 (Naumann et al. 2013) |
-| seagrass | benthic | 35 | 0.2 | 4.2 | g_DW_m2_d | 0.5 | 0.35 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | area PLACEHOLDER; NPP published | Thalassia production 4.2 g DW m-2 d-1 (Juman 2005); CARICOMP <200->2000 g DW m-2 yr-1 (van Tussenbroek et al. 2014) |
-| macroalgae | benthic | 30 | 0.3 | 582 | mmol_O2_m2_d | 0.5 | 0.25 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | area PLACEHOLDER; NPP published | Caribbean macroalgal beds Pn 582 mmol O2 m-2 d-1 (Wanders 1976 via Naumann et al. 2013) |
-| sand | benthic | 80 | 0.2 | 7 | mmol_O2_m2_d | 0.6 | 0.5 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | area PLACEHOLDER; NPP published | Microphytobenthos Pn 7 +/- 4 mmol O2 m-2 d-1 (Naumann et al. 2013) |
-| mangrove | benthic | 1.5 | 0.3 | 400 | mmol_O2_m2_d | 0.3 | 0.2 | 0.4 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | area PLACEHOLDER; NPP published | Caribbean mangrove Pn 400 +/- 83 mmol O2 m-2 d-1 (Gattuso et al. 1998); food_web_fraction = litter export |
-| deep_hardbottom | benthic | 65 | 0.3 | 250 | t_C_km2_yr | 0.6 | 0.35 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | PLACEHOLDER | Mesophotic (30-100 m) hardbottom incl. Lang Bank; light-limited production assumed ~1/6 of shallow reef |
+| coral_reef | benthic |  |  | 1500 | t_C_km2_yr | 0.5 | 0.35 | 0.3 | 0.15 | 0.2 | coral | coral_cover | 0.08 | 0.14 | 0 |  | area from NCCOS API; NPP published range | NPP: Caribbean reef net production 986-4108 t C (Adey & Steneck 1985 St. Croix); 1200-3000 (Ramachandran Nair & Pillai 1972) |
+| colonized_pavement | benthic |  |  | 181 | mmol_O2_m2_d | 0.4 | 0.35 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | area from NCCOS API; NPP published | Turf/macroalgae-dominated hardbottom; lagoon-wide Pn 181 +/- 28 mmol O2 m-2 d-1 (Naumann et al. 2013) |
+| seagrass | benthic |  |  | 4.2 | g_DW_m2_d | 0.5 | 0.35 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | area from NCCOS API; NPP published | Thalassia production 4.2 g DW m-2 d-1 (Juman 2005); CARICOMP <200->2000 g DW m-2 yr-1 (van Tussenbroek et al. 2014) |
+| macroalgae | benthic |  |  | 582 | mmol_O2_m2_d | 0.5 | 0.25 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | area from NCCOS API; NPP published | Caribbean macroalgal beds Pn 582 mmol O2 m-2 d-1 (Wanders 1976 via Naumann et al. 2013) |
+| sand | benthic |  |  | 7 | mmol_O2_m2_d | 0.6 | 0.5 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | area from NCCOS API; NPP published | Microphytobenthos Pn 7 +/- 4 mmol O2 m-2 d-1 (Naumann et al. 2013) |
+| mangrove | benthic |  |  | 400 | mmol_O2_m2_d | 0.3 | 0.2 | 0.4 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | area from NCCOS API; NPP published | Caribbean mangrove Pn 400 +/- 83 mmol O2 m-2 d-1 (Gattuso et al. 1998); food_web_fraction = litter export |
+| deep_hardbottom | benthic |  |  | 250 | t_C_km2_yr | 0.6 | 0.35 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | area from NCCOS API; NPP PLACEHOLDER | Mesophotic (30-100 m) hardbottom incl. Lang Bank; light-limited production assumed ~1/6 of shallow reef |
 | pelagic | pelagic | 1500 | 0.2 | 85 | g_C_m2_yr | 0.25 | 0.4 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 | npp_pelagic_index | area PLACEHOLDER; NPP derived | Shelf + 10 km buffer; regional satellite NPP ensemble (SEDAR103-DW-20 App. A; Ryan-Keogh et al. 2023) ~70-100 g C m-2 yr-1 |
 
 ## groups.csv
@@ -182,9 +191,6 @@ Values flagged `PLACEHOLDER` must be replaced with real data before management u
 
 | year | event | intensity | habitat | p1_loss | quality_loss | half_life_yr | gear | effort_loss | effort_half_life_yr | group | production_loss | data_status | notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 2008 | Hurricane Omar | 0.4 | coral_reef;colonized_pavement;seagrass;macroalgae;mangrove | 0.25 | 0.15 | 2 | trap_fish;trap_lobster | 0.4 | 1 | spiny_lobster | 0.2 | intensity PLACEHOLDER | Cat 3 passed near St. Croix (Oct 2008) |
-| 2017 | Hurricanes Irma & Maria | 1 | coral_reef;colonized_pavement;seagrass;macroalgae;mangrove | 0.25 | 0.15 | 2 | trap_fish;trap_lobster | 0.6 | 1.5 | spiny_lobster | 0.2 | intensity PLACEHOLDER | Maria (Cat 5) passed just SW of St. Croix; trap inventories destroyed |
-| 2017 | Hurricanes Irma & Maria (dive/H&L) | 1 | none | 0 | 0 | 1 | dive;hook_line | 0.3 | 1 |  | 0 | intensity PLACEHOLDER | Vessel/port infrastructure losses |
 |  | major_hurricane | 1 | coral_reef;colonized_pavement;seagrass;macroalgae;mangrove | 0.25 | 0.15 | 2 | trap_fish;trap_lobster | 0.6 | 1.5 | spiny_lobster | 0.2 | template | Template used by scenarios (year supplied by scenario) |
 |  | major_hurricane_other_gears | 1 | none | 0 | 0 | 1 | dive;hook_line | 0.3 | 1 |  | 0 | template | Template used by scenarios |
 
@@ -208,17 +214,23 @@ Values flagged `PLACEHOLDER` must be replaced with real data before management u
 
 | scenario | driver | target | start_year | end_year | value | notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| Warming | cov_trend | sst | 2025 | 2045 | 0.03 | ~SSP5-8.5 rate; replace with MOM6-NWA12 projection in env_covariates.csv |
-| Warming | cov_set | dhw | 2030 | 2030 | 12 | Severe bleaching year |
-| Warming | cov_set | dhw | 2036 | 2036 | 12 | Severe bleaching year |
-| Warming | cov_set | dhw | 2042 | 2042 | 14 | Severe bleaching year |
-| Warming | npp_trend | pelagic | 2025 | 2045 | -0.005 | 0.5%/yr decline in pelagic NPP |
+| Climate_SSP245 | cov_from | sst=sst_ssp245 | 2025 | 2045 |  | CMIP6 (CESM2 + ACCESS-ESM1-5) SST delta projection |
+| Climate_SSP245 | cov_from | npp_pelagic_index=npp_pelagic_index_ssp245 | 2025 | 2045 |  | CMIP6 integrated NPP delta projection |
+| Climate_SSP245 | cov_set | dhw | 2032 | 2032 | 10 | Bleaching year (PLACEHOLDER frequency/magnitude) |
+| Climate_SSP245 | cov_set | dhw | 2041 | 2041 | 10 | Bleaching year (PLACEHOLDER) |
+| Climate_SSP585 | cov_from | sst=sst_ssp585 | 2025 | 2045 |  | CMIP6 SST delta projection |
+| Climate_SSP585 | cov_from | npp_pelagic_index=npp_pelagic_index_ssp585 | 2025 | 2045 |  | CMIP6 integrated NPP delta projection |
+| Climate_SSP585 | cov_set | dhw | 2028 | 2028 | 12 | Bleaching year (PLACEHOLDER frequency/magnitude) |
+| Climate_SSP585 | cov_set | dhw | 2033 | 2033 | 14 | Bleaching year (PLACEHOLDER) |
+| Climate_SSP585 | cov_set | dhw | 2038 | 2038 | 14 | Bleaching year (PLACEHOLDER) |
+| Climate_SSP585 | cov_set | dhw | 2043 | 2043 | 16 | Bleaching year (PLACEHOLDER) |
 | Major_hurricane_2030 | disturbance | major_hurricane | 2030 | 2030 | 1 |  |
 | Major_hurricane_2030 | disturbance | major_hurricane_other_gears | 2030 | 2030 | 1 |  |
 | Trap_effort_plus30 | effort_mult | trap_fish;trap_lobster | 2025 | 2045 | 1.3 | Unmanaged trap effort surge |
 | Trap_reduction_minus25 | effort_mult | trap_fish;trap_lobster | 2025 | 2045 | 0.75 | Trap reduction program (cf. St. Thomas) |
-| Coral_disease_SCTLD | coral_disease | coral_reef | 2025 | 2032 | 0.08 | Continued SCTLD-driven coral loss |
-| Combined_stress | cov_trend | sst | 2025 | 2045 | 0.03 |  |
+| Coral_disease_SCTLD | coral_disease | coral_reef | 2025 | 2032 | 0.08 | Continued SCTLD-driven coral loss (PLACEHOLDER rate) |
+| Combined_stress | cov_from | sst=sst_ssp585 | 2025 | 2045 |  |  |
+| Combined_stress | cov_from | npp_pelagic_index=npp_pelagic_index_ssp585 | 2025 | 2045 |  |  |
 | Combined_stress | cov_set | dhw | 2030 | 2030 | 12 |  |
 | Combined_stress | disturbance | major_hurricane | 2033 | 2033 | 1 |  |
 | Combined_stress | disturbance | major_hurricane_other_gears | 2033 | 2033 | 1 |  |
@@ -228,137 +240,193 @@ Values flagged `PLACEHOLDER` must be replaced with real data before management u
 
 | group | gear | mean_landings_lb_2022_2024 |
 | --- | --- | --- |
-| angelfishes | dive | 438 |
-| angelfishes | trap_fish | 3592 |
-| boxfishes | trap_fish | 5234 |
-| boxfishes | trap_lobster | 640 |
-| goatfishes | dive | 1015 |
-| goatfishes | trap_fish | 3766 |
-| groupers_shallow | dive | 2998 |
-| groupers_shallow | hook_line | 4277 |
-| groupers_shallow | trap_fish | 8057 |
-| grunts | dive | 1873 |
-| grunts | hook_line | 3920 |
-| grunts | trap_fish | 14462 |
-| jacks | dive | 1941 |
-| jacks | hook_line | 14355 |
-| jacks | trap_fish | 4022 |
+| angelfishes | dive | 425 |
+| angelfishes | trap_fish | 3332 |
+| boxfishes | trap_fish | 5706 |
+| boxfishes | trap_lobster | 674 |
+| goatfishes | dive | 987 |
+| goatfishes | trap_fish | 4156 |
+| groupers_shallow | dive | 3003 |
+| groupers_shallow | hook_line | 3952 |
+| groupers_shallow | trap_fish | 6652 |
+| grunts | dive | 1999 |
+| grunts | hook_line | 3777 |
+| grunts | trap_fish | 13662 |
+| jacks | dive | 2188 |
+| jacks | hook_line | 12079 |
+| jacks | trap_fish | 4279 |
 | parrotfish_1 | trap_fish | 0 |
-| parrotfish_2 | dive | 27154 |
-| parrotfish_2 | trap_fish | 35875 |
-| pelagics | hook_line | 79049 |
-| porgies | hook_line | 833 |
-| porgies | trap_fish | 2021 |
-| queen_conch | dive | 30629 |
-| queen_triggerfish | dive | 1673 |
-| queen_triggerfish | hook_line | 684 |
-| queen_triggerfish | trap_fish | 11696 |
-| queen_triggerfish | trap_lobster | 707 |
-| snappers_deep | hook_line | 50735 |
-| snappers_shallow | dive | 2346 |
-| snappers_shallow | hook_line | 4663 |
-| snappers_shallow | trap_fish | 4872 |
-| spiny_lobster | dive | 61892 |
-| spiny_lobster | trap_fish | 18839 |
-| spiny_lobster | trap_lobster | 34725 |
-| squirrelfishes | hook_line | 2628 |
-| squirrelfishes | trap_fish | 5285 |
-| surgeonfishes | dive | 10036 |
-| surgeonfishes | trap_fish | 15911 |
-| wrasses_hogfish | dive | 4331 |
-| wrasses_hogfish | trap_fish | 2092 |
-| yellowtail_snapper | dive | 1921 |
-| yellowtail_snapper | hook_line | 30223 |
-| yellowtail_snapper | trap_fish | 7091 |
+| parrotfish_2 | dive | 29453 |
+| parrotfish_2 | trap_fish | 35971 |
+| pelagics | hook_line | 84975 |
+| porgies | hook_line | 984 |
+| porgies | trap_fish | 2087 |
+| queen_conch | dive | 28024 |
+| queen_triggerfish | dive | 1520 |
+| queen_triggerfish | hook_line | 754 |
+| queen_triggerfish | trap_fish | 11253 |
+| queen_triggerfish | trap_lobster | 830 |
+| snappers_deep | hook_line | 44981 |
+| snappers_shallow | dive | 2981 |
+| snappers_shallow | hook_line | 4946 |
+| snappers_shallow | trap_fish | 4807 |
+| spiny_lobster | dive | 58448 |
+| spiny_lobster | trap_fish | 16752 |
+| spiny_lobster | trap_lobster | 32481 |
+| squirrelfishes | hook_line | 2670 |
+| squirrelfishes | trap_fish | 5859 |
+| surgeonfishes | dive | 9686 |
+| surgeonfishes | trap_fish | 14617 |
+| wrasses_hogfish | dive | 4316 |
+| wrasses_hogfish | trap_fish | 2051 |
+| yellowtail_snapper | dive | 2140 |
+| yellowtail_snapper | hook_line | 29141 |
+| yellowtail_snapper | trap_fish | 7530 |
 
 ## effort.csv (summary: mean 2022-2024, trips; PLACEHOLDER)
 
 | gear | effort |
 | --- | --- |
-| dive | 1637 |
-| hook_line | 2070 |
-| trap_fish | 2312 |
-| trap_lobster | 859 |
+| dive | 1546 |
+| hook_line | 2074 |
+| trap_fish | 2211 |
+| trap_lobster | 916 |
 
 ## env_covariates.csv
 
 | year | variable | value | units | data_status |
 | --- | --- | --- | --- | --- |
-| 2000 | sst | 27.552 | degC | PLACEHOLDER |
-| 2001 | sst | 27.712 | degC | PLACEHOLDER |
-| 2002 | sst | 27.591 | degC | PLACEHOLDER |
-| 2003 | sst | 27.841 | degC | PLACEHOLDER |
-| 2004 | sst | 27.663 | degC | PLACEHOLDER |
-| 2005 | sst | 28.244 | degC | PLACEHOLDER |
-| 2006 | sst | 27.75 | degC | PLACEHOLDER |
-| 2007 | sst | 27.765 | degC | PLACEHOLDER |
-| 2008 | sst | 27.748 | degC | PLACEHOLDER |
-| 2009 | sst | 27.738 | degC | PLACEHOLDER |
-| 2010 | sst | 28.365 | degC | PLACEHOLDER |
-| 2011 | sst | 27.921 | degC | PLACEHOLDER |
-| 2012 | sst | 27.863 | degC | PLACEHOLDER |
-| 2013 | sst | 27.897 | degC | PLACEHOLDER |
-| 2014 | sst | 27.758 | degC | PLACEHOLDER |
-| 2015 | sst | 27.924 | degC | PLACEHOLDER |
-| 2016 | sst | 27.65 | degC | PLACEHOLDER |
-| 2017 | sst | 27.956 | degC | PLACEHOLDER |
-| 2018 | sst | 28.049 | degC | PLACEHOLDER |
-| 2019 | sst | 28.462 | degC | PLACEHOLDER |
-| 2020 | sst | 28.21 | degC | PLACEHOLDER |
-| 2021 | sst | 28.116 | degC | PLACEHOLDER |
-| 2022 | sst | 28.022 | degC | PLACEHOLDER |
-| 2023 | sst | 29.047 | degC | PLACEHOLDER |
-| 2024 | sst | 28.739 | degC | PLACEHOLDER |
-| 2000 | dhw | 1.39 | degC-weeks | PLACEHOLDER |
-| 2001 | dhw | 0.94 | degC-weeks | PLACEHOLDER |
-| 2002 | dhw | 1.73 | degC-weeks | PLACEHOLDER |
-| 2003 | dhw | 1.58 | degC-weeks | PLACEHOLDER |
-| 2004 | dhw | 0.46 | degC-weeks | PLACEHOLDER |
+| 1983 | sst | 27.218 | degC | PLACEHOLDER |
+| 1984 | sst | 27.227 | degC | PLACEHOLDER |
+| 1985 | sst | 27.169 | degC | PLACEHOLDER |
+| 1986 | sst | 27.306 | degC | PLACEHOLDER |
+| 1987 | sst | 27.322 | degC | PLACEHOLDER |
+| 1988 | sst | 27.526 | degC | PLACEHOLDER |
+| 1989 | sst | 27.398 | degC | PLACEHOLDER |
+| 1990 | sst | 27.608 | degC | PLACEHOLDER |
+| 1991 | sst | 27.375 | degC | PLACEHOLDER |
+| 1992 | sst | 27.286 | degC | PLACEHOLDER |
+| 1993 | sst | 27.33 | degC | PLACEHOLDER |
+| 1994 | sst | 27.486 | degC | PLACEHOLDER |
+| 1995 | sst | 27.226 | degC | PLACEHOLDER |
+| 1996 | sst | 27.733 | degC | PLACEHOLDER |
+| 1997 | sst | 27.566 | degC | PLACEHOLDER |
+| 1998 | sst | 27.686 | degC | PLACEHOLDER |
+| 1999 | sst | 27.388 | degC | PLACEHOLDER |
+| 2000 | sst | 27.737 | degC | PLACEHOLDER |
+| 2001 | sst | 27.73 | degC | PLACEHOLDER |
+| 2002 | sst | 27.574 | degC | PLACEHOLDER |
+| 2003 | sst | 27.711 | degC | PLACEHOLDER |
+| 2004 | sst | 27.631 | degC | PLACEHOLDER |
+| 2005 | sst | 28.353 | degC | PLACEHOLDER |
+| 2006 | sst | 27.593 | degC | PLACEHOLDER |
+| 2007 | sst | 27.451 | degC | PLACEHOLDER |
+| 2008 | sst | 27.739 | degC | PLACEHOLDER |
+| 2009 | sst | 27.93 | degC | PLACEHOLDER |
+| 2010 | sst | 28.095 | degC | PLACEHOLDER |
+| 2011 | sst | 27.824 | degC | PLACEHOLDER |
+| 2012 | sst | 27.91 | degC | PLACEHOLDER |
+| 2013 | sst | 27.909 | degC | PLACEHOLDER |
+| 2014 | sst | 27.767 | degC | PLACEHOLDER |
+| 2015 | sst | 27.792 | degC | PLACEHOLDER |
+| 2016 | sst | 27.889 | degC | PLACEHOLDER |
+| 2017 | sst | 28.102 | degC | PLACEHOLDER |
+| 2018 | sst | 28.033 | degC | PLACEHOLDER |
+| 2019 | sst | 28.223 | degC | PLACEHOLDER |
+| 2020 | sst | 28.057 | degC | PLACEHOLDER |
+| 2021 | sst | 28.106 | degC | PLACEHOLDER |
+| 2022 | sst | 28.04 | degC | PLACEHOLDER |
+| 2023 | sst | 28.891 | degC | PLACEHOLDER |
+| 2024 | sst | 28.63 | degC | PLACEHOLDER |
+| 1983 | dhw | 1.1 | degC-weeks | PLACEHOLDER |
+| 1984 | dhw | 0.76 | degC-weeks | PLACEHOLDER |
+| 1985 | dhw | 1.85 | degC-weeks | PLACEHOLDER |
+| 1986 | dhw | 0.75 | degC-weeks | PLACEHOLDER |
+| 1987 | dhw | 1.72 | degC-weeks | PLACEHOLDER |
+| 1988 | dhw | 1.58 | degC-weeks | PLACEHOLDER |
+| 1989 | dhw | 1.3 | degC-weeks | PLACEHOLDER |
+| 1990 | dhw | 0.96 | degC-weeks | PLACEHOLDER |
+| 1991 | dhw | 0.38 | degC-weeks | PLACEHOLDER |
+| 1992 | dhw | 0.59 | degC-weeks | PLACEHOLDER |
+| 1993 | dhw | 1.78 | degC-weeks | PLACEHOLDER |
+| 1994 | dhw | 1.73 | degC-weeks | PLACEHOLDER |
+| 1995 | dhw | 0.41 | degC-weeks | PLACEHOLDER |
+| 1996 | dhw | 2.26 | degC-weeks | PLACEHOLDER |
+| 1997 | dhw | 0.38 | degC-weeks | PLACEHOLDER |
+| 1998 | dhw | 0 | degC-weeks | PLACEHOLDER |
+| 1999 | dhw | 0 | degC-weeks | PLACEHOLDER |
+| 2000 | dhw | 0.26 | degC-weeks | PLACEHOLDER |
+| 2001 | dhw | 1.16 | degC-weeks | PLACEHOLDER |
+| 2002 | dhw | 1.28 | degC-weeks | PLACEHOLDER |
+| 2003 | dhw | 1.25 | degC-weeks | PLACEHOLDER |
+| 2004 | dhw | 0.64 | degC-weeks | PLACEHOLDER |
 | 2005 | dhw | 12 | degC-weeks | PLACEHOLDER |
-| 2006 | dhw | 2.72 | degC-weeks | PLACEHOLDER |
-| 2007 | dhw | 0.88 | degC-weeks | PLACEHOLDER |
-| 2008 | dhw | 0.67 | degC-weeks | PLACEHOLDER |
-| 2009 | dhw | 1.38 | degC-weeks | PLACEHOLDER |
+| 2006 | dhw | 1.83 | degC-weeks | PLACEHOLDER |
+| 2007 | dhw | 1.28 | degC-weeks | PLACEHOLDER |
+| 2008 | dhw | 0.5 | degC-weeks | PLACEHOLDER |
+| 2009 | dhw | 1.71 | degC-weeks | PLACEHOLDER |
 | 2010 | dhw | 6 | degC-weeks | PLACEHOLDER |
-| 2011 | dhw | 0.2 | degC-weeks | PLACEHOLDER |
-| 2012 | dhw | 2.03 | degC-weeks | PLACEHOLDER |
-| 2013 | dhw | 1.06 | degC-weeks | PLACEHOLDER |
-| 2014 | dhw | 1 | degC-weeks | PLACEHOLDER |
-| 2015 | dhw | 1.71 | degC-weeks | PLACEHOLDER |
-| 2016 | dhw | 0.76 | degC-weeks | PLACEHOLDER |
+| 2011 | dhw | 0.59 | degC-weeks | PLACEHOLDER |
+| 2012 | dhw | 0 | degC-weeks | PLACEHOLDER |
+| 2013 | dhw | 0.74 | degC-weeks | PLACEHOLDER |
+| 2014 | dhw | 0 | degC-weeks | PLACEHOLDER |
+| 2015 | dhw | 1.69 | degC-weeks | PLACEHOLDER |
+| 2016 | dhw | 1.78 | degC-weeks | PLACEHOLDER |
 | 2017 | dhw | 3 | degC-weeks | PLACEHOLDER |
-| 2018 | dhw | 1.47 | degC-weeks | PLACEHOLDER |
+| 2018 | dhw | 0.33 | degC-weeks | PLACEHOLDER |
 | 2019 | dhw | 6 | degC-weeks | PLACEHOLDER |
 | 2020 | dhw | 4 | degC-weeks | PLACEHOLDER |
-| 2021 | dhw | 0.9 | degC-weeks | PLACEHOLDER |
-| 2022 | dhw | 0.19 | degC-weeks | PLACEHOLDER |
+| 2021 | dhw | 1.95 | degC-weeks | PLACEHOLDER |
+| 2022 | dhw | 1.79 | degC-weeks | PLACEHOLDER |
 | 2023 | dhw | 16 | degC-weeks | PLACEHOLDER |
 | 2024 | dhw | 10 | degC-weeks | PLACEHOLDER |
-| 2000 | npp_pelagic_index | 0.914 | relative | PLACEHOLDER |
-| 2001 | npp_pelagic_index | 1.064 | relative | PLACEHOLDER |
-| 2002 | npp_pelagic_index | 0.878 | relative | PLACEHOLDER |
-| 2003 | npp_pelagic_index | 1.087 | relative | PLACEHOLDER |
-| 2004 | npp_pelagic_index | 0.926 | relative | PLACEHOLDER |
-| 2005 | npp_pelagic_index | 0.965 | relative | PLACEHOLDER |
-| 2006 | npp_pelagic_index | 0.922 | relative | PLACEHOLDER |
-| 2007 | npp_pelagic_index | 1.008 | relative | PLACEHOLDER |
-| 2008 | npp_pelagic_index | 1.053 | relative | PLACEHOLDER |
+| 1983 | npp_pelagic_index | 0.966 | relative | PLACEHOLDER |
+| 1984 | npp_pelagic_index | 1.006 | relative | PLACEHOLDER |
+| 1985 | npp_pelagic_index | 0.961 | relative | PLACEHOLDER |
+| 1986 | npp_pelagic_index | 0.999 | relative | PLACEHOLDER |
+| 1987 | npp_pelagic_index | 0.992 | relative | PLACEHOLDER |
+| 1988 | npp_pelagic_index | 1.141 | relative | PLACEHOLDER |
+| 1989 | npp_pelagic_index | 0.896 | relative | PLACEHOLDER |
+| 1990 | npp_pelagic_index | 1.051 | relative | PLACEHOLDER |
+| 1991 | npp_pelagic_index | 1.02 | relative | PLACEHOLDER |
+| 1992 | npp_pelagic_index | 0.949 | relative | PLACEHOLDER |
+| 1993 | npp_pelagic_index | 0.965 | relative | PLACEHOLDER |
+| 1994 | npp_pelagic_index | 1.081 | relative | PLACEHOLDER |
+| 1995 | npp_pelagic_index | 1 | relative | PLACEHOLDER |
+| 1996 | npp_pelagic_index | 1.066 | relative | PLACEHOLDER |
+| 1997 | npp_pelagic_index | 1.008 | relative | PLACEHOLDER |
+| 1998 | npp_pelagic_index | 0.889 | relative | PLACEHOLDER |
+| 1999 | npp_pelagic_index | 0.986 | relative | PLACEHOLDER |
+| 2000 | npp_pelagic_index | 1.182 | relative | PLACEHOLDER |
+| 2001 | npp_pelagic_index | 0.919 | relative | PLACEHOLDER |
+| 2002 | npp_pelagic_index | 1.128 | relative | PLACEHOLDER |
+| 2003 | npp_pelagic_index | 1.071 | relative | PLACEHOLDER |
+| 2004 | npp_pelagic_index | 1.054 | relative | PLACEHOLDER |
+| 2005 | npp_pelagic_index | 1.019 | relative | PLACEHOLDER |
+| 2006 | npp_pelagic_index | 1.081 | relative | PLACEHOLDER |
+| 2007 | npp_pelagic_index | 1.035 | relative | PLACEHOLDER |
+| 2008 | npp_pelagic_index | 1.062 | relative | PLACEHOLDER |
 | 2009 | npp_pelagic_index | 1.35 | relative | PLACEHOLDER |
-| 2010 | npp_pelagic_index | 1.041 | relative | PLACEHOLDER |
-| 2011 | npp_pelagic_index | 1.057 | relative | PLACEHOLDER |
-| 2012 | npp_pelagic_index | 0.959 | relative | PLACEHOLDER |
-| 2013 | npp_pelagic_index | 0.993 | relative | PLACEHOLDER |
-| 2014 | npp_pelagic_index | 1.226 | relative | PLACEHOLDER |
-| 2015 | npp_pelagic_index | 1.037 | relative | PLACEHOLDER |
-| 2016 | npp_pelagic_index | 1.07 | relative | PLACEHOLDER |
-| 2017 | npp_pelagic_index | 0.969 | relative | PLACEHOLDER |
-| 2018 | npp_pelagic_index | 0.893 | relative | PLACEHOLDER |
-| 2019 | npp_pelagic_index | 0.915 | relative | PLACEHOLDER |
-| 2020 | npp_pelagic_index | 1.186 | relative | PLACEHOLDER |
+| 2010 | npp_pelagic_index | 0.935 | relative | PLACEHOLDER |
+| 2011 | npp_pelagic_index | 1.068 | relative | PLACEHOLDER |
+| 2012 | npp_pelagic_index | 0.915 | relative | PLACEHOLDER |
+| 2013 | npp_pelagic_index | 0.982 | relative | PLACEHOLDER |
+| 2014 | npp_pelagic_index | 1.18 | relative | PLACEHOLDER |
+| 2015 | npp_pelagic_index | 0.959 | relative | PLACEHOLDER |
+| 2016 | npp_pelagic_index | 1.014 | relative | PLACEHOLDER |
+| 2017 | npp_pelagic_index | 1.227 | relative | PLACEHOLDER |
+| 2018 | npp_pelagic_index | 1.188 | relative | PLACEHOLDER |
+| 2019 | npp_pelagic_index | 0.935 | relative | PLACEHOLDER |
+| 2020 | npp_pelagic_index | 0.984 | relative | PLACEHOLDER |
 | 2021 | npp_pelagic_index | 1.3 | relative | PLACEHOLDER |
-| 2022 | npp_pelagic_index | 0.924 | relative | PLACEHOLDER |
-| 2023 | npp_pelagic_index | 0.967 | relative | PLACEHOLDER |
-| 2024 | npp_pelagic_index | 0.983 | relative | PLACEHOLDER |
+| 2022 | npp_pelagic_index | 1.052 | relative | PLACEHOLDER |
+| 2023 | npp_pelagic_index | 0.944 | relative | PLACEHOLDER |
+| 2024 | npp_pelagic_index | 0.981 | relative | PLACEHOLDER |
+| 1983 | coral_cover | 0.22 | proportion | PLACEHOLDER |
+| 1989 | coral_cover | 0.2 | proportion | PLACEHOLDER |
+| 1990 | coral_cover | 0.16 | proportion | PLACEHOLDER |
+| 1995 | coral_cover | 0.15 | proportion | PLACEHOLDER |
+| 1996 | coral_cover | 0.13 | proportion | PLACEHOLDER |
 | 2000 | coral_cover | 0.15 | proportion | approximate |
 | 2004 | coral_cover | 0.14 | proportion | approximate |
 | 2006 | coral_cover | 0.1 | proportion | approximate |
@@ -375,40 +443,55 @@ Values flagged `PLACEHOLDER` must be replaced with real data before management u
 
 | year | index | group | value | cv | lambda | data_status |
 | --- | --- | --- | --- | --- | --- | --- |
-| 2012 | SEDAR57_lobster_trap_CPUE | spiny_lobster | 1.301 | 0.35 | 0.5 | PLACEHOLDER |
-| 2013 | SEDAR57_lobster_trap_CPUE | spiny_lobster | 0.981 | 0.35 | 0.5 | PLACEHOLDER |
-| 2014 | SEDAR57_lobster_trap_CPUE | spiny_lobster | 0.941 | 0.35 | 0.5 | PLACEHOLDER |
-| 2015 | SEDAR57_lobster_trap_CPUE | spiny_lobster | 0.881 | 0.35 | 0.5 | PLACEHOLDER |
-| 2016 | SEDAR57_lobster_trap_CPUE | spiny_lobster | 0.994 | 0.35 | 0.5 | PLACEHOLDER |
-| 2017 | SEDAR57_lobster_trap_CPUE | spiny_lobster | 0.935 | 0.35 | 0.5 | PLACEHOLDER |
-| 2018 | SEDAR57_lobster_trap_CPUE | spiny_lobster | 0.762 | 0.35 | 0.5 | PLACEHOLDER |
-| 2019 | SEDAR57_lobster_trap_CPUE | spiny_lobster | 0.885 | 0.35 | 0.5 | PLACEHOLDER |
-| 2020 | SEDAR57_lobster_trap_CPUE | spiny_lobster | 1.028 | 0.35 | 0.5 | PLACEHOLDER |
-| 2021 | SEDAR57_lobster_trap_CPUE | spiny_lobster | 1.059 | 0.35 | 0.5 | PLACEHOLDER |
-| 2000 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.787 | 0.35 | 0.5 | PLACEHOLDER |
-| 2001 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.858 | 0.35 | 0.5 | PLACEHOLDER |
-| 2002 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.826 | 0.35 | 0.5 | PLACEHOLDER |
-| 2003 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.823 | 0.35 | 0.5 | PLACEHOLDER |
-| 2004 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.745 | 0.35 | 0.5 | PLACEHOLDER |
-| 2005 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.229 | 0.35 | 0.5 | PLACEHOLDER |
-| 2006 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.021 | 0.35 | 0.5 | PLACEHOLDER |
-| 2007 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.105 | 0.35 | 0.5 | PLACEHOLDER |
-| 2008 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.092 | 0.35 | 0.5 | PLACEHOLDER |
-| 2009 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.889 | 0.35 | 0.5 | PLACEHOLDER |
-| 2010 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.991 | 0.35 | 0.5 | PLACEHOLDER |
-| 2011 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.848 | 0.35 | 0.5 | PLACEHOLDER |
-| 2012 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.792 | 0.35 | 0.5 | PLACEHOLDER |
-| 2013 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.042 | 0.35 | 0.5 | PLACEHOLDER |
-| 2014 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.096 | 0.35 | 0.5 | PLACEHOLDER |
-| 2015 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.133 | 0.35 | 0.5 | PLACEHOLDER |
-| 2016 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.254 | 0.35 | 0.5 | PLACEHOLDER |
-| 2017 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.773 | 0.35 | 0.5 | PLACEHOLDER |
-| 2018 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.076 | 0.35 | 0.5 | PLACEHOLDER |
-| 2019 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.95 | 0.35 | 0.5 | PLACEHOLDER |
-| 2013 | NCRMP_parrotfish_density | parrotfish_1;parrotfish_2 | 0.99 | 0.35 | 0.5 | PLACEHOLDER |
-| 2015 | NCRMP_parrotfish_density | parrotfish_1;parrotfish_2 | 1.186 | 0.35 | 0.5 | PLACEHOLDER |
-| 2017 | NCRMP_parrotfish_density | parrotfish_1;parrotfish_2 | 0.929 | 0.35 | 0.5 | PLACEHOLDER |
-| 2019 | NCRMP_parrotfish_density | parrotfish_1;parrotfish_2 | 0.815 | 0.35 | 0.5 | PLACEHOLDER |
-| 2021 | NCRMP_parrotfish_density | parrotfish_1;parrotfish_2 | 0.873 | 0.35 | 0.5 | PLACEHOLDER |
-| 2023 | NCRMP_parrotfish_density | parrotfish_1;parrotfish_2 | 0.757 | 0.35 | 0.5 | PLACEHOLDER |
+| 2012 | SEDAR57_lobster_trap_CPUE | spiny_lobster | 1.047 | 0.35 | 0.5 | PLACEHOLDER |
+| 2013 | SEDAR57_lobster_trap_CPUE | spiny_lobster | 0.903 | 0.35 | 0.5 | PLACEHOLDER |
+| 2014 | SEDAR57_lobster_trap_CPUE | spiny_lobster | 0.998 | 0.35 | 0.5 | PLACEHOLDER |
+| 2015 | SEDAR57_lobster_trap_CPUE | spiny_lobster | 0.993 | 0.35 | 0.5 | PLACEHOLDER |
+| 2016 | SEDAR57_lobster_trap_CPUE | spiny_lobster | 1.035 | 0.35 | 0.5 | PLACEHOLDER |
+| 2017 | SEDAR57_lobster_trap_CPUE | spiny_lobster | 1.008 | 0.35 | 0.5 | PLACEHOLDER |
+| 2018 | SEDAR57_lobster_trap_CPUE | spiny_lobster | 0.612 | 0.35 | 0.5 | PLACEHOLDER |
+| 2019 | SEDAR57_lobster_trap_CPUE | spiny_lobster | 0.901 | 0.35 | 0.5 | PLACEHOLDER |
+| 2020 | SEDAR57_lobster_trap_CPUE | spiny_lobster | 0.933 | 0.35 | 0.5 | PLACEHOLDER |
+| 2021 | SEDAR57_lobster_trap_CPUE | spiny_lobster | 0.995 | 0.35 | 0.5 | PLACEHOLDER |
+| 1985 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.74 | 0.35 | 0.5 | PLACEHOLDER |
+| 1986 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.82 | 0.35 | 0.5 | PLACEHOLDER |
+| 1987 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.785 | 0.35 | 0.5 | PLACEHOLDER |
+| 1988 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.817 | 0.35 | 0.5 | PLACEHOLDER |
+| 1989 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.767 | 0.35 | 0.5 | PLACEHOLDER |
+| 1990 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.238 | 0.35 | 0.5 | PLACEHOLDER |
+| 1991 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.214 | 0.35 | 0.5 | PLACEHOLDER |
+| 1992 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.921 | 0.35 | 0.5 | PLACEHOLDER |
+| 1993 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.919 | 0.35 | 0.5 | PLACEHOLDER |
+| 1994 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.091 | 0.35 | 0.5 | PLACEHOLDER |
+| 1995 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1 | 0.35 | 0.5 | PLACEHOLDER |
+| 1996 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.915 | 0.35 | 0.5 | PLACEHOLDER |
+| 1997 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.826 | 0.35 | 0.5 | PLACEHOLDER |
+| 1998 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.754 | 0.35 | 0.5 | PLACEHOLDER |
+| 1999 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.961 | 0.35 | 0.5 | PLACEHOLDER |
+| 2000 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.168 | 0.35 | 0.5 | PLACEHOLDER |
+| 2001 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.918 | 0.35 | 0.5 | PLACEHOLDER |
+| 2002 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.227 | 0.35 | 0.5 | PLACEHOLDER |
+| 2003 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.968 | 0.35 | 0.5 | PLACEHOLDER |
+| 2004 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.087 | 0.35 | 0.5 | PLACEHOLDER |
+| 2005 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.046 | 0.35 | 0.5 | PLACEHOLDER |
+| 2006 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.063 | 0.35 | 0.5 | PLACEHOLDER |
+| 2007 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.971 | 0.35 | 0.5 | PLACEHOLDER |
+| 2008 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.06 | 0.35 | 0.5 | PLACEHOLDER |
+| 2009 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.748 | 0.35 | 0.5 | PLACEHOLDER |
+| 2010 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.983 | 0.35 | 0.5 | PLACEHOLDER |
+| 2011 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.193 | 0.35 | 0.5 | PLACEHOLDER |
+| 2012 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.045 | 0.35 | 0.5 | PLACEHOLDER |
+| 2013 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.975 | 0.35 | 0.5 | PLACEHOLDER |
+| 2014 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.336 | 0.35 | 0.5 | PLACEHOLDER |
+| 2015 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.902 | 0.35 | 0.5 | PLACEHOLDER |
+| 2016 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.039 | 0.35 | 0.5 | PLACEHOLDER |
+| 2017 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.08 | 0.35 | 0.5 | PLACEHOLDER |
+| 2018 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 0.864 | 0.35 | 0.5 | PLACEHOLDER |
+| 2019 | SEDAR80_QT_trap_CPUE | queen_triggerfish | 1.318 | 0.35 | 0.5 | PLACEHOLDER |
+| 2013 | NCRMP_parrotfish_density | parrotfish_1;parrotfish_2 | 1.113 | 0.35 | 0.5 | PLACEHOLDER |
+| 2015 | NCRMP_parrotfish_density | parrotfish_1;parrotfish_2 | 0.944 | 0.35 | 0.5 | PLACEHOLDER |
+| 2017 | NCRMP_parrotfish_density | parrotfish_1;parrotfish_2 | 0.922 | 0.35 | 0.5 | PLACEHOLDER |
+| 2019 | NCRMP_parrotfish_density | parrotfish_1;parrotfish_2 | 0.821 | 0.35 | 0.5 | PLACEHOLDER |
+| 2021 | NCRMP_parrotfish_density | parrotfish_1;parrotfish_2 | 1.095 | 0.35 | 0.5 | PLACEHOLDER |
+| 2023 | NCRMP_parrotfish_density | parrotfish_1;parrotfish_2 | 0.764 | 0.35 | 0.5 | PLACEHOLDER |
 

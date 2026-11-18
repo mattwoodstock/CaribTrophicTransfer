@@ -4,16 +4,19 @@
 
 ## 1. What is automated
 
-| Input | API / service | Function | Uncertainty attached |
+| Input | API / service (default source first) | Function | Uncertainty attached |
 |---|---|---|---|
-| Sea-surface temperature | NOAA Coral Reef Watch CoralTemp (NESDIS ERDDAP `noaacrwsstDaily`) or OISST v2.1 (PFEG ERDDAP `ncdcOisst21Agg_LonPM180`) | `fetch_erddap_series()` | within-domain spatial SD |
-| Degree heating weeks (annual max) | Coral Reef Watch (NESDIS ERDDAP `noaacrwdhwDaily`) | `fetch_erddap_series(time_agg = "max")` | spatial SD |
-| Pelagic NPP (index and absolute) | satellite ensemble: MODIS VGPM (`erdMH1ppmday`), VIIRS SNPP and NOAA-20 (`productivity_viirs_*_monthly`) on PFEG ERDDAP | `fetch_npp_ensemble()` | between-product (structural) spread + spatial SD |
-| Chlorophyll-a, Kd490 (water clarity) | VIIRS SNPP science quality (NESDIS ERDDAP) | `fetch_erddap_series()` | spatial SD |
-| Ocean-model hindcasts / projections | MOM6-NWA12 via NOAA CEFI THREDDS OPeNDAP; any CF NetCDF | `fetch_opendap_series()` | spatial SD |
+| Sea-surface temperature | Coral Reef Watch CoralTemp **monthly** (PIFSC OceanWatch ERDDAP `CRW_sst_v3_1_monthly`, 1985–); AVHRR Pathfinder 5.3 (`pf5-3-monthly`) fills earlier years. Alternatives: CRW daily (NESDIS), OISST (PFEG) | `fetch_erddap_series()` | within-domain spatial SD |
+| Degree heating weeks (annual max) | Coral Reef Watch (PIFSC `CRW_dhw_v1_0`; NESDIS `noaacrwdhwDaily`) | `fetch_erddap_series(time_agg = "max")` | spatial SD |
+| Pelagic NPP (index and absolute) | **computed** VGPM + Eppley-VGPM ensemble from ESA OC-CCI v6 chlorophyll, CRW SST and SeaWiFS/MODIS PAR (all PIFSC), 1998–. Alternative: pre-computed MODIS/VIIRS NPP on PFEG ERDDAP | `fetch_vgpm_ensemble()`, `vgpm_npp()`; `fetch_npp_ensemble()` | spread of the two algorithms' anomalies + propagated chlorophyll spatial SD |
+| Chlorophyll-a, Kd490 | ESA OC-CCI v6 monthly (PIFSC), 1998–; VIIRS (NESDIS) 2012– | `fetch_erddap_series()` | spatial SD |
+| SST and NPP projections | **CMIP6** CESM2 + ACCESS-ESM1-5 (`tos`, `intpp`), historical + SSP2-4.5 / SSP3-7.0 / SSP5-8.5 (PIFSC), delta method relative to 2005–2014 | `fetch_cmip6_series()`, `cmip6_delta_projection()` | between-model SD |
+| Regional ocean-model hindcasts/projections | MOM6-NWA12 via NOAA CEFI THREDDS OPeNDAP; any CF NetCDF | `fetch_opendap_series()` | spatial SD |
 | Reanalysis | GLORYS12 via Copernicus Marine Toolbox (free account) | `fetch_copernicus_series()` | spatial SD |
 | Benthic habitat area | NOAA NCCOS benthic habitat maps (ArcGIS REST; USVI 2002 = layer 6, Puerto Rico 2002 = layer 11) | `fetch_nccos_habitat_areas()`, `map_habitat_classes()` | per-class mapping CV |
 | Hurricane disturbances | NOAA NHC HURDAT2 Atlantic best tracks | `fetch_hurdat2()`, `hurricane_disturbances()` | intensity CV |
+
+**Server availability during development (Nov 2026).** PFEG CoastWatch reset connections and PSL THREDDS returned HTTP 429 from the cloud container. The defaults were therefore switched to equivalent, commonly used products on NOAA PIFSC OceanWatch and NESDIS CoastWatch, all of which were tested live. The PFEG, MOM6 and GLORYS fetchers remain available. In the St. Croix `data_sources.csv` they are disabled.
 
 **Not automated (no public API):**
 
@@ -30,7 +33,7 @@ One row per acquisition task:
 | Column | Meaning |
 |---|---|
 | `target` | covariate name to create (e.g., `sst`, `dhw`, `npp_pelagic_index`), or `habitat_areas` / `hurricanes` |
-| `method` | `erddap`, `npp_ensemble`, `opendap`, `copernicus`, `nccos_habitat`, `hurdat2` |
+| `method` | `erddap`, `vgpm_ensemble`, `npp_ensemble`, `cmip6_delta`, `opendap`, `copernicus`, `nccos_habitat`, `hurdat2` |
 | `enabled` | TRUE/FALSE |
 | `args` | `key=value` pairs separated by `;` (see below) |
 
@@ -38,7 +41,10 @@ Common arguments:
 
 | Argument | Applies to | Meaning |
 |---|---|---|
-| `key` | erddap | preset from `ocean_source_catalog()` (`crw_sst`, `crw_dhw_max`, `oisst_sst`, `viirs_chla`, `viirs_kd490`, `modis_vgpm_npp`, `viirs_snpp_npp`, `viirs_noaa20_npp`) |
+| `key` | erddap | preset from `ocean_source_catalog()` (`crw_sst_monthly`, `pathfinder_sst_monthly`, `crw_dhw_max_pifsc`, `occci_chla_monthly`, `occci_kd490_monthly`, `crw_sst`, `crw_dhw_max`, `oisst_sst`, `viirs_chla`, `viirs_kd490`, `modis_vgpm_npp`, `viirs_snpp_npp`, `viirs_noaa20_npp`) |
+| `fill_key` | erddap | second product used for years the first does not cover (e.g., Pathfinder before 1985) |
+| `chunk_years` | erddap | years per request (monthly products: 6–10) |
+| `obs_variable`, `cmip_var`, `type`, `experiments`, `models`, `baseline` | cmip6_delta | observed covariate to project, CMIP6 variable, `additive`/`ratio`, SSPs, models, baseline years; creates `<obs_variable>_<ssp>` variables |
 | `server`, `dataset_id`, `variable`, `extra_dims` | erddap | any ERDDAP griddap dataset (overrides `key`) |
 | `time_agg` | erddap, opendap, copernicus | `mean` (default), `max`, `min`, `sum` within year |
 | `stride_time`, `stride_space` | erddap | sub-sampling to reduce download size (e.g., weekly samples of daily data) |
@@ -78,11 +84,15 @@ I = \underbrace{\min\!\Big(1, \max\!\big(0, \tfrac{V_{max}-34}{137-34}\big)\Big)
 \underbrace{\begin{cases}1 & d \le d_{core} \\ e^{-(d-d_{core})/d_{decay}} & d > d_{core}\end{cases}}_{\text{distance at closest approach}}
 $$
 
-$V_{max}$ is the maximum sustained wind (kt) near closest approach, and $d$ is the distance (km). The NPP, habitat-quality, effort and production losses are copied from the template event and scaled by $I$. For St. Croix this gives the following intensities, over 2000–2024. The case study uses 2010–2024, so Omar 2008 and Jeanne 2004 are not part of it:
+$V_{max}$ is the maximum sustained wind (kt) near closest approach, and $d$ is the distance (km). The NPP, habitat-quality, effort and production losses are copied from the template event and scaled by $I$. For St. Croix (1983–2024) this gives the following intensities:
 
 | Storm | Intensity |
 |---|---|
 | Maria 2017 (47 km, 150 kt) | 1.00 |
+| Lenny 1999 | 0.98 |
+| Hugo 1989 | 0.84 |
+| Georges 1998 | 0.54 |
+| Marilyn 1995 | 0.54 |
 | Irma 2017 | 0.54 |
 | Omar 2008 | 0.36 |
 | Dorian 2019 | 0.30 |
@@ -139,3 +149,18 @@ When covariate `sd` or disturbance `intensity_cv` values are present, the annual
 * **ERDDAP, NCCOS, NHC and THREDDS** are public and need no credentials. Some servers throttle repeated requests. PFEG CoastWatch reset connections during development, and PSL THREDDS returned HTTP 429. Downloads are therefore retried with exponential back-off, and failures are logged without stopping the other sources.
 * **Copernicus Marine** needs a free account. Set `COPERNICUSMARINE_SERVICE_USERNAME` / `COPERNICUSMARINE_SERVICE_PASSWORD`, or run `copernicusmarine login` once, and install the toolbox with `pip install copernicusmarine`.
 * **MOM6-NWA12 (CEFI).** Browse the NOAA CEFI data portal for the desired variable, run (hindcast or SSP projection) and frequency, and paste its OPeNDAP URL into `data_sources.csv`. Projections can be appended as future years of a covariate. They are then used directly in the projection period.
+* **Using projections in scenarios.** The `cmip6_delta` method creates variables such as `sst_ssp585` (observations up to the last historical year, delta-projected afterwards). A scenario switches the model onto them with the `cov_from` driver, e.g. `scenario = Climate_SSP585, driver = cov_from, target = sst=sst_ssp585`. The Baseline keeps the recent climatology.
+
+### Computed NPP (VGPM ensemble)
+
+Monthly domain-mean chlorophyll *C* (mg m⁻³), SST *T* (°C) and PAR *E₀* (mol photons m⁻² d⁻¹) feed the Behrenfeld & Falkowski (1997) VGPM:
+
+$$
+NPP = 0.66125\,P^B_{opt}(T)\,\frac{E_0}{E_0+4.1}\,Z_{eu}\,C\,D_{irr}
+$$
+
+* $P^B_{opt}$ is either the VGPM 7th-order temperature polynomial or the Eppley exponential $1.54\cdot10^{0.0275T-0.07}$.
+* $Z_{eu}$ is the euphotic depth from total chlorophyll (Morel & Berthon 1989).
+* $D_{irr}$ is the day length.
+
+PAR gaps (before SeaWiFS, after the MODIS record) are filled with the monthly climatology. The pelagic **index** is the mean of each algorithm's own anomaly (value / its long-term mean), so differences in absolute level between algorithms do not inflate index uncertainty. The absolute level is also reported (`npp_pelagic_index_abs`, about 130–240 g C m⁻² yr⁻¹ for the St. Croix shelf + buffer). It is higher than the regional open-ocean value of about 85 used in SEDAR103-DW-20, partly because bottom reflectance in optically shallow water biases satellite chlorophyll upward. The case study therefore keeps 85 as the user-specified absolute level.

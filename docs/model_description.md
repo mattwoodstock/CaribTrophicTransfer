@@ -275,6 +275,7 @@ Draws are weighted by $\exp(-\text{NLL})$ and resampled. The effective sample si
 |---|---|
 | `effort_mult` | multiply effort of gear(s) (`target`, `;`-separated) |
 | `cov_offset` / `cov_trend` / `cov_set` | add a constant, add a linear trend, or set event values of any covariate (e.g., SST warming, DHW bleaching years) |
+| `cov_from` | replace a covariate by another series, e.g. `sst=sst_ssp585` from a CMIP6 / MOM6 projection |
 | `npp_mult` / `npp_trend` | scale habitat NPP once, or with a compound annual trend |
 | `area_trend` / `area_mult` | habitat area change (loss of seagrass, reef, mangrove) |
 | `tte_mult` | change transfer efficiency |

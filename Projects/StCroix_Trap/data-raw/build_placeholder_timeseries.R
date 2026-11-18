@@ -20,7 +20,7 @@
 # ==============================================================================
 set.seed(2024)
 out <- "Projects/StCroix_Trap/data"
-years <- 2000:2024
+years <- 1983:2024
 
 # ---- landings (lb, reported) -------------------------------------------------
 recent_lb <- c(spiny_lobster = 110000, queen_conch = 30500, parrotfish_1 = 0,
@@ -50,8 +50,11 @@ gear_split <- list(
   porgies = c(trap_fish = 0.70, hook_line = 0.30),
   pelagics = c(hook_line = 1))
 # year multiplier: higher effort early 2000s, Omar 2008 dip, Maria 2017-18 collapse, COVID 2020
-yr_mult <- approx(c(2000, 2007, 2008, 2009, 2016, 2017, 2018, 2019, 2020, 2021, 2024),
-                  c(1.35, 1.25, 1.05, 1.15, 1.00, 0.80, 0.55, 0.85, 0.80, 1.00, 1.00), xout = years)$y
+# year multiplier: Hugo 1989 and Marilyn 1995 collapses, high effort ~2000, Omar 2008 dip,
+# Maria 2017-18 collapse, COVID 2020
+yr_mult <- approx(c(1983, 1988, 1989, 1990, 1991, 1994, 1995, 1996, 1997, 2000, 2007, 2008, 2009, 2016, 2017, 2018, 2019, 2020, 2021, 2024),
+                  c(1.10, 1.20, 0.75, 0.60, 0.95, 1.15, 0.80, 0.85, 1.10, 1.35, 1.25, 1.05, 1.15, 1.00, 0.80, 0.55, 0.85, 0.80, 1.00, 1.00),
+                  xout = years)$y
 rows <- list()
 for (gr in names(recent_lb)) for (ge in names(gear_split[[gr]])) {
   v <- recent_lb[[gr]] * gear_split[[gr]][[ge]] * yr_mult * exp(rnorm(length(years), 0, 0.12))
@@ -68,7 +71,7 @@ write.csv(land[land$landings_lb > 0 | land$group == "parrotfish_1", ], file.path
 base_trips <- c(trap_fish = 2200, trap_lobster = 900, dive = 1600, hook_line = 2100)
 ef <- do.call(rbind, lapply(names(base_trips), function(ge) {
   m <- yr_mult
-  if (ge %in% c("trap_fish", "trap_lobster")) m[years %in% 2017:2018] <- m[years %in% 2017:2018] * 0.7
+  if (ge %in% c("trap_fish", "trap_lobster")) m[years %in% c(1989:1990, 1995, 2017:2018)] <- m[years %in% c(1989:1990, 1995, 2017:2018)] * 0.7
   data.frame(year = years, gear = ge, effort = round(base_trips[[ge]] * m * exp(rnorm(length(years), 0, 0.05))),
              units = "trips", data_status = "PLACEHOLDER")
 }))
@@ -83,8 +86,9 @@ dhw <- pmax(0, rnorm(length(years), 1, 0.7))
 dhw[years == 2005] <- 12; dhw[years == 2010] <- 6; dhw[years == 2017] <- 3
 dhw[years == 2019] <- 6; dhw[years == 2020] <- 4; dhw[years == 2023] <- 16; dhw[years == 2024] <- 10
 npp <- exp(rnorm(length(years), 0, 0.08)); npp[years == 2009] <- 1.35; npp[years == 2021] <- 1.30
-cc_years <- c(2000, 2004, 2006, 2009, 2013, 2015, 2017, 2019, 2021, 2023, 2024)
-cc <- c(0.15, 0.14, 0.10, 0.10, 0.08, 0.075, 0.065, 0.045, 0.045, 0.035, 0.03)
+cc_years <- c(1983, 1989, 1990, 1995, 1996, 2000, 2004, 2006, 2009, 2013, 2015, 2017, 2019, 2021, 2023, 2024)
+cc <- c(0.22, 0.20, 0.16, 0.15, 0.13, 0.15, 0.14, 0.10, 0.10, 0.08, 0.075, 0.065, 0.045, 0.045, 0.035, 0.03)
+cc_status <- ifelse(cc_years < 2000, "PLACEHOLDER", "approximate")
 cov <- rbind(
   data.frame(year = years, variable = "sst", value = round(sst, 3), units = "degC",
              source = "PLACEHOLDER (replace with GLORYS12 / OISST annual mean)", data_status = "PLACEHOLDER"),
@@ -93,8 +97,10 @@ cov <- rbind(
   data.frame(year = years, variable = "npp_pelagic_index", value = round(npp, 3), units = "relative",
              source = "PLACEHOLDER (replace with St. Croix NPP ensemble / mean)", data_status = "PLACEHOLDER"),
   data.frame(year = cc_years, variable = "coral_cover", value = cc, units = "proportion",
-             source = "APPROXIMATE (NCRMP ~8% in 2013 to ~4% in 2019; TCRMP; SCTLD from 2021)",
-             data_status = "approximate"))
+             source = ifelse(cc_years < 2000, "PLACEHOLDER (pre-TCRMP; post-Hugo/Marilyn losses assumed)",
+                             "APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)"),
+             data_status = cc_status))
+cov$sd <- ifelse(cov$variable == "coral_cover", ifelse(cov$year < 2000, 0.03, 0.01), 0)
 write.csv(cov, file.path(out, "env_covariates.csv"), row.names = FALSE)
 
 # ---- indices (for SIR) ------------------------------------------------------
@@ -102,8 +108,8 @@ idx <- rbind(
   data.frame(year = 2012:2021, index = "SEDAR57_lobster_trap_CPUE", group = "spiny_lobster",
              value = round(exp(rnorm(10, 0, 0.15)) * c(1.0, 0.95, 0.9, 0.9, 0.95, 0.85, 0.75, 0.9, 1.0, 1.05), 3),
              cv = 0.35, lambda = 0.5, data_status = "PLACEHOLDER", reference = "Replace with SEDAR 57 Update St. Croix trap CPUE"),
-  data.frame(year = 2000:2019, index = "SEDAR80_QT_trap_CPUE", group = "queen_triggerfish",
-             value = round(exp(rnorm(20, 0, 0.15)) * seq(0.9, 1.1, length.out = 20), 3),
+  data.frame(year = 1985:2019, index = "SEDAR80_QT_trap_CPUE", group = "queen_triggerfish",
+             value = round(exp(rnorm(35, 0, 0.15)) * seq(0.9, 1.1, length.out = 35), 3),
              cv = 0.35, lambda = 0.5, data_status = "PLACEHOLDER", reference = "Replace with SEDAR 80 St. Croix commercial trap index"),
   data.frame(year = seq(2013, 2023, 2), index = "NCRMP_parrotfish_density", group = "parrotfish_1;parrotfish_2",
              value = round(exp(rnorm(6, 0, 0.1)) * c(1.0, 1.05, 0.95, 0.8, 0.9, 0.85), 3),

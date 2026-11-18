@@ -51,7 +51,8 @@ build_covariates <- function(proj, scenario = "Baseline", par = NULL) {
   ec <- if (!is.null(par$env_covariates)) par$env_covariates else proj$env_covariates
   vars <- if (is.null(ec)) character(0) else unique(ec$variable)
   sc <- .scenario_rows(proj, scenario)
-  if (!is.null(sc)) vars <- unique(c(vars, sc$target[sc$driver %in% c("cov_offset", "cov_trend", "cov_set")]))
+  if (!is.null(sc)) vars <- unique(c(vars, sc$target[sc$driver %in% c("cov_offset", "cov_trend", "cov_set")],
+                                     sub("=.*", "", sc$target[sc$driver == "cov_from"])))
   M <- matrix(NA_real_, length(years), length(vars), dimnames = list(years, vars))
   proj_years <- years[years > max(hy)]
   for (v in vars) {
@@ -70,7 +71,17 @@ build_covariates <- function(proj, scenario = "Baseline", par = NULL) {
     } else M[, v] <- 0
   }
   if (!is.null(sc)) for (i in seq_len(nrow(sc))) {
-    r <- sc[i, ]; if (!r$driver %in% c("cov_offset", "cov_trend", "cov_set")) next
+    r <- sc[i, ]
+    if (r$driver == "cov_from") {
+      # replace a covariate by another series (e.g., sst=sst_ssp585 from a CMIP6 projection)
+      parts <- strsplit(r$target, "=")[[1]]
+      src <- ec[ec$variable == parts[2], , drop = FALSE]
+      if (!nrow(src)) stop("cov_from source variable not found: ", parts[2])
+      yy <- years[years >= r$start_year & years <= r$end_year]
+      M[as.character(yy), parts[1]] <- stats::approx(src$year, src$value, xout = yy, rule = 2)$y
+      next
+    }
+    if (!r$driver %in% c("cov_offset", "cov_trend", "cov_set")) next
     yy <- as.character(years[years >= r$start_year & years <= r$end_year])
     if (r$driver == "cov_offset") M[yy, r$target] <- M[yy, r$target] + r$value
     if (r$driver == "cov_set")    M[yy, r$target] <- r$value
@@ -186,7 +197,7 @@ build_drivers <- function(proj, scenario = "Baseline", par = NULL) {
         if (!nrow(tmpl)) stop("Disturbance template not found: ", r$target)
         apply_dist(tmpl, t0_override = r$start_year, scale = ifelse(is.na(r$value), 1, r$value))
       },
-      cov_offset = NULL, cov_trend = NULL, cov_set = NULL,
+      cov_offset = NULL, cov_trend = NULL, cov_set = NULL, cov_from = NULL,
       stop("Unknown scenario driver: ", r$driver))
   }
   drv
