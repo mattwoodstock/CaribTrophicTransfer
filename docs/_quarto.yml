@@ -16,6 +16,7 @@ book:
     - review_readiness.md
     - ecological_review.md
     - assumptions.md
+    - code_review.md
     - data_needs.md
     - stcroix_input_values.md
     - references.md

@@ -33,7 +33,7 @@ productivity_units <- function() {
 #' @param unit character unit code (see [productivity_units()]); recycled.
 #' @param pq photosynthetic quotient (mol O2 per mol C). Default 1.
 #' @param dw_to_c carbon fraction of dry weight (default 0.34; seagrass, Duarte 1990;
-#'   Juman 2005 gives 83.9 t C / 249 t DW = 0.337).
+#'   Juman (2005a, Thalassia) gives 83.9 t C / 249 t DW = 0.337).
 #' @param om_to_c carbon fraction of organic matter / ash-free dry weight (default 0.45).
 #' @param c_to_ww wet weight per unit carbon, only used for `t_WW_km2_yr` input.
 #' @return numeric vector in t C km^-2 yr^-1.

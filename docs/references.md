@@ -51,7 +51,6 @@
 * Gattuso, J.-P., Frankignoulle, M., Wollast, R. (1998). Carbon and carbonate metabolism in coastal aquatic ecosystems. Annu. Rev. Ecol. Syst. 29: 405–434.
 * Gomis, E., Strydom, S., Foster, N. R., Montemayor, D., Mateo, M. A., Serrano, E., Serrano, O. (2025). Global estimates of seagrass blue carbon stocks in biomass and net primary production. Nature Communications 16: 9530.
 * Hatcher, B. G. (1990). Coral reef primary productivity: a hierarchy of pattern and process. Trends Ecol. Evol. 5: 149–155.
-* Juman, R. A. (2004, 2005). Biomass, litterfall and decomposition rates for the fringed *Rhizophora mangle* forest / *Thalassia testudinum* production, Bon Accord Lagoon, Tobago. Rev. Biol. Trop.
 * Lewis, J. B. (1977). Processes of organic production on coral reefs. Biol. Rev. 52: 305–347.
 * López-Calderón, J., et al. (2013). Decadal monitoring of *Thalassia testudinum* growth, Bocas del Toro, Panama.
 * Loría-Naranjo, M., Samper-Villarreal, J., Cortés, J. (2018). Long-term changes in seagrass at Cahuita, Costa Rica.
@@ -85,6 +84,8 @@
 * Froese, R., Binohlan, C. (2000). Empirical relationships to estimate asymptotic length, length at first maturity and length at maximum yield per recruit in fishes. J. Fish Biol. 56: 758–773.
 * Froese, R., Pauly, D. (eds) (2024). FishBase, version 24.07 (www.fishbase.org); tables accessed via the rfishbase data release on Hugging Face (datasets/cboettig/fishbase).
 * Kaschner, K., et al. (2019). AquaMaps: predicted range maps for aquatic species (temperature preferences via FishBase).
+* Juman, R. A. (2005a). The structure and productivity of the *Thalassia testudinum* community in Bon Accord Lagoon, Tobago. Rev. Biol. Trop. 53 (Suppl. 1): 219–227. (Productivity 3.9–4.9 g DW m⁻² d⁻¹; a nutrient-enriched lagoon.)
+* Juman, R. A. (2005b). Biomass, litterfall and decomposition rates for the fringed *Rhizophora mangle* forest lining the Bon Accord Lagoon, Tobago. Rev. Biol. Trop. 53 (Suppl. 1): 207–217.
 * Link, J. S., Watson, R. A. (2019). Global ecosystem overfishing: clear delineation within real limits to production. Science Advances 5: eaav0474.
 * McAllister, M. K., Ianelli, J. N. (1997). Bayesian stock assessment using catch-age data and the sampling-importance resampling algorithm. Can. J. Fish. Aquat. Sci. 54: 284–300.
 * Mohn, R. (1999). The retrospective problem in sequential population analysis. ICES J. Mar. Sci. 56: 473–488.
@@ -135,7 +136,6 @@
 * Forsythe, W. C., Rykiel, E. J., Stahl, R. S., Wu, H., Schoolfield, R. M. (1995). A model comparison for daylength as a function of latitude and day of year. Ecol. Model. 80: 87–95.
 * Gower, J., Young, E., King, S. (2013). Satellite images suggest a new *Sargassum* source region in 2011. Remote Sens. Lett. 4: 764–773.
 * Ionides, E. L. (2008). Truncated importance sampling. J. Comput. Graph. Stat. 17: 295–311.
-* Juman, R. A. (2005). Biomass, litterfall and decomposition rates for the fringed *Rhizophora mangle* forest lining the Bon Accord Lagoon, Tobago. Rev. Biol. Trop. 53 (Suppl. 1): 207–217.
 * Link, J. S., Watson, R. A. (2019). Global ecosystem overfishing: clear delineation within real limits to production. Sci. Adv. 5: eaav0474.
 * Morel, A., Berthon, J.-F. (1989). Surface pigments, algal biomass profiles, and potential production of the euphotic layer: relationships reinvestigated in view of remote-sensing applications. Limnol. Oceanogr. 34: 1545–1562.
 * Nair, P. V. R., Pillai, C. S. G. (1972). Primary productivity of some coral reefs in the Indian seas. Proc. Symp. Corals and Coral Reefs, Marine Biological Association of India: 33–42. *(Indian Ocean values, used only to bracket the reef NPP range)*
