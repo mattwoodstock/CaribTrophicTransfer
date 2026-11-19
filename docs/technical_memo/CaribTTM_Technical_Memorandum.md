@@ -16,7 +16,7 @@ lang: en-US
 
 Every placeholder is flagged in the input files and listed in Section 13 and Appendix B. Results in Section 10 illustrate the method and the direction of effects. **They are not management advice** until those inputs are replaced.
 
-**Reproducibility.** The tables in this memorandum are generated from the project input files and the model outputs by `docs/technical_memo/build_memo.R`. Text and numbers therefore come from the same model run. The run reported here took .
+**Reproducibility.** The tables in this memorandum are generated from the project input files and the model outputs by `docs/technical_memo/build_memo.R`. Text and numbers therefore come from the same model run. The run reported here took 42.5 min.
 
 # Abstract {-}
 
@@ -54,7 +54,55 @@ The St. Croix trap fishery case study covers 1983–2045. It applies the model t
 # Executive summary {-}
 
 
-*(to be completed from the full run)*
+**Purpose.** CaribTTM estimates how much yield each functional group, guild and gear in the St. Croix trap fishery can sustain, given:
+
+* the primary production of the island's habitats;
+* how efficiently that production moves up the food web;
+* how it is shared among fished and unfished consumers;
+* how warming, coral loss, hurricanes, invasive lionfish, *Sargassum* and fishing modify it.
+
+Its outputs (group, guild and gear MMSY, effort ceilings and choke groups) are the biological inputs to the stochastic production frontier being developed for the SEDAR 103 trophic frontier framework.
+
+**What was built.**
+
+* **An R package** with:
+  - a habitat-resolved energy budget;
+  - theory-consistent population dynamics (natural-mortality basis, per-recruit priors for x and B_MSY/B₀, Pella–Tomlinson production);
+  - ecological processes that theory and expert review require: open recruitment, nursery habitats, herbivory–coral feedback, no-take areas and ghost fishing;
+  - automated acquisition of eleven public data products, with user override.
+* **Full uncertainty propagation**, with adaptive importance sampling conditioned on assessment OFLs and on the feasibility of historical landings.
+* **A review toolkit:**
+  - out-of-sample validation;
+  - a simulation self-test;
+  - sensitivity and value-of-information analyses;
+  - a 14-variant structural ensemble;
+  - an independent catch-only comparator;
+  - closed-loop management strategy evaluation.
+
+**Main St. Croix findings.** These are conditional on placeholder landings and effort.
+
+1. **The two assessed stocks are reproduced.**
+   * Queen triggerfish MMSY is 23,500 lb (90% interval 12,500–37,300), against an OFL of 22,773. It passes leave-one-out validation: predicted without its OFL, the 90% interval of 10,300–47,900 lb contains the OFL.
+   * Spiny lobster MMSY is 250,000 lb (120,000–441,000), 1.5× its OFL. An independent catch-only analysis gives 205,000 lb. Without its OFL, lobster scale is poorly identified (the leave-one-out prediction misses the OFL), so the SEDAR 57 inputs are critical.
+2. **Small trap-bycatch groups limit the fishery, not lobster.**
+   * Fish traps and diving are already at their multispecies effort ceilings (median 0.95× and 0.96× current effort). Hogfish is the choke group in more than half of draws.
+   * Lobster traps could expand by about 28% before queen triggerfish bycatch limits them (73% of draws).
+   * At current catch, the probability of overfishing is 35% for hogfish, 16% for porgies and 16% for queen triggerfish. It is 7% for lobster and 9% for Parrotfish 2.
+3. **Climate is the largest projected stressor.** By 2043–2045 under SSP5-8.5, MMSY falls by about 43% for Parrotfish 2, 32% for grunts, 25% for spiny lobster and 16–22% for queen triggerfish, hogfish and porgies. Combined stresses double the overfishing probability of queen triggerfish (0.08 to 0.16) and raise that of hogfish by half (0.12 to 0.18).
+4. **Management levers work in the expected direction.**
+   * Expanding no-take areas or cutting trap effort by 25% lowers the overfishing risk of the choke groups by about a quarter.
+   * Open-access effort dynamics roughly double or triple it.
+   * In closed-loop tests, the SPF effort-ceiling rule performs slightly better than status quo. A 50% optimistic assessment makes it worse than status quo, which shows the value of accurate assessments for these choke groups.
+5. **The ecosystem as a whole is not overfished by Link & Watson's (2019) Ryther criterion** (0.61–0.66 t km⁻² yr⁻¹ in 2022–2024). The Fogarty ratio (0.56–0.60‰) sits in the caution band.
+6. **What would most improve the estimates.** The value-of-information analysis ranks four data streams that together account for about 70% of the first-order variance in total trap-group MMSY:
+   * fishery-independent biomass surveys (NCRMP), especially of competing benthic invertebrates;
+   * benthic primary-production measurements;
+   * transfer efficiency;
+   * the food-web fraction of colonized pavement.
+
+   Real landings and effort, and the SEDAR 57/80 CPUE series, determine the calibration and are the highest-priority data overall.
+
+**Status.** The model, data pipeline and diagnostics are complete and tested (124 unit tests). Every assumption is listed in a register with its basis and how it is tested. The results illustrate the method. Management use requires replacing the placeholders listed in Section 13.
 
 
 
@@ -1408,16 +1456,137 @@ The report also gives:
 All values are in lb yr⁻¹ unless stated, for the Baseline scenario and the 2022–2024 reference years. Landings are expanded by 1.5. **Absolute values for unassessed groups are conditional on placeholder landings and priors** (Section 13).
 
 
-*(to be completed from the full run)*
+## Summary of results
+
+**Calibration.** The run used 60,000 prior draws in five adaptive rounds of 12,000 and took 42.5 minutes on four cores.
+
+* The raw importance weights had an effective sample size (ESS) of 20.
+* The weight tail was too heavy for reliable Pareto smoothing (k̂ = 2.2), so the weights were truncated (Ionides 2008). This gave ESS 125, with 307 unique draws among 2,000 resamples and a largest weight of 1.3%.
+* Reported quantiles are therefore stable, but the posterior is still represented by a few hundred distinct parameter sets. Larger runs, or a sequential Monte Carlo sampler, would sharpen the tails.
+* Every retained draw supports all historical landings of the focus groups (shortfall 0).
+
+**Assessed stocks.**
+
+* **Queen triggerfish:** median MMSY 23,497 lb (90% interval 12,541–37,329) against the SEDAR 80 OFL of 22,773 lb (ratio 1.03). Current expanded catch is 15,466 lb, B/B_MSY 1.83 and P(overfishing) 0.16.
+* **Spiny lobster:** median MMSY 249,798 lb (120,321–441,273), 1.52× the SEDAR 57 OFL. Catch is 121,353 lb, B/B_MSY 2.44 and P(overfishing) 0.07.
+
+The lobster gap is consistent with an OFL being a catch at F_MSY under current conditions while MMSY is an equilibrium cap. It is within the CV of 0.4 used for the OFL.
+
+**Trap groups.** The groups with the least headroom are:
+
+* **hogfish:** MMSY 8,201 lb against catch 7,003 lb; P(overfishing) 0.35;
+* **porgies:** 5,890 against 3,338; P(overfishing) 0.16.
+
+These are low-production groups caught mainly as trap bycatch. The theory-based priors (x ≈ 0.20, B_MSY/B₀ ≈ 0.36) give them much less headroom than the original x = 0.5 form did.
+
+The large herbivore and invertivore complexes have wide intervals and MMSY well above their catches:
+
+* Parrotfish 2: 155,615 lb, 2.2× its ACL;
+* grunts: 315,880 lb;
+* shallow snappers (Snapper 3): 187,034 lb, 13× its ACL.
+
+These scales are the least constrained by data (Section 10.11). Uncalibrated groups (conch, yellowtail, deepwater snappers, jacks, pelagics) are reported for completeness without a status.
+
+**Gears.** Effort ceilings, as multipliers of 2022–2024 effort, are:
+
+| Gear | Ceiling at median MMSY | Ceiling at P* target | Choke group |
+|---|---|---|---|
+| Fish traps | 0.95 | 0.90 | hogfish (54% of draws) |
+| Dive | 0.96 | 0.92 | hogfish (56%) |
+| Lobster traps | 1.28 | 1.21 | queen triggerfish (73%) |
+| Hook and line | 1.21 | 1.10 | queen triggerfish (61%) |
+
+Fish-trap and dive effort are therefore at or just above the multispecies sustainable level, set by their bycatch of small reef fishes.
+
+**Processes.**
+
+* The no-take areas leave 83–88% of each focus group's biomass fishable.
+* Ghost fishing (chronic plus storm losses) removed the equivalent of 3–11% of landings over 1983–2024: about 5% for lobster, 9% for queen triggerfish and 11% for boxfishes. This mortality is not counted in the landings record.
+* Nursery indices changed by less than 3% over the history, because mapped habitat areas are static. They respond in the seagrass-loss scenario.
+
+**Scenarios** (2043–2045, against Baseline):
+
+* **SSP5-8.5** lowers MMSY by about 25% for lobster (now with its SeaLifeBase thermal curve), 43% for Parrotfish 2, 32% for grunts, 18% for queen triggerfish, 16% for hogfish and 22% for porgies.
+* **Combined stress** raises P(overfishing) for queen triggerfish from 0.08 to 0.16 and for hogfish from 0.12 to 0.18.
+* **Open-access effort dynamics** raise it to 0.20, 0.24 and 0.29 for queen triggerfish, hogfish and lobster.
+* **Management measures:**
+  - the 25% trap reduction lowers queen triggerfish risk to 0.06;
+  - the no-take expansion lowers it to 0.06, and hogfish risk to 0.09.
+* **+50% dive effort** (the herbivory test) raises hogfish and lobster risk (0.16 each), because divers also take those groups.
+* **Native seagrass loss** of 2% per year lowers lobster MMSY by 13% and grunts by 21% through the nursery pathway.
+
+**Validation.**
+
+* **Leave-one-benchmark-out:**
+  - The queen triggerfish OFL lies inside the predictive interval of a fit that excludes it (PIT 0.66).
+  - The lobster OFL does not (prediction 774,000 lb). Lobster scale is identified only by assessment information, because the 1980s Opitz biomass prior is high relative to the modern stock.
+* **Held-out indices:** the three placeholder series are covered at 90%, with MASE about 1.0–1.2. Because they are synthetic, this only demonstrates the procedure.
+* **Simulation self-test:** 90% interval coverage is 0.79–0.93 and median bias is −19% to +12% across the 13 groups. Bias is 0.0% for queen triggerfish and −6% for lobster.
+
+**Sensitivity and value of information.** Total focus-group MMSY is driven by:
+
+* the biomass of the competing benthic predatory invertebrates (negative);
+* the transfer efficiency, NPP and food-web fraction of colonized pavement, which is 53% of the benthic domain;
+* reef NPP;
+* the lobster partition.
+
+The rank model explains 76% of the variance. Grouped by data stream, the first-order variance shares are:
+
+| Data stream | Share of variance |
+|---|---|
+| Biomass surveys | 24% |
+| Primary-production measurements | 18% |
+| Transfer efficiency | 18% |
+| Food-web flows | 10% |
+
+For individual stocks, biomass surveys dominate: 46% for lobster, 37% for queen triggerfish and 57% for hogfish. Landings and the expansion factor show no prior variance share, because they act through calibration rather than through prior MMSY. Their value is shown instead by how strongly catch feasibility shapes the posterior.
+
+**Structural uncertainty.** The 14 structural variants each took 7,500 draws (five rounds). The assessed stocks are structurally robust:
+
+* lobster: pooled MMSY 279,000 lb (90% 146,000–554,000), between-variant CV 0.07;
+* queen triggerfish: 23,300 lb (13,600–40,300), CV 0.10.
+
+The unassessed herbivore and invertivore complexes are not: Parrotfish 2 CV 0.44, grunts 0.38.
+
+The variants quantify each structural choice (variant medians against base):
+
+* **Original form** (`gulland_PB`: x = 0.5 on P/B, Schaefer shape). MMSY rises for hogfish (+67%), porgies (+52%), queen triggerfish (+39%) and Parrotfish 2 (+91%). This is the effect of the theory correction.
+* **Closed lobster population.** Lobster MMSY falls by 14%.
+* **No thermal effects.** Lobster +13%, Parrotfish 2 +39%.
+* **Food-web fraction ×1.5.** Parrotfish 2 MMSY triples.
+* **Other variants.** Schaefer shape, nursery, ghost fishing, and lionfish/*Sargassum* change trap-group MMSY by less than 25%.
+
+The herbivory feedback acts only in projections, so it does not change reference-year MMSY. Its effect appears in the `Parrotfish_harvest_plus50` scenario. The low-TTE variant has a small effective sample (ESS 8), so its medians are less precise.
+
+**Independent comparator.** The catch-only (CMSY-style) analysis, which uses only landings and resilience, gives results close to the TTM and the OFLs for the assessed stocks:
+
+* queen triggerfish: 28,400 lb (TTM 23,500; OFL 22,800);
+* spiny lobster: 205,000 lb (TTM 250,000; OFL 164,000).
+
+It also agrees closely for porgies, hogfish and Parrotfish 2 (TTM/CMSY 0.75–1.24). For grunts, shallow snappers and angelfishes the TTM is 8–19× higher. Those catch-only estimates are bounded by the placeholder landings, while the energy budget sees large unexploited production. This is where real landings and survey biomass would discriminate between the two views.
+
+**Management strategy evaluation** (150 operating models, 2036–2045). The probability that any focus group falls below 0.5 B_MSY in some year is:
+
+| Procedure | Probability |
+|---|---|
+| Status quo | 0.33 |
+| 25% trap reduction | 0.31 |
+| SPF effort-ceiling rule | 0.31 |
+| SPF rule, +50% biased assessment | 0.41 |
+| Catch-rate rule | 0.41 |
+
+Queen triggerfish (0.17), hogfish (0.13) and porgies (0.06) account for the risk. The unbiased ceiling rule raises focus-group catch by about 11% over status quo at similar risk. The biased version raises catch by 68% at much higher risk, which quantifies the cost of optimistic assessments. The catch-rate rule lets effort drift upward (1.48×), because CPUE stays high while the choke groups decline.
+
+**Ecosystem overfishing.** The Ryther index (0.61–0.66 t km⁻² yr⁻¹ in 2022–2024) is below the practical limit of 1. The Fogarty ratio (0.56–0.60‰) is in the 0.22–0.92‰ caution band.
 
 
 ## Calibration diagnostics
 
 **Table. Importance-sampling diagnostics.**
 
-| n_prior | ESS | unique_resampled | max_weight | top10_weight_share | pareto_k_hat |
-| --- | --- | --- | --- | --- | --- |
-| 48,000 | 86.1 | 316.0 | 0.047 | 0.253 |  |
+| n_prior | ESS | ESS_raw | unique_resampled | max_weight | top10_weight_share | pareto_k_hat | weight_method |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 60,000 | 124.9 | 20.2 | 307.0 | 0.013 | 0.125 | 2.174 | truncated |
 
 
 ![Figure (fig08). MMSY prior and SIR-conditioned posterior for calibrated stocks.](../../Projects/StCroix_Trap/output/figures/fig08_sir.png){width=100%}
@@ -1434,25 +1603,25 @@ All values are in lb yr⁻¹ unless stated, for the Baseline scenario and the 20
 
 | Group | Status | MMSY p05 | MMSY p50 | MMSY p95 | P* target | Catch | B/B_MSY | P(overfishing) | P(overfished) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| spiny_lobster | Below target | 178,509 | 273,858 | 446,066 | 256,940 | 112,540 | 1.63 | 0.000 | 0.011 |
-| queen_conch | Outside focus (uncalibrated) | 6,179 | 31,582 | 165,347 | 22,602 | 1.547 | 0.00 | 0.000 | 0.603 |
-| parrotfish_1 | Prohibited | 82,844 | 348,183 | 1,596,762 | 284,560 | 0.000 | 2.00 | 0.000 | 0.000 |
-| parrotfish_2 | Below target | 104,972 | 310,629 | 1,380,547 | 269,834 | 68,816 | 2.33 | 0.007 | 0.000 |
-| surgeonfishes | Below target | 80,189 | 263,550 | 867,857 | 232,308 | 25,571 | 2.06 | 0.000 | 0.000 |
-| queen_triggerfish | Below target | 15,593 | 25,252 | 39,465 | 24,373 | 14,787 | 1.73 | 0.018 | 0.001 |
-| grunts | Below target | 197,825 | 575,461 | 1,915,195 | 488,713 | 20,159 | 2.32 | 0.000 | 0.000 |
-| snappers_shallow | Below target | 64,743 | 335,824 | 1,158,577 | 294,619 | 13,342 | 2.11 | 0.000 | 0.000 |
-| yellowtail_snapper | Outside focus (uncalibrated) | 120,103 | 447,721 | 1,406,440 | 382,570 | 40,956 | 2.08 | 0.000 | 0.000 |
-| snappers_deep | Outside focus (uncalibrated) | 20,634 | 114,694 | 498,689 | 85,663 | 43,632 | 1.63 | 0.004 | 0.232 |
-| groupers_shallow | Below target | 30,699 | 104,264 | 319,170 | 98,200 | 14,244 | 2.08 | 0.002 | 0.004 |
-| squirrelfishes | Below target | 27,973 | 113,734 | 281,497 | 101,040 | 9,291 | 2.14 | 0.000 | 0.000 |
-| goatfishes | Below target | 11,320 | 37,798 | 115,062 | 29,759 | 5,434 | 2.02 | 0.000 | 0.000 |
-| boxfishes | Below target | 17,669 | 64,233 | 264,068 | 50,460 | 6,602 | 2.13 | 0.000 | 0.000 |
-| angelfishes | Below target | 41,899 | 196,951 | 731,758 | 170,756 | 3,811 | 2.09 | 0.000 | 0.000 |
-| wrasses_hogfish | Below target | 6,985 | 11,018 | 37,777 | 10,130 | 6,559 | 1.79 | 0.034 | 0.000 |
-| jacks | Outside focus (uncalibrated) | 149,087 | 536,796 | 1,824,327 | 464,128 | 19,187 | 2.19 | 0.000 | 0.000 |
-| porgies | Below target | 3,046 | 6,393 | 18,899 | 5,510 | 3,242 | 1.85 | 0.026 | 0.000 |
-| pelagics | Outside focus (uncalibrated) | 4,540 | 32,692 | 216,585 | 24,538 | 63,100 | 1.41 | 0.716 | 0.352 |
+| spiny_lobster | Below target | 120,321 | 249,798 | 441,273 | 233,002 | 121,353 | 2.44 | 0.069 | 0.000 |
+| queen_conch | Outside focus (uncalibrated) | 5,295 | 21,229 | 131,984 | 15,470 | 0.973 | 0.00 | 0.002 | 0.659 |
+| parrotfish_1 | Prohibited | 30,990 | 162,400 | 463,707 | 133,716 | 0.000 | 2.75 | 0.000 | 0.000 |
+| parrotfish_2 | Below target | 64,134 | 155,615 | 570,872 | 136,762 | 70,634 | 3.06 | 0.090 | 0.000 |
+| surgeonfishes | Below target | 53,671 | 124,686 | 501,952 | 111,947 | 26,847 | 2.57 | 0.003 | 0.000 |
+| queen_triggerfish | Below target | 12,541 | 23,497 | 37,329 | 22,007 | 15,466 | 1.83 | 0.155 | 0.031 |
+| grunts | Below target | 83,145 | 315,880 | 881,866 | 270,015 | 21,707 | 3.04 | 0.000 | 0.000 |
+| snappers_shallow | Below target | 44,124 | 187,034 | 467,583 | 155,049 | 14,089 | 2.92 | 0.000 | 0.000 |
+| yellowtail_snapper | Outside focus (uncalibrated) | 114,558 | 313,526 | 1,159,174 | 269,875 | 43,324 | 2.92 | 0.001 | 0.001 |
+| snappers_deep | Outside focus (uncalibrated) | 10,387 | 76,025 | 335,889 | 58,236 | 35,868 | 1.77 | 0.012 | 0.422 |
+| groupers_shallow | Below target | 19,718 | 55,711 | 143,712 | 43,752 | 15,247 | 2.86 | 0.013 | 0.000 |
+| squirrelfishes | Below target | 18,253 | 57,639 | 222,069 | 53,097 | 9,400 | 3.06 | 0.004 | 0.000 |
+| goatfishes | Below target | 6,805 | 23,597 | 68,086 | 19,572 | 5,757 | 2.55 | 0.023 | 0.000 |
+| boxfishes | Below target | 13,577 | 33,743 | 135,635 | 29,109 | 6,918 | 2.80 | 0.006 | 0.000 |
+| angelfishes | Below target | 29,389 | 134,861 | 487,461 | 110,747 | 4,113 | 2.76 | 0.000 | 0.000 |
+| wrasses_hogfish | Below target | 4,157 | 8,201 | 26,263 | 7,375 | 7,003 | 2.03 | 0.352 | 0.026 |
+| jacks | Outside focus (uncalibrated) | 51,299 | 283,016 | 1,031,919 | 243,652 | 20,453 | 2.55 | 0.000 | 0.000 |
+| porgies | Below target | 2,698 | 5,890 | 21,926 | 4,746 | 3,338 | 1.98 | 0.160 | 0.052 |
+| pelagics | Outside focus (uncalibrated) | 2,327 | 30,022 | 196,292 | 21,849 | 68,700 | 1.08 | 0.788 | 0.358 |
 
 
 ![Figure (fig02). Group MMSY intervals with current catch and management benchmarks.](../../Projects/StCroix_Trap/output/figures/fig02_group_mmsy.png){width=100%}
@@ -1462,17 +1631,17 @@ All values are in lb yr⁻¹ unless stated, for the Baseline scenario and the 20
 
 | group | metric | value_lb | MMSY_p05_lb | MMSY_p50_lb | MMSY_p95_lb | ratio_MMSYp50_to_benchmark |
 | --- | --- | --- | --- | --- | --- | --- |
-| parrotfish_2 | ACL | 72,365 | 104,972 | 310,629 | 1,380,547 | 4.29 |
-| pelagics | ACL | 86,633 | 4,540 | 32,692 | 216,585 | 0.38 |
-| queen_conch | ACL | 50,000 | 6,179 | 31,582 | 165,347 | 0.63 |
-| queen_triggerfish | OFL | 22,773 | 15,593 | 25,252 | 39,465 | 1.11 |
-| queen_triggerfish | ABC | 18,808 | 15,593 | 25,252 | 39,465 | 1.34 |
-| queen_triggerfish | ACL | 18,808 | 15,593 | 25,252 | 39,465 | 1.34 |
-| snappers_deep | ACL | 69,366 | 20,634 | 114,694 | 498,689 | 1.65 |
-| snappers_shallow | ACL | 14,156 | 64,743 | 335,824 | 1,158,577 | 23.72 |
-| spiny_lobster | OFL | 163,823 | 178,509 | 273,858 | 446,066 | 1.67 |
-| spiny_lobster | ABC | 144,478 | 178,509 | 273,858 | 446,066 | 1.90 |
-| spiny_lobster | ACL | 137,254 | 178,509 | 273,858 | 446,066 | 2.00 |
+| parrotfish_2 | ACL | 72,365 | 64,134 | 155,615 | 570,872 | 2.15 |
+| pelagics | ACL | 86,633 | 2,327 | 30,022 | 196,292 | 0.35 |
+| queen_conch | ACL | 50,000 | 5,295 | 21,229 | 131,984 | 0.42 |
+| queen_triggerfish | OFL | 22,773 | 12,541 | 23,497 | 37,329 | 1.03 |
+| queen_triggerfish | ABC | 18,808 | 12,541 | 23,497 | 37,329 | 1.25 |
+| queen_triggerfish | ACL | 18,808 | 12,541 | 23,497 | 37,329 | 1.25 |
+| snappers_deep | ACL | 69,366 | 10,387 | 76,025 | 335,889 | 1.10 |
+| snappers_shallow | ACL | 14,156 | 44,124 | 187,034 | 467,583 | 13.21 |
+| spiny_lobster | OFL | 163,823 | 120,321 | 249,798 | 441,273 | 1.52 |
+| spiny_lobster | ABC | 144,478 | 120,321 | 249,798 | 441,273 | 1.73 |
+| spiny_lobster | ACL | 137,254 | 120,321 | 249,798 | 441,273 | 1.82 |
 
 
 ## Guild MMSY
@@ -1481,11 +1650,11 @@ All values are in lb yr⁻¹ unless stated, for the Baseline scenario and the 20
 
 | name | MMSY_p50_lb | catch_lb | P_overfishing |
 | --- | --- | --- | --- |
-| Invertivores | 1,547,512 | 185,487 | 0.000 |
-| Herbivores | 1,056,751 | 103,895 | 0.000 |
-| Mesopredators | 885,560 | 54,652 | 0.000 |
-| Piscivores | 872,546 | 72,011 | 0.000 |
-| Pelagic piscivores | 32,692 | 63,100 | 0.716 |
+| Invertivores | 927,797 | 194,189 | 0.000 |
+| Herbivores | 542,810 | 111,086 | 0.000 |
+| Mesopredators | 541,175 | 58,126 | 0.000 |
+| Piscivores | 443,150 | 62,410 | 0.000 |
+| Pelagic piscivores | 30,022 | 68,700 | 0.788 |
 
 
 ## Gear effort ceilings and choke groups
@@ -1494,10 +1663,10 @@ All values are in lb yr⁻¹ unless stated, for the Baseline scenario and the 20
 
 | gear | effort_ref | effort_multiplier_p05 | effort_multiplier_p50 | effort_multiplier_p95 | effort_multiplier_target | choke_group | P_choke | choke_alternatives |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| trap_fish | 2,208 | 0.97 | 1.33 | 1.85 | 1.27 | wrasses_hogfish | 0.37 | wrasses_hogfish (37%); queen_triggerfish (29%); porgies (27%); parrotfish_2 (3%); spiny_lobster (2%); groupers_shallow (1%); goatfishes (0%); surgeonfishes (0%); boxfishes (0%) |
-| trap_lobster | 920.9 | 1.08 | 1.65 | 3.11 | 1.55 | queen_triggerfish | 0.82 | queen_triggerfish (82%); spiny_lobster (15%); boxfishes (2%) |
-| dive | 1,555 | 0.98 | 1.42 | 2.21 | 1.35 | wrasses_hogfish | 0.47 | wrasses_hogfish (48%); queen_triggerfish (42%); spiny_lobster (4%); parrotfish_2 (3%); groupers_shallow (3%); goatfishes (1%); surgeonfishes (0%) |
-| hook_line | 2,094 | 1.01 | 1.42 | 3.72 | 1.37 | queen_triggerfish | 0.62 | queen_triggerfish (62%); porgies (37%); groupers_shallow (1%) |
+| trap_fish | 2,191 | 0.67 | 0.95 | 1.62 | 0.90 | wrasses_hogfish | 0.54 | wrasses_hogfish (54%); queen_triggerfish (16%); porgies (11%); parrotfish_2 (8%); spiny_lobster (7%); groupers_shallow (3%); goatfishes (2%); boxfishes (0%); squirrelfishes (0%); surgeonfishes (0%) |
+| trap_lobster | 917.2 | 0.80 | 1.28 | 2.18 | 1.21 | queen_triggerfish | 0.73 | queen_triggerfish (73%); spiny_lobster (25%); boxfishes (2%) |
+| dive | 1,528 | 0.67 | 0.96 | 1.82 | 0.92 | wrasses_hogfish | 0.56 | wrasses_hogfish (56%); queen_triggerfish (20%); parrotfish_2 (11%); spiny_lobster (9%); groupers_shallow (3%); goatfishes (2%); surgeonfishes (0%) |
+| hook_line | 2,073 | 0.79 | 1.21 | 2.16 | 1.10 | queen_triggerfish | 0.61 | queen_triggerfish (61%); porgies (34%); groupers_shallow (3%); squirrelfishes (1%); grunts (0%) |
 
 
 ![Figure (fig07). Gear effort ceilings and choke groups.](../../Projects/StCroix_Trap/output/figures/fig07_effort_ceilings.png){width=100%}
@@ -1505,7 +1674,24 @@ All values are in lb yr⁻¹ unless stated, for the Baseline scenario and the 20
 
 ## Ecological process diagnostics
 
-*(not available: run the case study first)*
+**Table. Ecological process diagnostics (Baseline medians).**
+
+| group | fishable_fraction | nursery_index_hist_end | nursery_index_proj_end | ghost_removals_hist_lb | landings_hist_lb | ghost_share_of_catch |
+| --- | --- | --- | --- | --- | --- | --- |
+| spiny_lobster | 0.844 | 0.984 | 1.000 | 260,779 | 5,474,573 | 0.048 |
+| parrotfish_2 | 0.841 | 0.989 | 1.000 | 176,907 | 3,012,452 | 0.059 |
+| surgeonfishes | 0.840 | 1.000 | 1.000 | 81,933 | 1,247,169 | 0.066 |
+| queen_triggerfish | 0.847 | 1.000 | 1.000 | 71,728 | 761,808 | 0.094 |
+| grunts | 0.862 | 0.974 | 1.000 | 74,993 | 982,565 | 0.076 |
+| snappers_shallow | 0.875 | 0.979 | 1.000 | 26,467 | 591,598 | 0.045 |
+| groupers_shallow | 0.855 | 1.000 | 1.000 | 39,437 | 713,418 | 0.055 |
+| squirrelfishes | 0.881 | 1.000 | 1.000 | 30,621 | 400,045 | 0.077 |
+| goatfishes | 0.859 | 1.000 | 1.000 | 22,309 | 253,283 | 0.088 |
+| boxfishes | 0.845 | 1.000 | 1.000 | 33,411 | 297,695 | 0.112 |
+| angelfishes | 0.835 | 1.000 | 1.000 | 19,684 | 197,091 | 0.100 |
+| wrasses_hogfish | 0.845 | 0.989 | 1.000 | 10,123 | 302,448 | 0.033 |
+| porgies | 0.855 | 1.000 | 1.000 | 11,542 | 148,445 | 0.078 |
+
 
 ![Figure (fig06). Coral habitat quality.](../../Projects/StCroix_Trap/output/figures/fig06_coral_quality.png){width=100%}
 
@@ -1516,110 +1702,162 @@ All values are in lb yr⁻¹ unless stated, for the Baseline scenario and the 20
 
 | Scenario | Group | MMSY p50 | Catch | B/B_MSY | P(overfishing) | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| Baseline | spiny_lobster | 311,836 | 150,536 | 1.67 | 0.001 | Below target |
-| Baseline | parrotfish_2 | 397,874 | 82,448 | 1.86 | 0.007 | Below target |
-| Baseline | surgeonfishes | 289,208 | 30,495 | 1.97 | 0.000 | Below target |
-| Baseline | queen_triggerfish | 28,684 | 17,644 | 1.61 | 0.032 | Below target |
-| Baseline | grunts | 650,119 | 21,582 | 1.96 | 0.000 | Below target |
-| Baseline | snappers_shallow | 391,670 | 13,924 | 1.98 | 0.000 | Below target |
-| Baseline | groupers_shallow | 123,018 | 14,375 | 1.84 | 0.000 | Below target |
-| Baseline | squirrelfishes | 121,806 | 9,790 | 1.95 | 0.000 | Below target |
-| Baseline | goatfishes | 43,211 | 6,201 | 1.94 | 0.000 | Below target |
-| Baseline | boxfishes | 75,315 | 7,666 | 1.89 | 0.000 | Below target |
-| Baseline | angelfishes | 219,522 | 4,168 | 1.96 | 0.000 | Below target |
-| Baseline | wrasses_hogfish | 12,544 | 7,959 | 1.56 | 0.017 | Below target |
-| Baseline | porgies | 7,340 | 3,630 | 1.63 | 0.037 | Below target |
-| Climate_SSP245 | spiny_lobster | 311,614 | 150,514 | 1.67 | 0.001 | Below target |
-| Climate_SSP245 | parrotfish_2 | 309,839 | 61,689 | 1.85 | 0.007 | Below target |
-| Climate_SSP245 | surgeonfishes | 267,458 | 27,333 | 1.96 | 0.000 | Below target |
-| Climate_SSP245 | queen_triggerfish | 25,835 | 15,980 | 1.57 | 0.043 | Below target |
-| Climate_SSP245 | grunts | 543,631 | 18,167 | 1.95 | 0.000 | Below target |
-| Climate_SSP245 | snappers_shallow | 362,755 | 13,110 | 2.00 | 0.000 | Below target |
-| Climate_SSP245 | groupers_shallow | 105,125 | 12,763 | 1.87 | 0.004 | Below target |
-| Climate_SSP245 | squirrelfishes | 113,463 | 9,427 | 1.95 | 0.000 | Below target |
-| Climate_SSP245 | goatfishes | 39,891 | 5,625 | 1.93 | 0.000 | Below target |
-| Climate_SSP245 | boxfishes | 67,137 | 6,640 | 1.90 | 0.000 | Below target |
-| Climate_SSP245 | angelfishes | 193,114 | 3,724 | 1.98 | 0.000 | Below target |
-| Climate_SSP245 | wrasses_hogfish | 11,275 | 7,112 | 1.59 | 0.013 | Below target |
-| Climate_SSP245 | porgies | 6,665 | 3,313 | 1.65 | 0.038 | Below target |
-| Climate_SSP585 | spiny_lobster | 309,630 | 150,362 | 1.67 | 0.001 | Below target |
-| Climate_SSP585 | parrotfish_2 | 192,117 | 38,624 | 1.81 | 0.005 | Below target |
-| Climate_SSP585 | surgeonfishes | 236,768 | 24,110 | 1.99 | 0.000 | Below target |
-| Climate_SSP585 | queen_triggerfish | 23,812 | 14,061 | 1.59 | 0.062 | Below target |
-| Climate_SSP585 | grunts | 442,171 | 13,952 | 1.94 | 0.000 | Below target |
-| Climate_SSP585 | snappers_shallow | 303,884 | 11,480 | 1.97 | 0.000 | Below target |
-| Climate_SSP585 | groupers_shallow | 88,821 | 10,498 | 1.86 | 0.000 | Below target |
-| Climate_SSP585 | squirrelfishes | 102,104 | 8,628 | 1.96 | 0.000 | Below target |
-| Climate_SSP585 | goatfishes | 35,043 | 4,945 | 1.94 | 0.000 | Below target |
-| Climate_SSP585 | boxfishes | 56,781 | 5,651 | 1.91 | 0.000 | Below target |
-| Climate_SSP585 | angelfishes | 172,747 | 3,275 | 1.99 | 0.000 | Below target |
-| Climate_SSP585 | wrasses_hogfish | 10,103 | 6,211 | 1.58 | 0.032 | Below target |
-| Climate_SSP585 | porgies | 5,949 | 2,915 | 1.63 | 0.009 | Below target |
-| Major_hurricane_2030 | spiny_lobster | 310,291 | 149,997 | 1.66 | 0.001 | Below target |
-| Major_hurricane_2030 | parrotfish_2 | 395,197 | 82,069 | 1.85 | 0.007 | Below target |
-| Major_hurricane_2030 | surgeonfishes | 288,873 | 30,339 | 1.97 | 0.000 | Below target |
-| Major_hurricane_2030 | queen_triggerfish | 28,617 | 17,612 | 1.60 | 0.032 | Below target |
-| Major_hurricane_2030 | grunts | 649,133 | 21,528 | 1.96 | 0.000 | Below target |
-| Major_hurricane_2030 | snappers_shallow | 389,257 | 13,840 | 1.97 | 0.000 | Below target |
-| Major_hurricane_2030 | groupers_shallow | 122,679 | 14,192 | 1.83 | 0.000 | Below target |
-| Major_hurricane_2030 | squirrelfishes | 121,638 | 9,723 | 1.95 | 0.000 | Below target |
-| Major_hurricane_2030 | goatfishes | 43,104 | 6,187 | 1.94 | 0.000 | Below target |
-| Major_hurricane_2030 | boxfishes | 75,142 | 7,633 | 1.88 | 0.000 | Below target |
-| Major_hurricane_2030 | angelfishes | 218,882 | 4,144 | 1.95 | 0.000 | Below target |
-| Major_hurricane_2030 | wrasses_hogfish | 12,524 | 7,921 | 1.56 | 0.018 | Below target |
-| Major_hurricane_2030 | porgies | 7,333 | 3,620 | 1.63 | 0.037 | Below target |
-| Trap_effort_plus30 | spiny_lobster | 311,833 | 167,270 | 1.64 | 0.001 | Below target |
-| Trap_effort_plus30 | parrotfish_2 | 397,874 | 94,700 | 1.83 | 0.007 | Below target |
-| Trap_effort_plus30 | surgeonfishes | 289,208 | 35,765 | 1.95 | 0.000 | Below target |
-| Trap_effort_plus30 | queen_triggerfish | 28,681 | 20,234 | 1.50 | 0.061 | Below target |
-| Trap_effort_plus30 | grunts | 650,099 | 26,056 | 1.96 | 0.000 | Below target |
-| Trap_effort_plus30 | snappers_shallow | 391,599 | 15,432 | 1.98 | 0.000 | Below target |
-| Trap_effort_plus30 | groupers_shallow | 123,001 | 16,394 | 1.82 | 0.004 | Below target |
-| Trap_effort_plus30 | squirrelfishes | 121,804 | 11,656 | 1.93 | 0.000 | Below target |
-| Trap_effort_plus30 | goatfishes | 43,211 | 7,651 | 1.92 | 0.000 | Below target |
-| Trap_effort_plus30 | boxfishes | 75,314 | 9,823 | 1.87 | 0.000 | Below target |
-| Trap_effort_plus30 | angelfishes | 219,520 | 5,261 | 1.95 | 0.000 | Below target |
-| Trap_effort_plus30 | wrasses_hogfish | 12,543 | 8,378 | 1.53 | 0.014 | Below target |
-| Trap_effort_plus30 | porgies | 7,340 | 4,215 | 1.59 | 0.036 | Below target |
-| Trap_reduction_minus25 | spiny_lobster | 311,838 | 136,521 | 1.69 | 0.000 | Below target |
-| Trap_reduction_minus25 | parrotfish_2 | 397,874 | 72,180 | 1.87 | 0.007 | Below target |
-| Trap_reduction_minus25 | surgeonfishes | 289,208 | 25,553 | 1.99 | 0.000 | Below target |
-| Trap_reduction_minus25 | queen_triggerfish | 28,688 | 14,698 | 1.66 | 0.023 | Below target |
-| Trap_reduction_minus25 | grunts | 650,135 | 17,842 | 1.96 | 0.000 | Below target |
-| Trap_reduction_minus25 | snappers_shallow | 391,735 | 12,806 | 1.98 | 0.000 | Below target |
-| Trap_reduction_minus25 | groupers_shallow | 123,033 | 12,687 | 1.85 | 0.000 | Below target |
-| Trap_reduction_minus25 | squirrelfishes | 121,807 | 8,205 | 1.96 | 0.000 | Below target |
-| Trap_reduction_minus25 | goatfishes | 43,212 | 4,986 | 1.96 | 0.000 | Below target |
-| Trap_reduction_minus25 | boxfishes | 75,316 | 5,803 | 1.92 | 0.000 | Below target |
-| Trap_reduction_minus25 | angelfishes | 219,523 | 3,238 | 1.96 | 0.000 | Below target |
-| Trap_reduction_minus25 | wrasses_hogfish | 12,544 | 7,452 | 1.59 | 0.028 | Below target |
-| Trap_reduction_minus25 | porgies | 7,341 | 3,164 | 1.67 | 0.006 | Below target |
-| Coral_disease_SCTLD | spiny_lobster | 308,563 | 150,396 | 1.67 | 0.001 | Below target |
-| Coral_disease_SCTLD | parrotfish_2 | 394,608 | 81,612 | 1.86 | 0.007 | Below target |
-| Coral_disease_SCTLD | surgeonfishes | 288,638 | 30,412 | 1.97 | 0.000 | Below target |
-| Coral_disease_SCTLD | queen_triggerfish | 28,630 | 17,593 | 1.61 | 0.032 | Below target |
-| Coral_disease_SCTLD | grunts | 647,388 | 21,581 | 1.96 | 0.000 | Below target |
-| Coral_disease_SCTLD | snappers_shallow | 388,018 | 13,884 | 1.98 | 0.000 | Below target |
-| Coral_disease_SCTLD | groupers_shallow | 122,808 | 14,277 | 1.84 | 0.000 | Below target |
-| Coral_disease_SCTLD | squirrelfishes | 120,830 | 9,668 | 1.95 | 0.000 | Below target |
-| Coral_disease_SCTLD | goatfishes | 43,173 | 6,199 | 1.94 | 0.000 | Below target |
-| Coral_disease_SCTLD | boxfishes | 75,262 | 7,638 | 1.89 | 0.000 | Below target |
-| Coral_disease_SCTLD | angelfishes | 218,709 | 4,143 | 1.96 | 0.000 | Below target |
-| Coral_disease_SCTLD | wrasses_hogfish | 12,543 | 7,953 | 1.56 | 0.017 | Below target |
-| Coral_disease_SCTLD | porgies | 7,338 | 3,630 | 1.63 | 0.037 | Below target |
-| Combined_stress | spiny_lobster | 308,372 | 165,712 | 1.63 | 0.001 | Below target |
-| Combined_stress | parrotfish_2 | 191,891 | 44,102 | 1.78 | 0.006 | Below target |
-| Combined_stress | surgeonfishes | 235,468 | 27,639 | 1.97 | 0.000 | Below target |
-| Combined_stress | queen_triggerfish | 23,671 | 15,737 | 1.49 | 0.083 | Below target |
-| Combined_stress | grunts | 440,094 | 16,724 | 1.93 | 0.000 | Below target |
-| Combined_stress | snappers_shallow | 305,795 | 12,627 | 1.94 | 0.000 | Below target |
-| Combined_stress | groupers_shallow | 88,415 | 11,801 | 1.82 | 0.000 | Below target |
-| Combined_stress | squirrelfishes | 102,623 | 10,258 | 1.95 | 0.000 | Below target |
-| Combined_stress | goatfishes | 34,851 | 6,030 | 1.90 | 0.000 | Below target |
-| Combined_stress | boxfishes | 56,431 | 7,193 | 1.89 | 0.000 | Below target |
-| Combined_stress | angelfishes | 172,042 | 4,067 | 1.96 | 0.000 | Below target |
-| Combined_stress | wrasses_hogfish | 10,066 | 6,499 | 1.54 | 0.017 | Below target |
-| Combined_stress | porgies | 5,913 | 3,270 | 1.57 | 0.042 | Below target |
+| Baseline | spiny_lobster | 317,146 | 154,355 | 2.20 | 0.102 | Below target |
+| Baseline | parrotfish_2 | 194,279 | 80,813 | 2.49 | 0.026 | Below target |
+| Baseline | surgeonfishes | 141,866 | 32,672 | 2.54 | 0.001 | Below target |
+| Baseline | queen_triggerfish | 27,585 | 16,786 | 1.67 | 0.083 | Below target |
+| Baseline | grunts | 365,151 | 22,455 | 2.62 | 0.000 | Below target |
+| Baseline | snappers_shallow | 208,570 | 14,221 | 2.58 | 0.000 | Below target |
+| Baseline | groupers_shallow | 61,354 | 15,430 | 2.34 | 0.006 | Below target |
+| Baseline | squirrelfishes | 66,637 | 10,042 | 2.73 | 0.000 | Below target |
+| Baseline | goatfishes | 27,176 | 6,736 | 2.58 | 0.015 | Below target |
+| Baseline | boxfishes | 38,011 | 7,908 | 2.53 | 0.000 | Below target |
+| Baseline | angelfishes | 157,964 | 4,414 | 2.64 | 0.000 | Below target |
+| Baseline | wrasses_hogfish | 10,000 | 6,903 | 1.70 | 0.123 | Below target |
+| Baseline | porgies | 6,693 | 3,666 | 1.87 | 0.046 | Below target |
+| Climate_SSP245 | spiny_lobster | 284,258 | 138,530 | 2.21 | 0.110 | Below target |
+| Climate_SSP245 | parrotfish_2 | 154,685 | 60,365 | 2.35 | 0.032 | Below target |
+| Climate_SSP245 | surgeonfishes | 133,317 | 29,628 | 2.46 | 0.001 | Below target |
+| Climate_SSP245 | queen_triggerfish | 24,849 | 15,343 | 1.69 | 0.092 | Below target |
+| Climate_SSP245 | grunts | 295,046 | 18,457 | 2.59 | 0.000 | Below target |
+| Climate_SSP245 | snappers_shallow | 188,561 | 13,374 | 2.66 | 0.000 | Below target |
+| Climate_SSP245 | groupers_shallow | 55,565 | 13,775 | 2.39 | 0.009 | Below target |
+| Climate_SSP245 | squirrelfishes | 63,217 | 9,610 | 2.75 | 0.000 | Below target |
+| Climate_SSP245 | goatfishes | 24,603 | 6,062 | 2.54 | 0.017 | Below target |
+| Climate_SSP245 | boxfishes | 33,406 | 6,990 | 2.53 | 0.000 | Below target |
+| Climate_SSP245 | angelfishes | 140,666 | 3,978 | 2.62 | 0.000 | Below target |
+| Climate_SSP245 | wrasses_hogfish | 9,136 | 6,204 | 1.75 | 0.126 | Below target |
+| Climate_SSP245 | porgies | 6,125 | 3,351 | 1.87 | 0.049 | Below target |
+| Climate_SSP585 | spiny_lobster | 239,194 | 123,845 | 2.31 | 0.123 | Below target |
+| Climate_SSP585 | parrotfish_2 | 111,657 | 43,314 | 2.44 | 0.032 | Below target |
+| Climate_SSP585 | surgeonfishes | 113,762 | 26,297 | 2.54 | 0.001 | Below target |
+| Climate_SSP585 | queen_triggerfish | 22,467 | 13,948 | 1.70 | 0.096 | Below target |
+| Climate_SSP585 | grunts | 249,111 | 15,087 | 2.71 | 0.000 | Below target |
+| Climate_SSP585 | snappers_shallow | 174,045 | 12,552 | 2.80 | 0.000 | Below target |
+| Climate_SSP585 | groupers_shallow | 44,550 | 12,060 | 2.51 | 0.043 | Below target |
+| Climate_SSP585 | squirrelfishes | 56,166 | 8,407 | 2.77 | 0.001 | Below target |
+| Climate_SSP585 | goatfishes | 22,967 | 5,370 | 2.56 | 0.029 | Below target |
+| Climate_SSP585 | boxfishes | 29,423 | 6,030 | 2.55 | 0.002 | Below target |
+| Climate_SSP585 | angelfishes | 118,905 | 3,684 | 2.68 | 0.000 | Below target |
+| Climate_SSP585 | wrasses_hogfish | 8,438 | 5,673 | 1.75 | 0.165 | Below target |
+| Climate_SSP585 | porgies | 5,197 | 3,043 | 1.89 | 0.093 | Below target |
+| Major_hurricane_2030 | spiny_lobster | 315,988 | 150,748 | 2.15 | 0.089 | Below target |
+| Major_hurricane_2030 | parrotfish_2 | 193,531 | 79,651 | 2.45 | 0.019 | Below target |
+| Major_hurricane_2030 | surgeonfishes | 141,555 | 32,300 | 2.51 | 0.001 | Below target |
+| Major_hurricane_2030 | queen_triggerfish | 27,468 | 16,472 | 1.65 | 0.086 | Below target |
+| Major_hurricane_2030 | grunts | 363,687 | 21,873 | 2.55 | 0.000 | Below target |
+| Major_hurricane_2030 | snappers_shallow | 207,945 | 13,915 | 2.52 | 0.000 | Below target |
+| Major_hurricane_2030 | groupers_shallow | 60,822 | 15,038 | 2.32 | 0.007 | Below target |
+| Major_hurricane_2030 | squirrelfishes | 66,021 | 9,966 | 2.72 | 0.000 | Below target |
+| Major_hurricane_2030 | goatfishes | 27,104 | 6,650 | 2.54 | 0.015 | Below target |
+| Major_hurricane_2030 | boxfishes | 37,966 | 7,860 | 2.50 | 0.000 | Below target |
+| Major_hurricane_2030 | angelfishes | 157,718 | 4,223 | 2.57 | 0.000 | Below target |
+| Major_hurricane_2030 | wrasses_hogfish | 9,972 | 6,741 | 1.66 | 0.122 | Below target |
+| Major_hurricane_2030 | porgies | 6,664 | 3,677 | 1.84 | 0.060 | Below target |
+| Trap_effort_plus30 | spiny_lobster | 316,641 | 172,005 | 2.16 | 0.145 | Below target |
+| Trap_effort_plus30 | parrotfish_2 | 194,275 | 92,342 | 2.45 | 0.040 | Below target |
+| Trap_effort_plus30 | surgeonfishes | 141,853 | 37,906 | 2.50 | 0.000 | Below target |
+| Trap_effort_plus30 | queen_triggerfish | 27,580 | 19,194 | 1.51 | 0.113 | Below target |
+| Trap_effort_plus30 | grunts | 365,118 | 27,096 | 2.61 | 0.000 | Below target |
+| Trap_effort_plus30 | snappers_shallow | 208,440 | 15,911 | 2.58 | 0.000 | Below target |
+| Trap_effort_plus30 | groupers_shallow | 61,339 | 17,258 | 2.30 | 0.021 | Below target |
+| Trap_effort_plus30 | squirrelfishes | 66,627 | 11,817 | 2.68 | 0.000 | Below target |
+| Trap_effort_plus30 | goatfishes | 27,176 | 8,030 | 2.51 | 0.030 | Below target |
+| Trap_effort_plus30 | boxfishes | 38,010 | 9,839 | 2.46 | 0.002 | Below target |
+| Trap_effort_plus30 | angelfishes | 157,842 | 5,565 | 2.63 | 0.000 | Below target |
+| Trap_effort_plus30 | wrasses_hogfish | 9,998 | 7,212 | 1.65 | 0.137 | Below target |
+| Trap_effort_plus30 | porgies | 6,692 | 3,991 | 1.76 | 0.093 | Below target |
+| Trap_reduction_minus25 | spiny_lobster | 317,631 | 144,073 | 2.25 | 0.075 | Below target |
+| Trap_reduction_minus25 | parrotfish_2 | 194,282 | 72,845 | 2.56 | 0.011 | Below target |
+| Trap_reduction_minus25 | surgeonfishes | 141,877 | 28,614 | 2.58 | 0.001 | Below target |
+| Trap_reduction_minus25 | queen_triggerfish | 27,589 | 14,749 | 1.82 | 0.061 | Below target |
+| Trap_reduction_minus25 | grunts | 365,179 | 18,639 | 2.63 | 0.000 | Below target |
+| Trap_reduction_minus25 | snappers_shallow | 208,686 | 12,779 | 2.58 | 0.000 | Below target |
+| Trap_reduction_minus25 | groupers_shallow | 61,368 | 13,612 | 2.42 | 0.006 | Below target |
+| Trap_reduction_minus25 | squirrelfishes | 66,646 | 8,398 | 2.75 | 0.000 | Below target |
+| Trap_reduction_minus25 | goatfishes | 27,177 | 5,637 | 2.61 | 0.013 | Below target |
+| Trap_reduction_minus25 | boxfishes | 38,011 | 6,206 | 2.58 | 0.000 | Below target |
+| Trap_reduction_minus25 | angelfishes | 158,080 | 3,428 | 2.64 | 0.000 | Below target |
+| Trap_reduction_minus25 | wrasses_hogfish | 10,001 | 6,560 | 1.74 | 0.121 | Below target |
+| Trap_reduction_minus25 | porgies | 6,693 | 3,301 | 1.95 | 0.035 | Below target |
+| Coral_disease_SCTLD | spiny_lobster | 313,070 | 153,292 | 2.20 | 0.102 | Below target |
+| Coral_disease_SCTLD | parrotfish_2 | 192,821 | 80,380 | 2.49 | 0.019 | Below target |
+| Coral_disease_SCTLD | surgeonfishes | 141,117 | 32,557 | 2.54 | 0.001 | Below target |
+| Coral_disease_SCTLD | queen_triggerfish | 27,549 | 16,742 | 1.67 | 0.083 | Below target |
+| Coral_disease_SCTLD | grunts | 363,613 | 22,371 | 2.62 | 0.000 | Below target |
+| Coral_disease_SCTLD | snappers_shallow | 207,185 | 14,127 | 2.59 | 0.000 | Below target |
+| Coral_disease_SCTLD | groupers_shallow | 60,708 | 15,175 | 2.34 | 0.006 | Below target |
+| Coral_disease_SCTLD | squirrelfishes | 65,745 | 9,923 | 2.73 | 0.000 | Below target |
+| Coral_disease_SCTLD | goatfishes | 27,163 | 6,735 | 2.57 | 0.015 | Below target |
+| Coral_disease_SCTLD | boxfishes | 37,960 | 7,898 | 2.52 | 0.000 | Below target |
+| Coral_disease_SCTLD | angelfishes | 157,006 | 4,401 | 2.63 | 0.000 | Below target |
+| Coral_disease_SCTLD | wrasses_hogfish | 9,966 | 6,896 | 1.70 | 0.123 | Below target |
+| Coral_disease_SCTLD | porgies | 6,691 | 3,664 | 1.87 | 0.046 | Below target |
+| Combined_stress | spiny_lobster | 237,712 | 127,529 | 2.13 | 0.124 | Below target |
+| Combined_stress | parrotfish_2 | 111,065 | 47,642 | 2.26 | 0.049 | Below target |
+| Combined_stress | surgeonfishes | 113,651 | 30,037 | 2.45 | 0.001 | Below target |
+| Combined_stress | queen_triggerfish | 22,340 | 15,638 | 1.49 | 0.162 | Below target |
+| Combined_stress | grunts | 248,712 | 17,379 | 2.61 | 0.000 | Below target |
+| Combined_stress | snappers_shallow | 173,655 | 13,538 | 2.68 | 0.000 | Below target |
+| Combined_stress | groupers_shallow | 44,354 | 13,304 | 2.40 | 0.048 | Below target |
+| Combined_stress | squirrelfishes | 56,479 | 9,848 | 2.69 | 0.001 | Below target |
+| Combined_stress | goatfishes | 22,855 | 6,224 | 2.42 | 0.033 | Below target |
+| Combined_stress | boxfishes | 29,261 | 7,337 | 2.45 | 0.004 | Below target |
+| Combined_stress | angelfishes | 118,779 | 4,387 | 2.61 | 0.000 | Below target |
+| Combined_stress | wrasses_hogfish | 8,379 | 5,726 | 1.64 | 0.181 | Below target |
+| Combined_stress | porgies | 5,178 | 3,181 | 1.75 | 0.095 | Below target |
+| MPA_expansion | spiny_lobster | 317,639 | 142,407 | 2.27 | 0.070 | Below target |
+| MPA_expansion | parrotfish_2 | 194,282 | 72,378 | 2.56 | 0.011 | Below target |
+| MPA_expansion | surgeonfishes | 141,878 | 28,105 | 2.58 | 0.001 | Below target |
+| MPA_expansion | queen_triggerfish | 27,588 | 15,372 | 1.77 | 0.064 | Below target |
+| MPA_expansion | grunts | 365,179 | 20,267 | 2.62 | 0.000 | Below target |
+| MPA_expansion | snappers_shallow | 208,680 | 12,672 | 2.58 | 0.000 | Below target |
+| MPA_expansion | groupers_shallow | 61,368 | 13,659 | 2.43 | 0.006 | Below target |
+| MPA_expansion | squirrelfishes | 66,646 | 9,045 | 2.74 | 0.000 | Below target |
+| MPA_expansion | goatfishes | 27,177 | 6,255 | 2.59 | 0.015 | Below target |
+| MPA_expansion | boxfishes | 38,011 | 7,086 | 2.55 | 0.000 | Below target |
+| MPA_expansion | angelfishes | 158,083 | 3,720 | 2.64 | 0.000 | Below target |
+| MPA_expansion | wrasses_hogfish | 10,001 | 6,301 | 1.80 | 0.094 | Below target |
+| MPA_expansion | porgies | 6,693 | 3,461 | 1.92 | 0.038 | Below target |
+| Open_access_effort | spiny_lobster | 317,594 | 225,440 | 1.96 | 0.287 | Below target |
+| Open_access_effort | parrotfish_2 | 194,270 | 104,842 | 2.33 | 0.052 | Below target |
+| Open_access_effort | surgeonfishes | 141,879 | 47,500 | 2.44 | 0.006 | Below target |
+| Open_access_effort | queen_triggerfish | 27,560 | 19,980 | 1.41 | 0.203 | Below target |
+| Open_access_effort | grunts | 365,037 | 29,874 | 2.56 | 0.004 | Below target |
+| Open_access_effort | snappers_shallow | 208,373 | 18,288 | 2.58 | 0.000 | Below target |
+| Open_access_effort | groupers_shallow | 61,253 | 19,937 | 2.23 | 0.074 | Below target |
+| Open_access_effort | squirrelfishes | 66,580 | 13,013 | 2.67 | 0.003 | Below target |
+| Open_access_effort | goatfishes | 27,175 | 8,959 | 2.46 | 0.046 | Below target |
+| Open_access_effort | boxfishes | 38,011 | 11,383 | 2.47 | 0.003 | Below target |
+| Open_access_effort | angelfishes | 158,125 | 6,178 | 2.64 | 0.000 | Below target |
+| Open_access_effort | wrasses_hogfish | 9,998 | 8,361 | 1.48 | 0.239 | Below target |
+| Open_access_effort | porgies | 6,691 | 3,996 | 1.65 | 0.129 | Below target |
+| Parrotfish_harvest_plus50 | spiny_lobster | 316,421 | 181,835 | 2.09 | 0.159 | Below target |
+| Parrotfish_harvest_plus50 | parrotfish_2 | 194,274 | 95,523 | 2.42 | 0.041 | Below target |
+| Parrotfish_harvest_plus50 | surgeonfishes | 141,848 | 38,650 | 2.50 | 0.000 | Below target |
+| Parrotfish_harvest_plus50 | queen_triggerfish | 27,580 | 17,429 | 1.64 | 0.085 | Below target |
+| Parrotfish_harvest_plus50 | grunts | 365,099 | 23,518 | 2.62 | 0.000 | Below target |
+| Parrotfish_harvest_plus50 | snappers_shallow | 208,441 | 15,920 | 2.57 | 0.000 | Below target |
+| Parrotfish_harvest_plus50 | groupers_shallow | 61,333 | 16,966 | 2.31 | 0.019 | Below target |
+| Parrotfish_harvest_plus50 | squirrelfishes | 66,624 | 10,041 | 2.73 | 0.000 | Below target |
+| Parrotfish_harvest_plus50 | goatfishes | 27,176 | 7,233 | 2.55 | 0.024 | Below target |
+| Parrotfish_harvest_plus50 | boxfishes | 38,010 | 7,908 | 2.53 | 0.000 | Below target |
+| Parrotfish_harvest_plus50 | angelfishes | 157,808 | 4,643 | 2.64 | 0.000 | Below target |
+| Parrotfish_harvest_plus50 | wrasses_hogfish | 9,998 | 7,984 | 1.49 | 0.165 | Below target |
+| Parrotfish_harvest_plus50 | porgies | 6,692 | 3,666 | 1.87 | 0.046 | Below target |
+| Seagrass_loss_Halophila | spiny_lobster | 275,987 | 132,717 | 2.14 | 0.072 | Below target |
+| Seagrass_loss_Halophila | parrotfish_2 | 177,363 | 74,204 | 2.54 | 0.040 | Below target |
+| Seagrass_loss_Halophila | surgeonfishes | 140,924 | 32,427 | 2.55 | 0.001 | Below target |
+| Seagrass_loss_Halophila | queen_triggerfish | 27,274 | 16,530 | 1.70 | 0.088 | Below target |
+| Seagrass_loss_Halophila | grunts | 289,654 | 18,756 | 2.75 | 0.000 | Below target |
+| Seagrass_loss_Halophila | snappers_shallow | 175,738 | 12,814 | 2.85 | 0.000 | Below target |
+| Seagrass_loss_Halophila | groupers_shallow | 61,222 | 15,301 | 2.36 | 0.006 | Below target |
+| Seagrass_loss_Halophila | squirrelfishes | 66,653 | 10,048 | 2.73 | 0.000 | Below target |
+| Seagrass_loss_Halophila | goatfishes | 26,554 | 6,446 | 2.58 | 0.016 | Below target |
+| Seagrass_loss_Halophila | boxfishes | 37,014 | 7,560 | 2.54 | 0.000 | Below target |
+| Seagrass_loss_Halophila | angelfishes | 158,016 | 4,415 | 2.64 | 0.000 | Below target |
+| Seagrass_loss_Halophila | wrasses_hogfish | 8,996 | 6,485 | 1.76 | 0.138 | Below target |
+| Seagrass_loss_Halophila | porgies | 6,265 | 3,563 | 1.88 | 0.063 | Below target |
 
 
 ![Figure (fig03). Scenario status matrix, 2043–2045.](../../Projects/StCroix_Trap/output/figures/fig03_scenario_status.png){width=100%}
@@ -1637,8 +1875,8 @@ All values are in lb yr⁻¹ unless stated, for the Baseline scenario and the 20
 
 | held_out | benchmark_lb | pred_p05 | pred_p50 | pred_p95 | PIT | inside90 | ratio_pred_to_benchmark | ess |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| spiny_lobster OFL | 163,823 | 344,105 | 1,063,325 | 3,123,831 | 1.09e-04 | FALSE | 6.491 | 518.3 |
-| queen_triggerfish OFL | 22,773 | 14,804 | 28,723 | 76,299 | 0.232 | TRUE | 1.261 | 119.5 |
+| spiny_lobster OFL | 163,823 | 229,141 | 774,435 | 2,167,595 | 0.020 | FALSE | 4.727 | 96.4 |
+| queen_triggerfish OFL | 22,773 | 10,311 | 16,442 | 47,933 | 0.656 | TRUE | 0.722 | 17.0 |
 
 
 ![Figure (fig13). Leave-one-benchmark-out predictions.](../../Projects/StCroix_Trap/output/figures/fig13_loo_benchmarks.png){width=100%}
@@ -1648,9 +1886,9 @@ All values are in lb yr⁻¹ unless stated, for the Baseline scenario and the 20
 
 | index | group | mode | n_obs | coverage50 | coverage90 | rmse_log | MASE_vs_naive | cor_anomaly |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| SEDAR57_lobster_trap_CPUE | spiny_lobster | scale-free anomalies (whole series held out) | 10.0 | 1.000 | 1.000 | 0.172 | 1.551 | 0.663 |
-| SEDAR80_QT_trap_CPUE | queen_triggerfish | scale-free anomalies (whole series held out) | 35.0 | 0.571 | 1.000 | 0.270 | 1.752 | -0.386 |
-| NCRMP_parrotfish_density | parrotfish_1;parrotfish_2 | scale-free anomalies (whole series held out) | 6.000 | 0.833 | 1.000 | 0.174 | 1.243 | 0.169 |
+| SEDAR57_lobster_trap_CPUE | spiny_lobster | scale-free anomalies (whole series held out) | 10.0 | 0.900 | 1.000 | 0.166 | 1.108 | 0.135 |
+| SEDAR80_QT_trap_CPUE | queen_triggerfish | scale-free anomalies (whole series held out) | 35.0 | 0.914 | 1.000 | 0.177 | 1.160 | 0.096 |
+| NCRMP_parrotfish_density | parrotfish_1;parrotfish_2 | scale-free anomalies (whole series held out) | 6.000 | 0.833 | 1.000 | 0.145 | 1.043 | 0.347 |
 
 
 ![Figure (fig12). Held-out index validation.](../../Projects/StCroix_Trap/output/figures/fig12_validation.png){width=100%}
@@ -1660,19 +1898,19 @@ All values are in lb yr⁻¹ unless stated, for the Baseline scenario and the 20
 
 | group | median_rel_error | MARE | coverage50 | coverage90 | median_ess |
 | --- | --- | --- | --- | --- | --- |
-| angelfishes | 0.333 | 0.649 | 0.42 | 0.84 | 229.4 |
-| boxfishes | 0.079 | 0.495 | 0.45 | 0.87 | 229.4 |
-| goatfishes | 0.160 | 0.487 | 0.46 | 0.85 | 229.4 |
-| groupers_shallow | 0.071 | 0.448 | 0.48 | 0.90 | 229.4 |
-| grunts | -0.033 | 0.507 | 0.46 | 0.90 | 229.4 |
-| parrotfish_2 | 0.203 | 0.587 | 0.43 | 0.82 | 229.4 |
-| porgies | -0.309 | 0.587 | 0.42 | 0.78 | 229.4 |
-| queen_triggerfish | -0.001 | 0.222 | 0.46 | 0.87 | 229.4 |
-| snappers_shallow | -0.010 | 0.500 | 0.44 | 0.88 | 229.4 |
-| spiny_lobster | 0.100 | 0.270 | 0.46 | 0.86 | 229.4 |
-| squirrelfishes | 0.027 | 0.461 | 0.42 | 0.87 | 229.4 |
-| surgeonfishes | 0.142 | 0.441 | 0.58 | 0.91 | 229.4 |
-| wrasses_hogfish | -0.370 | 0.461 | 0.38 | 0.77 | 229.4 |
+| angelfishes | -0.007 | 0.641 | 0.39 | 0.79 | 33.0 |
+| boxfishes | -0.188 | 0.572 | 0.44 | 0.85 | 33.0 |
+| goatfishes | -0.103 | 0.395 | 0.58 | 0.91 | 33.0 |
+| groupers_shallow | 0.122 | 0.449 | 0.43 | 0.86 | 33.0 |
+| grunts | -0.165 | 0.466 | 0.47 | 0.90 | 33.0 |
+| parrotfish_2 | 0.003 | 0.477 | 0.59 | 0.88 | 33.0 |
+| porgies | -0.114 | 0.445 | 0.45 | 0.80 | 33.0 |
+| queen_triggerfish | 0.000 | 0.190 | 0.54 | 0.89 | 33.0 |
+| snappers_shallow | 0.031 | 0.361 | 0.50 | 0.88 | 33.0 |
+| spiny_lobster | -0.065 | 0.217 | 0.49 | 0.87 | 33.0 |
+| squirrelfishes | 0.024 | 0.474 | 0.52 | 0.87 | 33.0 |
+| surgeonfishes | -0.152 | 0.397 | 0.52 | 0.93 | 33.0 |
+| wrasses_hogfish | -0.101 | 0.372 | 0.41 | 0.83 | 33.0 |
 
 
 ## Sensitivity and structural uncertainty
@@ -1681,48 +1919,48 @@ All values are in lb yr⁻¹ unless stated, for the Baseline scenario and the 20
 
 | output | input | SRRC | PRCC | R2_rank_model |
 | --- | --- | --- | --- | --- |
-| MMSY_groupers_shallow | partition:groupers_shallow | 0.506 | 0.767 | 0.822 |
-| MMSY_groupers_shallow | pb:groupers_shallow | 0.389 | 0.677 | 0.822 |
-| MMSY_groupers_shallow | tte:colonized_pavement | 0.353 | 0.641 | 0.822 |
-| MMSY_groupers_shallow | x_msy:groupers_shallow | 0.239 | 0.493 | 0.822 |
-| MMSY_groupers_shallow | npp:colonized_pavement | 0.205 | 0.437 | 0.822 |
-| MMSY_groupers_shallow | fwf:colonized_pavement | 0.167 | 0.368 | 0.822 |
-| MMSY_grunts | partition:grunts | 0.535 | 0.783 | 0.820 |
-| MMSY_grunts | pb:grunts | 0.425 | 0.708 | 0.820 |
-| MMSY_grunts | partition:benthic_predatory_inverts | -0.295 | -0.571 | 0.820 |
-| MMSY_grunts | x_msy:grunts | 0.242 | 0.495 | 0.820 |
-| MMSY_grunts | tte:colonized_pavement | 0.214 | 0.450 | 0.820 |
-| MMSY_grunts | npp:colonized_pavement | 0.169 | 0.370 | 0.820 |
-| MMSY_parrotfish_2 | partition:parrotfish_2 | 0.594 | 0.804 | 0.808 |
-| MMSY_parrotfish_2 | partition:benthic_detritivores_filter | -0.356 | -0.630 | 0.808 |
-| MMSY_parrotfish_2 | pb:parrotfish_2 | 0.276 | 0.533 | 0.808 |
-| MMSY_parrotfish_2 | x_msy:parrotfish_2 | 0.235 | 0.471 | 0.808 |
-| MMSY_parrotfish_2 | npp:colonized_pavement | 0.226 | 0.457 | 0.808 |
-| MMSY_parrotfish_2 | fwf:colonized_pavement | 0.182 | 0.382 | 0.808 |
-| MMSY_queen_triggerfish | partition:queen_triggerfish | 0.597 | 0.823 | 0.832 |
-| MMSY_queen_triggerfish | tte:colonized_pavement | 0.337 | 0.635 | 0.832 |
-| MMSY_queen_triggerfish | pb:queen_triggerfish | 0.304 | 0.596 | 0.832 |
-| MMSY_queen_triggerfish | partition:benthic_predatory_inverts | -0.267 | -0.546 | 0.832 |
-| MMSY_queen_triggerfish | npp:colonized_pavement | 0.232 | 0.492 | 0.832 |
-| MMSY_queen_triggerfish | x_msy:queen_triggerfish | 0.208 | 0.452 | 0.832 |
-| MMSY_snappers_shallow | pb:snappers_shallow | 0.491 | 0.766 | 0.831 |
-| MMSY_snappers_shallow | partition:snappers_shallow | 0.469 | 0.751 | 0.831 |
-| MMSY_snappers_shallow | tte:colonized_pavement | 0.277 | 0.558 | 0.831 |
-| MMSY_snappers_shallow | x_msy:snappers_shallow | 0.249 | 0.516 | 0.831 |
-| MMSY_snappers_shallow | tte:pelagic | 0.215 | 0.463 | 0.831 |
-| MMSY_snappers_shallow | npp:colonized_pavement | 0.162 | 0.366 | 0.831 |
-| MMSY_spiny_lobster | partition:spiny_lobster | 0.624 | 0.826 | 0.821 |
-| MMSY_spiny_lobster | partition:benthic_predatory_inverts | -0.340 | -0.626 | 0.821 |
-| MMSY_spiny_lobster | tte:colonized_pavement | 0.239 | 0.492 | 0.821 |
-| MMSY_spiny_lobster | x_msy:spiny_lobster | 0.224 | 0.468 | 0.821 |
-| MMSY_spiny_lobster | npp:colonized_pavement | 0.219 | 0.459 | 0.821 |
-| MMSY_spiny_lobster | pb:spiny_lobster | 0.205 | 0.435 | 0.821 |
-| total_focus_MMSY | tte:colonized_pavement | 0.344 | 0.570 | 0.754 |
-| total_focus_MMSY | partition:benthic_predatory_inverts | -0.338 | -0.563 | 0.754 |
-| total_focus_MMSY | npp:colonized_pavement | 0.317 | 0.538 | 0.754 |
-| total_focus_MMSY | fwf:colonized_pavement | 0.255 | 0.457 | 0.754 |
-| total_focus_MMSY | npp:coral_reef | 0.214 | 0.396 | 0.754 |
-| total_focus_MMSY | tte:coral_reef | 0.183 | 0.346 | 0.754 |
+| MMSY_groupers_shallow | partition:groupers_shallow | 0.498 | 0.762 | 0.823 |
+| MMSY_groupers_shallow | pb:groupers_shallow | 0.381 | 0.669 | 0.823 |
+| MMSY_groupers_shallow | tte:colonized_pavement | 0.350 | 0.637 | 0.823 |
+| MMSY_groupers_shallow | x_msy:groupers_shallow | 0.234 | 0.483 | 0.823 |
+| MMSY_groupers_shallow | npp:colonized_pavement | 0.204 | 0.434 | 0.823 |
+| MMSY_groupers_shallow | fwf:colonized_pavement | 0.167 | 0.367 | 0.823 |
+| MMSY_grunts | partition:grunts | 0.530 | 0.779 | 0.820 |
+| MMSY_grunts | pb:grunts | 0.418 | 0.700 | 0.820 |
+| MMSY_grunts | partition:benthic_predatory_inverts | -0.300 | -0.575 | 0.820 |
+| MMSY_grunts | x_msy:grunts | 0.239 | 0.490 | 0.820 |
+| MMSY_grunts | tte:colonized_pavement | 0.209 | 0.440 | 0.820 |
+| MMSY_grunts | npp:colonized_pavement | 0.166 | 0.363 | 0.820 |
+| MMSY_parrotfish_2 | partition:parrotfish_2 | 0.531 | 0.767 | 0.805 |
+| MMSY_parrotfish_2 | partition:benthic_detritivores_filter | -0.357 | -0.627 | 0.805 |
+| MMSY_parrotfish_2 | x_msy:parrotfish_2 | 0.340 | 0.607 | 0.805 |
+| MMSY_parrotfish_2 | pb:parrotfish_2 | 0.272 | 0.522 | 0.805 |
+| MMSY_parrotfish_2 | npp:colonized_pavement | 0.224 | 0.450 | 0.805 |
+| MMSY_parrotfish_2 | fwf:colonized_pavement | 0.184 | 0.382 | 0.805 |
+| MMSY_queen_triggerfish | partition:queen_triggerfish | 0.515 | 0.765 | 0.814 |
+| MMSY_queen_triggerfish | tte:colonized_pavement | 0.362 | 0.641 | 0.814 |
+| MMSY_queen_triggerfish | pb:queen_triggerfish | 0.318 | 0.592 | 0.814 |
+| MMSY_queen_triggerfish | partition:benthic_predatory_inverts | -0.294 | -0.562 | 0.814 |
+| MMSY_queen_triggerfish | npp:colonized_pavement | 0.251 | 0.501 | 0.814 |
+| MMSY_queen_triggerfish | x_msy:queen_triggerfish | 0.221 | 0.455 | 0.814 |
+| MMSY_snappers_shallow | pb:snappers_shallow | 0.490 | 0.761 | 0.828 |
+| MMSY_snappers_shallow | partition:snappers_shallow | 0.467 | 0.745 | 0.828 |
+| MMSY_snappers_shallow | tte:colonized_pavement | 0.277 | 0.553 | 0.828 |
+| MMSY_snappers_shallow | x_msy:snappers_shallow | 0.239 | 0.497 | 0.828 |
+| MMSY_snappers_shallow | tte:pelagic | 0.213 | 0.455 | 0.828 |
+| MMSY_snappers_shallow | npp:colonized_pavement | 0.164 | 0.366 | 0.828 |
+| MMSY_spiny_lobster | partition:spiny_lobster | 0.542 | 0.772 | 0.803 |
+| MMSY_spiny_lobster | partition:benthic_predatory_inverts | -0.369 | -0.638 | 0.803 |
+| MMSY_spiny_lobster | tte:colonized_pavement | 0.258 | 0.501 | 0.803 |
+| MMSY_spiny_lobster | x_msy:spiny_lobster | 0.244 | 0.481 | 0.803 |
+| MMSY_spiny_lobster | npp:colonized_pavement | 0.236 | 0.468 | 0.803 |
+| MMSY_spiny_lobster | pb:spiny_lobster | 0.219 | 0.441 | 0.803 |
+| total_focus_MMSY | partition:benthic_predatory_inverts | -0.355 | -0.582 | 0.758 |
+| total_focus_MMSY | tte:colonized_pavement | 0.336 | 0.562 | 0.758 |
+| total_focus_MMSY | npp:colonized_pavement | 0.315 | 0.537 | 0.758 |
+| total_focus_MMSY | fwf:colonized_pavement | 0.256 | 0.460 | 0.758 |
+| total_focus_MMSY | npp:coral_reef | 0.210 | 0.390 | 0.758 |
+| total_focus_MMSY | partition:spiny_lobster | 0.192 | 0.361 | 0.758 |
 
 
 ![Figure (fig11). Global sensitivity of total focus-group MMSY.](../../Projects/StCroix_Trap/output/figures/fig11_sensitivity_total_focus_MMSY.png){width=100%}
@@ -1732,91 +1970,111 @@ All values are in lb yr⁻¹ unless stated, for the Baseline scenario and the 20
 
 | group | MMSY_p05_lb | MMSY_p50_lb | MMSY_p95_lb | between_variant_cv |
 | --- | --- | --- | --- | --- |
-| spiny_lobster | 178,427 | 280,474 | 418,842 | 0.10 |
-| queen_conch | 7,408 | 33,814 | 166,391 | 0.18 |
-| parrotfish_1 | 72,350 | 351,856 | 1,451,166 | 0.32 |
-| parrotfish_2 | 98,664 | 386,678 | 1,449,264 | 0.45 |
-| surgeonfishes | 61,047 | 193,342 | 576,405 | 0.30 |
-| queen_triggerfish | 15,215 | 25,701 | 42,280 | 0.09 |
-| grunts | 204,559 | 608,190 | 1,986,831 | 0.26 |
-| snappers_shallow | 93,766 | 353,956 | 1,373,079 | 0.36 |
-| yellowtail_snapper | 104,419 | 427,433 | 2,463,453 | 0.69 |
-| snappers_deep | 13,704 | 102,019 | 532,925 | 0.53 |
-| groupers_shallow | 27,614 | 107,021 | 562,322 | 0.48 |
-| squirrelfishes | 31,491 | 101,546 | 371,985 | 0.33 |
-| goatfishes | 9,999 | 33,128 | 93,988 | 0.34 |
-| boxfishes | 18,671 | 52,882 | 143,864 | 0.19 |
-| angelfishes | 57,739 | 242,193 | 957,701 | 0.31 |
-| wrasses_hogfish | 6,006 | 13,699 | 30,337 | 0.25 |
-| jacks | 106,786 | 484,184 | 2,816,519 | 0.66 |
-| porgies | 2,641 | 6,441 | 15,035 | 0.19 |
-| pelagics | 2,552 | 34,904 | 656,526 | 0.56 |
-| zooplankton | 16,288,164 | 46,843,006 | 163,301,608 | 0.44 |
-| benthic_grazers | 8,708,949 | 24,452,355 | 71,353,847 | 0.30 |
-| benthic_detritivores_filter | 65,744,444 | 128,632,860 | 248,236,909 | 0.12 |
-| small_reef_fish | 1,576,903 | 4,563,528 | 14,882,806 | 0.35 |
-| small_pelagics | 1,770,161 | 6,551,489 | 29,560,297 | 0.48 |
-| other_reef_predators | 52,476 | 188,749 | 651,642 | 0.34 |
-| sharks_apex | 10,123 | 45,073 | 167,243 | 0.40 |
-| benthic_predatory_inverts | 7,020,601 | 21,257,153 | 53,687,036 | 0.30 |
-| other_invertivore_fishes | 721,323 | 2,052,009 | 6,054,471 | 0.23 |
-| squids_pelagic_predators | 49,792 | 352,153 | 2,467,796 | 0.48 |
+| spiny_lobster | 146,300 | 279,019 | 554,007 | 0.07 |
+| queen_conch | 4,983 | 23,725 | 125,071 | 0.28 |
+| parrotfish_1 | 33,265 | 121,710 | 527,921 | 0.46 |
+| parrotfish_2 | 48,772 | 166,507 | 649,267 | 0.44 |
+| surgeonfishes | 40,362 | 128,445 | 445,216 | 0.25 |
+| queen_triggerfish | 13,616 | 23,296 | 40,269 | 0.10 |
+| grunts | 69,488 | 316,705 | 1,234,703 | 0.38 |
+| snappers_shallow | 37,572 | 168,205 | 678,842 | 0.48 |
+| yellowtail_snapper | 92,558 | 368,139 | 1,390,318 | 0.32 |
+| snappers_deep | 9,112 | 58,799 | 414,773 | 0.50 |
+| groupers_shallow | 15,419 | 57,485 | 221,276 | 0.33 |
+| squirrelfishes | 16,944 | 57,187 | 195,969 | 0.31 |
+| goatfishes | 8,669 | 24,851 | 75,591 | 0.20 |
+| boxfishes | 10,094 | 38,017 | 134,715 | 0.30 |
+| angelfishes | 25,799 | 109,448 | 496,744 | 0.41 |
+| wrasses_hogfish | 3,541 | 8,069 | 19,619 | 0.16 |
+| jacks | 78,714 | 355,414 | 1,686,038 | 0.25 |
+| porgies | 2,290 | 6,176 | 17,079 | 0.17 |
+| pelagics | 1,938 | 27,023 | 419,844 | 0.48 |
+| zooplankton | 20,263,066 | 53,166,857 | 145,538,347 | 0.23 |
+| benthic_grazers | 10,801,631 | 30,744,448 | 85,060,842 | 0.16 |
+| benthic_detritivores_filter | 75,372,246 | 135,879,576 | 263,275,945 | 0.20 |
+| small_reef_fish | 2,021,199 | 4,980,637 | 13,808,933 | 0.25 |
+| small_pelagics | 1,895,090 | 6,586,659 | 21,312,591 | 0.34 |
+| other_reef_predators | 81,315 | 323,475 | 1,364,370 | 0.32 |
+| sharks_apex | 13,575 | 54,589 | 237,640 | 0.49 |
+| benthic_predatory_inverts | 9,149,220 | 22,410,812 | 53,830,553 | 0.28 |
+| other_invertivore_fishes | 1,187,915 | 3,075,765 | 7,796,693 | 0.19 |
+| squids_pelagic_predators | 57,687 | 347,010 | 1,967,964 | 0.59 |
 
 
 **Table. Structural ensemble by variant (selected groups).**
 
 | Variant | Group | MMSY p50 (lb) | ESS |
 | --- | --- | --- | --- |
-| base | spiny_lobster | 293,019 | 19.9 |
-| base | parrotfish_2 | 417,221 | 19.9 |
-| base | queen_triggerfish | 26,336 | 19.9 |
-| base | wrasses_hogfish | 15,692 | 19.9 |
-| base | porgies | 7,155 | 19.9 |
-| x_msy_0.3 | spiny_lobster | 229,667 | 14.7 |
-| x_msy_0.3 | parrotfish_2 | 180,910 | 14.7 |
-| x_msy_0.3 | queen_triggerfish | 21,514 | 14.7 |
-| x_msy_0.3 | wrasses_hogfish | 9,458 | 14.7 |
-| x_msy_0.3 | porgies | 5,247 | 14.7 |
-| x_msy_0.4 | spiny_lobster | 259,577 | 14.0 |
-| x_msy_0.4 | parrotfish_2 | 334,283 | 14.0 |
-| x_msy_0.4 | queen_triggerfish | 26,383 | 14.0 |
-| x_msy_0.4 | wrasses_hogfish | 8,296 | 14.0 |
-| x_msy_0.4 | porgies | 8,076 | 14.0 |
-| tte_0.10 | spiny_lobster | 316,114 | 5.4 |
-| tte_0.10 | parrotfish_2 | 281,573 | 5.4 |
-| tte_0.10 | queen_triggerfish | 23,038 | 5.4 |
-| tte_0.10 | wrasses_hogfish | 16,673 | 5.4 |
-| tte_0.10 | porgies | 5,368 | 5.4 |
-| tte_0.20 | spiny_lobster | 305,480 | 23.8 |
-| tte_0.20 | parrotfish_2 | 505,809 | 23.8 |
-| tte_0.20 | queen_triggerfish | 27,736 | 23.8 |
-| tte_0.20 | wrasses_hogfish | 15,883 | 23.8 |
-| tte_0.20 | porgies | 6,169 | 23.8 |
-| no_fishing_feedback | spiny_lobster | 293,028 | 20.0 |
-| no_fishing_feedback | parrotfish_2 | 407,018 | 20.0 |
-| no_fishing_feedback | queen_triggerfish | 26,349 | 20.0 |
-| no_fishing_feedback | wrasses_hogfish | 15,697 | 20.0 |
-| no_fishing_feedback | porgies | 7,157 | 20.0 |
-| no_thermal | spiny_lobster | 293,016 | 21.5 |
-| no_thermal | parrotfish_2 | 581,235 | 21.5 |
-| no_thermal | queen_triggerfish | 29,257 | 21.5 |
-| no_thermal | wrasses_hogfish | 19,209 | 21.5 |
-| no_thermal | porgies | 8,145 | 21.5 |
-| fwf_low | spiny_lobster | 249,812 | 17.1 |
-| fwf_low | parrotfish_2 | 263,149 | 17.1 |
-| fwf_low | queen_triggerfish | 23,922 | 17.1 |
-| fwf_low | wrasses_hogfish | 10,185 | 17.1 |
-| fwf_low | porgies | 6,246 | 17.1 |
-| fwf_high | spiny_lobster | 257,921 | 14.1 |
-| fwf_high | parrotfish_2 | 859,649 | 14.1 |
-| fwf_high | queen_triggerfish | 25,683 | 14.1 |
-| fwf_high | wrasses_hogfish | 14,681 | 14.1 |
-| fwf_high | porgies | 4,369 | 14.1 |
-| pelagic_npp_satellite | spiny_lobster | 293,019 | 19.9 |
-| pelagic_npp_satellite | parrotfish_2 | 417,221 | 19.9 |
-| pelagic_npp_satellite | queen_triggerfish | 26,336 | 19.9 |
-| pelagic_npp_satellite | wrasses_hogfish | 15,692 | 19.9 |
-| pelagic_npp_satellite | porgies | 7,155 | 19.9 |
+| base | spiny_lobster | 290,544 | 22.1 |
+| base | parrotfish_2 | 140,966 | 22.1 |
+| base | queen_triggerfish | 21,361 | 22.1 |
+| base | wrasses_hogfish | 7,182 | 22.1 |
+| base | porgies | 5,640 | 22.1 |
+| gulland_PB | spiny_lobster | 282,279 | 50.0 |
+| gulland_PB | parrotfish_2 | 269,755 | 50.0 |
+| gulland_PB | queen_triggerfish | 29,820 | 50.0 |
+| gulland_PB | wrasses_hogfish | 11,960 | 50.0 |
+| gulland_PB | porgies | 8,493 | 50.0 |
+| schaefer_shape | spiny_lobster | 285,667 | 18.1 |
+| schaefer_shape | parrotfish_2 | 149,662 | 18.1 |
+| schaefer_shape | queen_triggerfish | 24,528 | 18.1 |
+| schaefer_shape | wrasses_hogfish | 7,325 | 18.1 |
+| schaefer_shape | porgies | 6,768 | 18.1 |
+| x_msy_low | spiny_lobster | 254,205 | 12.9 |
+| x_msy_low | parrotfish_2 | 115,005 | 12.9 |
+| x_msy_low | queen_triggerfish | 22,089 | 12.9 |
+| x_msy_low | wrasses_hogfish | 7,660 | 12.9 |
+| x_msy_low | porgies | 4,090 | 12.9 |
+| closed_population | spiny_lobster | 250,245 | 29.0 |
+| closed_population | parrotfish_2 | 165,474 | 29.0 |
+| closed_population | queen_triggerfish | 22,454 | 29.0 |
+| closed_population | wrasses_hogfish | 8,255 | 29.0 |
+| closed_population | porgies | 5,596 | 29.0 |
+| no_nursery | spiny_lobster | 297,275 | 22.8 |
+| no_nursery | parrotfish_2 | 141,195 | 22.8 |
+| no_nursery | queen_triggerfish | 22,404 | 22.8 |
+| no_nursery | wrasses_hogfish | 7,272 | 22.8 |
+| no_nursery | porgies | 5,988 | 22.8 |
+| no_herbivory_feedback | spiny_lobster | 290,544 | 22.1 |
+| no_herbivory_feedback | parrotfish_2 | 140,966 | 22.1 |
+| no_herbivory_feedback | queen_triggerfish | 21,361 | 22.1 |
+| no_herbivory_feedback | wrasses_hogfish | 7,182 | 22.1 |
+| no_herbivory_feedback | porgies | 5,640 | 22.1 |
+| no_ghost_fishing | spiny_lobster | 294,028 | 25.3 |
+| no_ghost_fishing | parrotfish_2 | 138,276 | 25.3 |
+| no_ghost_fishing | queen_triggerfish | 22,333 | 25.3 |
+| no_ghost_fishing | wrasses_hogfish | 7,085 | 25.3 |
+| no_ghost_fishing | porgies | 6,178 | 25.3 |
+| no_lionfish_sargassum | spiny_lobster | 268,361 | 26.8 |
+| no_lionfish_sargassum | parrotfish_2 | 154,267 | 26.8 |
+| no_lionfish_sargassum | queen_triggerfish | 20,794 | 26.8 |
+| no_lionfish_sargassum | wrasses_hogfish | 9,276 | 26.8 |
+| no_lionfish_sargassum | porgies | 5,270 | 26.8 |
+| tte_0.10 | spiny_lobster | 265,701 | 7.9 |
+| tte_0.10 | parrotfish_2 | 140,386 | 7.9 |
+| tte_0.10 | queen_triggerfish | 22,199 | 7.9 |
+| tte_0.10 | wrasses_hogfish | 7,691 | 7.9 |
+| tte_0.10 | porgies | 6,836 | 7.9 |
+| tte_0.20 | spiny_lobster | 282,655 | 46.5 |
+| tte_0.20 | parrotfish_2 | 161,298 | 46.5 |
+| tte_0.20 | queen_triggerfish | 23,832 | 46.5 |
+| tte_0.20 | wrasses_hogfish | 9,221 | 46.5 |
+| tte_0.20 | porgies | 6,523 | 46.5 |
+| no_thermal | spiny_lobster | 327,597 | 20.1 |
+| no_thermal | parrotfish_2 | 195,906 | 20.1 |
+| no_thermal | queen_triggerfish | 24,965 | 20.1 |
+| no_thermal | wrasses_hogfish | 8,585 | 20.1 |
+| no_thermal | porgies | 6,651 | 20.1 |
+| fwf_low | spiny_lobster | 253,847 | 14.8 |
+| fwf_low | parrotfish_2 | 175,872 | 14.8 |
+| fwf_low | queen_triggerfish | 23,757 | 14.8 |
+| fwf_low | wrasses_hogfish | 8,723 | 14.8 |
+| fwf_low | porgies | 6,881 | 14.8 |
+| fwf_high | spiny_lobster | 293,763 | 38.0 |
+| fwf_high | parrotfish_2 | 423,903 | 38.0 |
+| fwf_high | queen_triggerfish | 26,796 | 38.0 |
+| fwf_high | wrasses_hogfish | 8,257 | 38.0 |
+| fwf_high | porgies | 7,205 | 38.0 |
 
 
 ![Figure (fig15). Structural ensemble.](../../Projects/StCroix_Trap/output/figures/fig15_structural_ensemble.png){width=100%}
@@ -1824,23 +2082,140 @@ All values are in lb yr⁻¹ unless stated, for the Baseline scenario and the 20
 
 ## Independent comparator
 
-*(not available: run the case study first)*
+**Table. TTM MMSY vs catch-only MSY.**
 
-*(figure fig16_method_comparison.png not available)*
+| group | CMSY_p05_lb | CMSY_p50_lb | CMSY_p95_lb | r_p50 | n_viable | resilience | MMSY_p05_lb | MMSY_p50_lb | MMSY_p95_lb | OFL_lb | ratio_TTM_to_catch_only |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| angelfishes | 4,397 | 6,975 | 9,878 | 0.10 | 5,552 | low | 29,389 | 134,861 | 487,461 |  | 19.34 |
+| boxfishes | 10,777 | 12,774 | 15,078 | 0.94 | 4,322 | high | 13,577 | 33,743 | 135,635 |  | 2.64 |
+| goatfishes | 7,906 | 9,708 | 11,571 | 0.37 | 4,355 | medium | 6,805 | 23,597 | 68,086 |  | 2.43 |
+| groupers_shallow | 16,106 | 25,433 | 36,332 | 0.11 | 5,783 | low | 19,718 | 55,711 | 143,712 |  | 2.19 |
+| grunts | 30,655 | 37,216 | 43,454 | 0.36 | 3,727 | medium | 83,145 | 315,880 | 881,866 |  | 8.49 |
+| parrotfish_2 | 107,311 | 125,517 | 144,330 | 0.92 | 3,815 | high | 64,134 | 155,615 | 570,872 |  | 1.24 |
+| porgies | 4,591 | 5,574 | 6,575 | 0.37 | 4,072 | medium | 2,698 | 5,890 | 21,926 |  | 1.06 |
+| queen_triggerfish | 23,634 | 28,427 | 33,145 | 0.36 | 3,678 | medium | 12,541 | 23,497 | 37,329 | 22,773 | 0.83 |
+| snappers_shallow | 13,470 | 21,643 | 30,084 | 0.11 | 5,909 | low | 44,124 | 187,034 | 467,583 |  | 8.64 |
+| spiny_lobster | 169,373 | 205,478 | 238,957 | 0.36 | 3,534 | medium | 120,321 | 249,798 | 441,273 | 163,823 | 1.22 |
+| squirrelfishes | 14,132 | 16,823 | 19,890 | 0.94 | 4,351 | high | 18,253 | 57,639 | 222,069 |  | 3.43 |
+| surgeonfishes | 44,152 | 49,359 | 54,674 | 0.88 | 2,671 | high | 53,671 | 124,686 | 501,952 |  | 2.53 |
+| wrasses_hogfish | 6,818 | 10,920 | 15,500 | 0.11 | 6,046 | low | 4,157 | 8,201 | 26,263 |  | 0.75 |
+
+
+![Figure (fig16). TTM MMSY vs catch-only MSY and OFLs.](../../Projects/StCroix_Trap/output/figures/fig16_method_comparison.png){width=100%}
+
 
 ## Value of information
 
-*(res_voi not available)*
+**Table. Value of information by data stream (total focus MMSY).**
 
-*(figure fig17_value_of_information.png not available)*
+| output | data_stream | S1_max | S1_sum | top_input |
+| --- | --- | --- | --- | --- |
+| total_focus_MMSY | Biomass surveys (NCRMP / assessment B0) | 0.128 | 0.240 | partition:benthic_predatory_inverts |
+| total_focus_MMSY | Primary-production measurements | 0.116 | 0.176 | npp:colonized_pavement |
+| total_focus_MMSY | Trophic transfer efficiency | 0.121 | 0.176 | tte:colonized_pavement |
+| total_focus_MMSY | Food-web / detritus flows | 0.071 | 0.095 | fwf:colonized_pavement |
+| total_focus_MMSY | Production/biomass (Ecopath) | 0.012 | 0.034 | pb:grunts |
+| total_focus_MMSY | Other | 0.030 | 0.030 | c_to_ww |
+| total_focus_MMSY | Life history (growth, maturity, selectivity) | 0.009 | 0.028 | x_msy:spiny_lobster |
+| total_focus_MMSY | Habitat mapping | 0.016 | 0.022 | area:colonized_pavement |
+| total_focus_MMSY | Hurricane and trap-loss impacts | 0.020 | 0.020 | dist_loss_mult |
+| total_focus_MMSY | Natural mortality (life history / tagging) | 0.001 | 0.003 | M:surgeonfishes |
+| total_focus_MMSY | Lionfish / Sargassum effects | 0.001 | 0.003 | env:lionfish:grunts |
+| total_focus_MMSY | Historical CPUE (1980s depletion) | 0.001 | 0.003 | init_dep:wrasses_hogfish |
+| total_focus_MMSY | Coral and herbivory dynamics | 0.000 | 0.001 | herbivory_elasticity |
+| total_focus_MMSY | Larval connectivity / settlement | 0.000 | 0.000 | open_rec:spiny_lobster |
+| total_focus_MMSY | Catch monitoring (landings, expansion) | 0.000 | 0.000 | catch_expansion |
+
+
+![Figure (fig17). Value of information by data stream.](../../Projects/StCroix_Trap/output/figures/fig17_value_of_information.png){width=100%}
+
 
 ## Management strategy evaluation
 
-*(not available: run the case study first)*
+**Table. Closed-loop MSE performance (2036–2045).**
 
-*(res_mse_group not available)*
+| procedure | P_any_focus_overfished | annual_P_any_focus_overfished | min_BBmsy_p05 | min_BBmsy_p50 | focus_catch_lb_p50 | catch_AAV_p50 | effort_mult_p50 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Status_quo | 0.333 | 0.309 | 0.00 | 0.90 | 354,802 | 0.049 | 1.00 |
+| Trap_minus25 | 0.307 | 0.299 | 0.00 | 0.99 | 314,801 | 0.050 | 0.88 |
+| SPF_ceiling | 0.307 | 0.295 | 0.00 | 0.94 | 395,035 | 0.084 | 1.33 |
+| SPF_ceiling_biased | 0.407 | 0.359 | 0.00 | 0.65 | 595,070 | 0.084 | 2.06 |
+| CPUE_HCR | 0.413 | 0.356 | 0.00 | 0.72 | 492,301 | 0.066 | 1.48 |
 
-*(figure fig18_mse.png not available)*
+
+**Table. MSE: probability each focus group falls below 0.5 B_MSY.**
+
+| procedure | group | P_overfished | min_BBmsy_p50 |
+| --- | --- | --- | --- |
+| Status_quo | spiny_lobster | 0.007 | 1.63 |
+| Status_quo | parrotfish_2 | 0.020 | 2.05 |
+| Status_quo | surgeonfishes | 0.007 | 2.13 |
+| Status_quo | queen_triggerfish | 0.167 | 1.39 |
+| Status_quo | grunts | 0.000 | 2.08 |
+| Status_quo | snappers_shallow | 0.000 | 1.95 |
+| Status_quo | groupers_shallow | 0.013 | 1.71 |
+| Status_quo | squirrelfishes | 0.000 | 2.39 |
+| Status_quo | goatfishes | 0.000 | 2.13 |
+| Status_quo | boxfishes | 0.000 | 2.14 |
+| Status_quo | angelfishes | 0.000 | 2.19 |
+| Status_quo | wrasses_hogfish | 0.127 | 1.49 |
+| Status_quo | porgies | 0.060 | 1.54 |
+| Trap_minus25 | spiny_lobster | 0.007 | 1.67 |
+| Trap_minus25 | parrotfish_2 | 0.020 | 2.11 |
+| Trap_minus25 | surgeonfishes | 0.000 | 2.17 |
+| Trap_minus25 | queen_triggerfish | 0.160 | 1.50 |
+| Trap_minus25 | grunts | 0.000 | 2.09 |
+| Trap_minus25 | snappers_shallow | 0.000 | 1.96 |
+| Trap_minus25 | groupers_shallow | 0.013 | 1.72 |
+| Trap_minus25 | squirrelfishes | 0.000 | 2.44 |
+| Trap_minus25 | goatfishes | 0.000 | 2.18 |
+| Trap_minus25 | boxfishes | 0.000 | 2.20 |
+| Trap_minus25 | angelfishes | 0.000 | 2.20 |
+| Trap_minus25 | wrasses_hogfish | 0.113 | 1.54 |
+| Trap_minus25 | porgies | 0.053 | 1.61 |
+| SPF_ceiling | spiny_lobster | 0.007 | 1.55 |
+| SPF_ceiling | parrotfish_2 | 0.020 | 2.07 |
+| SPF_ceiling | surgeonfishes | 0.000 | 2.19 |
+| SPF_ceiling | queen_triggerfish | 0.153 | 1.41 |
+| SPF_ceiling | grunts | 0.000 | 2.11 |
+| SPF_ceiling | snappers_shallow | 0.000 | 1.93 |
+| SPF_ceiling | groupers_shallow | 0.013 | 1.72 |
+| SPF_ceiling | squirrelfishes | 0.000 | 2.39 |
+| SPF_ceiling | goatfishes | 0.000 | 2.15 |
+| SPF_ceiling | boxfishes | 0.000 | 2.19 |
+| SPF_ceiling | angelfishes | 0.000 | 2.20 |
+| SPF_ceiling | wrasses_hogfish | 0.100 | 1.58 |
+| SPF_ceiling | porgies | 0.060 | 1.56 |
+| SPF_ceiling_biased | spiny_lobster | 0.007 | 1.34 |
+| SPF_ceiling_biased | parrotfish_2 | 0.020 | 1.84 |
+| SPF_ceiling_biased | surgeonfishes | 0.007 | 2.06 |
+| SPF_ceiling_biased | queen_triggerfish | 0.200 | 1.14 |
+| SPF_ceiling_biased | grunts | 0.000 | 2.07 |
+| SPF_ceiling_biased | snappers_shallow | 0.000 | 1.90 |
+| SPF_ceiling_biased | groupers_shallow | 0.013 | 1.60 |
+| SPF_ceiling_biased | squirrelfishes | 0.000 | 2.27 |
+| SPF_ceiling_biased | goatfishes | 0.000 | 2.01 |
+| SPF_ceiling_biased | boxfishes | 0.000 | 2.08 |
+| SPF_ceiling_biased | angelfishes | 0.000 | 2.18 |
+| SPF_ceiling_biased | wrasses_hogfish | 0.153 | 1.22 |
+| SPF_ceiling_biased | porgies | 0.113 | 1.24 |
+| CPUE_HCR | spiny_lobster | 0.020 | 1.40 |
+| CPUE_HCR | parrotfish_2 | 0.020 | 1.89 |
+| CPUE_HCR | surgeonfishes | 0.007 | 2.05 |
+| CPUE_HCR | queen_triggerfish | 0.233 | 1.15 |
+| CPUE_HCR | grunts | 0.000 | 2.06 |
+| CPUE_HCR | snappers_shallow | 0.000 | 1.93 |
+| CPUE_HCR | groupers_shallow | 0.013 | 1.63 |
+| CPUE_HCR | squirrelfishes | 0.000 | 2.34 |
+| CPUE_HCR | goatfishes | 0.000 | 2.04 |
+| CPUE_HCR | boxfishes | 0.000 | 2.08 |
+| CPUE_HCR | angelfishes | 0.000 | 2.18 |
+| CPUE_HCR | wrasses_hogfish | 0.187 | 1.28 |
+| CPUE_HCR | porgies | 0.073 | 1.41 |
+
+
+![Figure (fig18). Closed-loop management strategy evaluation.](../../Projects/StCroix_Trap/output/figures/fig18_mse.png){width=100%}
+
 
 ## Ecosystem-level indicators
 
@@ -1848,14 +2223,14 @@ All values are in lb yr⁻¹ unless stated, for the Baseline scenario and the 20
 
 | year | ryther_p50 | ryther_p05 | ryther_p95 | fogarty_permil_p50 | fogarty_permil_p05 | fogarty_permil_p95 | ryther_status | fogarty_status |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1,985 | 0.714 | 0.498 | 0.955 | 0.593 | 0.269 | 0.924 | below | caution |
-| 1,995 | 0.500 | 0.338 | 0.686 | 0.473 | 0.207 | 0.727 | below | caution |
-| 2,005 | 0.801 | 0.545 | 1.079 | 0.736 | 0.333 | 1.184 | below | caution |
-| 2,015 | 0.644 | 0.477 | 0.874 | 0.595 | 0.300 | 0.923 | below | caution |
-| 2,022 | 0.594 | 0.409 | 0.798 | 0.537 | 0.236 | 0.899 | below | caution |
-| 2,023 | 0.627 | 0.425 | 0.835 | 0.593 | 0.276 | 0.939 | below | caution |
-| 2,024 | 0.598 | 0.414 | 0.804 | 0.560 | 0.265 | 0.916 | below | caution |
-| 2,045 | 0.703 | 0.473 | 0.976 | 0.609 | 0.259 | 1.006 | below | caution |
+| 1,985 | 0.753 | 0.487 | 1.177 | 0.607 | 0.373 | 0.982 | below | caution |
+| 1,995 | 0.526 | 0.343 | 0.806 | 0.467 | 0.279 | 0.793 | below | caution |
+| 2,005 | 0.827 | 0.577 | 1.315 | 0.725 | 0.461 | 1.270 | below | caution |
+| 2,015 | 0.679 | 0.473 | 1.039 | 0.588 | 0.373 | 0.978 | below | caution |
+| 2,022 | 0.646 | 0.398 | 0.977 | 0.569 | 0.335 | 0.939 | below | caution |
+| 2,023 | 0.665 | 0.427 | 1.005 | 0.596 | 0.340 | 0.966 | below | caution |
+| 2,024 | 0.606 | 0.395 | 0.927 | 0.557 | 0.353 | 0.939 | below | caution |
+| 2,045 | 0.728 | 0.479 | 1.119 | 0.605 | 0.375 | 0.957 | below | caution |
 
 
 ![Figure (fig14). Ecosystem-overfishing indices.](../../Projects/StCroix_Trap/output/figures/fig14_eco_indices.png){width=100%}
@@ -1865,7 +2240,28 @@ All values are in lb yr⁻¹ unless stated, for the Baseline scenario and the 20
 # Discussion
 
 
-*(to be completed from the full run)*
+## Interpretation of the St. Croix results
+
+**Theory changes the answer.** Two changes give the trap bycatch groups much less headroom than the original SEDAR103-DW-20 formulation did:
+
+* replacing x = 0.5 on Ecopath P/B with per-recruit x on natural mortality;
+* replacing Schaefer with Pella–Tomlinson production.
+
+Under the earlier form, every trap group was "Below target" with P(overfishing) of at most 3.4%. Under the theory-consistent form, hogfish, porgies and queen triggerfish carry overfishing probabilities of 16–35% at current (placeholder) catch. Fish-trap and dive effort are at their multispecies ceilings.
+
+This direction of change is what fisheries theory predicts. Gulland's x = 0.5 is an upper bound for species whose gear selectivity, maturity and steepness keep F_MSY below M (Beddington & Cooke 1983; Zhou et al. 2012). The `gulland_PB` structural variant quantifies the change.
+
+**The binding constraint is bycatch, not lobster.** Lobster and Parrotfish 2 dominate the value of the trap fishery and have substantial headroom. The groups that limit fish-trap and dive effort are small, slow-turnover bycatch species. This matches the logic of the SEDAR 103 framework: in a multispecies, non-selective fishery, effort ceilings are set by the weakest stock the gear catches. Management options that protect choke groups without cutting all effort would raise sustainable value. Examples include escape gaps or mesh changes for small fishes, and spatial closures where those species concentrate. The model can evaluate such options as scenarios once their effect on group-specific catchability is specified.
+
+**The lobster anchor matters most.** Lobster MMSY is 1.5× the OFL. The catch-only comparator lies between the two. Without its OFL, the energy budget overestimates lobster scale several-fold. Lobster is a large-bodied invertivore that shares the invertivore pools with abundant benthic predatory invertebrates, and the biomass of those competitors is the single largest driver of total MMSY. Fishery-independent estimates of lobster and invertebrate-competitor biomass, and the SEDAR 57 CPUE as a fitted index, are therefore the most valuable additions for the trap fishery.
+
+**Climate effects are large but uncertain.** Projected MMSY declines of 16–43% under SSP5-8.5 come mainly from the thermal-performance curves. These are realized-niche curves, so the magnitudes are assumptions (Appendix B, A18). They are tested by the `no_thermal` ensemble variant. The direction is robust: every focus group has an optimum near or below current St. Croix temperatures. The magnitude would benefit from physiological thermal-performance data for the key species.
+
+**Management procedures.**
+
+* The closed-loop results caution against relying on catch-rate rules for this fishery. CPUE in a multispecies trap fishery is dominated by the abundant groups, so it can stay high while choke groups decline.
+* The SPF effort-ceiling rule tracks the choke groups and performs better, but only with unbiased assessments.
+* In none of the procedures tested is the risk to queen triggerfish and hogfish below about 10–15%. Achieving that would need lower effort on the gears that catch them, or gear and area measures that reduce their catchability.
 
 
 ## What the model can and cannot say
@@ -2038,7 +2434,20 @@ Optional sources that are configured but disabled, because they need credentials
 # Conclusions
 
 
-*(to be completed from the full run)*
+1. CaribTTM provides a habitat-resolved, energetically bounded and theory-consistent estimate of multispecies sustainable yield for every functional group, guild and gear in an island fishery. It carries full uncertainty propagation and the diagnostics a CIE review expects.
+
+2. The data pipeline is automated and reproducible for every input that has a public source: temperature, bleaching stress, chlorophyll, water clarity, primary production, climate projections, habitat areas, bathymetry, hurricanes, *Sargassum* and species traits. The model can therefore be applied to St. Thomas/St. John, Puerto Rico or other regions by changing a bounding box and a few input tables.
+
+3. For St. Croix, the model reproduces the two assessed stocks within their uncertainty. Queen triggerfish passes out-of-sample validation. The model identifies small trap-bycatch groups (hogfish, porgies, queen triggerfish) as the binding constraints on fish-trap, dive and lobster-trap effort.
+
+4. Climate warming is the largest projected stressor. Nursery loss, open-access effort and optimistic assessments are the main avoidable risks.
+
+5. The results are conditional on placeholder landings, effort and indices and on several expert-judgement process magnitudes. All are documented and tested. The highest-value next steps are:
+   * enter the confidential landings and effort by gear;
+   * fit the SEDAR 57 and SEDAR 80 standardized CPUE;
+   * ingest NCRMP fish and invertebrate surveys, including as absolute biomass indices;
+   * obtain St. Croix-specific benthic production and transfer-efficiency estimates;
+   * replace the placeholder process magnitudes through structured expert elicitation and fishers' knowledge.
 
 
 
@@ -2406,7 +2815,7 @@ Values flagged `PLACEHOLDER` must be replaced with real data before management u
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | coral_reef | benthic |  |  | 1500 | t_C_km2_yr | 0.5 | 0.35 | 0.3 | 0.15 | 0.2 | coral | coral_cover | 0.08 | 0.14 | 0 |  | 0.25 | area from NCCOS API; NPP published range; closed_fraction PLACEHOLDER (approximate BIRNM + EEMP no-take share; replace with GIS overlay) | NPP: Caribbean reef net production 986-4108 t C (Adey & Steneck 1985 St. Croix); 1200-3000 for Indian Ocean reefs (Nair & Pillai 1972) |
 | colonized_pavement | benthic |  |  | 181 | mmol_O2_m2_d | 0.4 | 0.35 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | 0.15 | area from NCCOS API; NPP published; closed_fraction PLACEHOLDER (approximate BIRNM + EEMP no-take share; replace with GIS overlay) | Turf/macroalgae-dominated hardbottom; lagoon-wide Pn 181 +/- 28 mmol O2 m-2 d-1 (Naumann et al. 2013) |
-| seagrass | benthic |  |  | 4.2 | g_DW_m2_d | 0.5 | 0.35 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 | light_seagrass | 0.1 | area from NCCOS API; NPP published; closed_fraction PLACEHOLDER (approximate BIRNM + EEMP no-take share; replace with GIS overlay) | Thalassia production 4.2 g DW m-2 d-1 (Juman 2005); CARICOMP <200->2000 g DW m-2 yr-1 (van Tussenbroek et al. 2014); annual NPP index from bottom light (OC-CCI Kd490; build_light_index.R; depth ASSUMPTION) |
+| seagrass | benthic |  |  | 4.2 | g_DW_m2_d | 0.5 | 0.35 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 | light_seagrass | 0.1 | area from NCCOS API; NPP published; closed_fraction PLACEHOLDER (approximate BIRNM + EEMP no-take share; replace with GIS overlay) | Thalassia production 4.2 g DW m-2 d-1, annual mean of 3.9-4.9 (Juman 2005a, Tobago; nutrient-enriched lagoon, so the high end of the CARICOMP range - ASSUMPTION that it applies to St. Croix; CV 0.5); CARICOMP <200->2000 g DW m-2 yr-1 (van Tussenbroek et al. 2014); annual NPP index from bottom light (OC-CCI Kd490; build_light_index.R; depth ASSUMPTION) |
 | macroalgae | benthic |  |  | 582 | mmol_O2_m2_d | 0.5 | 0.25 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 | light_macroalgae | 0.15 | area from NCCOS API; NPP published; closed_fraction PLACEHOLDER (approximate BIRNM + EEMP no-take share; replace with GIS overlay) | Caribbean macroalgal beds Pn 582 mmol O2 m-2 d-1 (Wanders 1976 via Naumann et al. 2013); annual NPP index from bottom light (OC-CCI Kd490; build_light_index.R; depth ASSUMPTION) |
 | sand | benthic |  |  | 7 | mmol_O2_m2_d | 0.6 | 0.5 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | 0.2 | area from NCCOS API; NPP published; closed_fraction PLACEHOLDER (approximate BIRNM + EEMP no-take share; replace with GIS overlay) | Microphytobenthos Pn 7 +/- 4 mmol O2 m-2 d-1 (Naumann et al. 2013) |
 | mangrove | benthic |  |  | 400 | mmol_O2_m2_d | 0.3 | 0.2 | 0.4 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | 0 | area from NCCOS API; NPP published | Caribbean mangrove Pn 400 +/- 83 mmol O2 m-2 d-1 (Gattuso et al. 1998); food_web_fraction = litter export |

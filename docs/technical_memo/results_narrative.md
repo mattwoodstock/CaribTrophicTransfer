@@ -76,6 +76,21 @@ The rank model explains 76% of the variance. Grouped by data stream, the first-o
 
 For individual stocks, biomass surveys dominate: 46% for lobster, 37% for queen triggerfish and 57% for hogfish. Landings and the expansion factor show no prior variance share, because they act through calibration rather than through prior MMSY. Their value is shown instead by how strongly catch feasibility shapes the posterior.
 
+**Structural uncertainty.** The 14 structural variants each took 7,500 draws (five rounds). The assessed stocks are structurally robust:
+* lobster: pooled MMSY 279,000 lb (90% 146,000–554,000), between-variant CV 0.07;
+* queen triggerfish: 23,300 lb (13,600–40,300), CV 0.10.
+
+The unassessed herbivore and invertivore complexes are not: Parrotfish 2 CV 0.44, grunts 0.38.
+
+The variants quantify each structural choice (variant medians against base):
+* **Original form** (`gulland_PB`: x = 0.5 on P/B, Schaefer shape). MMSY rises for hogfish (+67%), porgies (+52%), queen triggerfish (+39%) and Parrotfish 2 (+91%). This is the effect of the theory correction.
+* **Closed lobster population.** Lobster MMSY falls by 14%.
+* **No thermal effects.** Lobster +13%, Parrotfish 2 +39%.
+* **Food-web fraction ×1.5.** Parrotfish 2 MMSY triples.
+* **Other variants.** Schaefer shape, nursery, ghost fishing, and lionfish/*Sargassum* change trap-group MMSY by less than 25%.
+
+The herbivory feedback acts only in projections, so it does not change reference-year MMSY. Its effect appears in the `Parrotfish_harvest_plus50` scenario. The low-TTE variant has a small effective sample (ESS 8), so its medians are less precise.
+
 **Independent comparator.** The catch-only (CMSY-style) analysis, which uses only landings and resilience, gives results close to the TTM and the OFLs for the assessed stocks:
 * queen triggerfish: 28,400 lb (TTM 23,500; OFL 22,800);
 * spiny lobster: 205,000 lb (TTM 250,000; OFL 164,000).

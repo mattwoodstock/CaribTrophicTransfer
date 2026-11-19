@@ -16,10 +16,10 @@ This page anticipates the questions a Center for Independent Experts (CIE) panel
 | # | Likely critique | Response | Evidence | Status |
 |---|---|---|---|---|
 | 2.1 | "MMSY = x·P/B·K is a strong assumption." | Replaced by MMSY = x·M·K on natural mortality, with group-specific x (0.17–0.32) and Pella–Tomlinson shape (B_MSY/K 0.29–0.38) from a per-recruit analysis of FishBase/SEDAR traits (Beddington & Cooke 1983; Zhou et al. 2012). The original form is kept as structural variant `gulland_PB`. | `data-raw/life_history/xmsy_priors.csv`; Assumptions A5–A10 | ✅ |
-| 2.2 | "Trophic transfer efficiency is unknown." | TTE is sampled (0.15 ± 20%) and tested structurally at 0.10 and 0.20. Assessed-stock MMSY changes by only 4–13% (lobster +8% and +4%, queen triggerfish −13% and +5%), because SIR re-scales the partition. Unassessed groups move more. | GSA (`fig11`); ensemble | ✅ |
+| 2.2 | "Trophic transfer efficiency is unknown." | TTE is sampled (0.15 ± 20%) and tested at 0.10 and 0.20. Assessed-stock MMSY changes by −9% and −3% (lobster) and +4% and +11% (queen triggerfish), because the OFLs re-scale the partition. The ESS of the 0.10 variant is low (8). | `structural_ensemble_by_variant.csv`, `fig15` | ✅ |
 | 2.3 | "Does the energy budget conserve mass?" | Demand is partitioned as w·D·pref, so production summed over consumers equals TTE × E. Unit tests check conservation. | `tests/testthat/test-core.R` | ✅ |
-| 2.4 | "Results hinge on one structural choice." | Ten structural variants are pooled with equal weight. Between-variant CV of MMSY: lobster 0.10, queen triggerfish 0.09, grunts 0.26, Parrotfish 2 0.45. Assessed-stock conclusions are structurally robust; unassessed-complex scale is not, and is reported as such. | `structural_ensemble_pooled.csv` | ✅ |
-| 2.5 | "Pelagic production is double-counted or mis-scaled." | Swapping the regional 85 g C m⁻² yr⁻¹ for the satellite VGPM ensemble leaves trap-group MMSY unchanged (ESS 19.95 vs 19.95). Trap stocks are benthic-energy limited. | ensemble variant `pelagic_npp_satellite` | ✅ |
+| 2.4 | "Results hinge on one structural choice." | Fourteen structural variants, each calibrated separately, are pooled with equal weight. Between-variant CV of MMSY: lobster 0.07, queen triggerfish 0.10, grunts 0.38, Parrotfish 2 0.44. The anchored stocks are robust; the scale of the unassessed complexes is not, and is reported as such. | `structural_ensemble_pooled.csv`, `fig15` | ✅ |
+| 2.5 | "Do the added ecological processes drive the answer?" | Each one can be switched off (ensemble). Closed lobster population −14% lobster MMSY. No nursery, ghost fishing, or lionfish/*Sargassum* effects: under 25% for every trap group. Herbivory acts only in projections (scenario `Parrotfish_harvest_plus50`). | `structural_ensemble_by_variant.csv` | ✅ |
 | 2.6 | "The unmapped deeper shelf inflates production." | The NCCOS "Unknown" class (388 km²) was mostly off-shelf. It was replaced by 41.4 km² at 30–100 m from ETOPO 2022, with light-limited NPP (Morel 2007 Kd–PAR, tanh P–I) and CV 0.6. | `acquired/`; [Data Acquisition](data_acquisition.md) | ✅ |
 
 ## 3. Priors and inputs
@@ -53,8 +53,8 @@ This page anticipates the questions a Center for Independent Experts (CIE) panel
 | # | Likely critique | Response | Evidence | Status |
 |---|---|---|---|---|
 | 6.1 | "Which inputs matter?" | Global sensitivity analysis (rank R² 0.76 for total focus MMSY): invertebrate-competitor biomass (negative), pavement TTE, NPP and food-web fraction, reef NPP and lobster partition. Value of information by data stream: biomass surveys 24%, NPP 18%, TTE 18%, food-web fraction 10%. Landings act through calibration, not prior variance. | `global_sensitivity.csv`, `value_of_information_*.csv`, `fig11`, `fig17` | ✅ |
-| 6.2 | "Thermal response is speculative." | AquaMaps thermal curves come from FishBase. Removing thermal effects changes queen triggerfish MMSY by +11% and lobster by 0%. Lobster has no thermal curve yet (SeaLifeBase pending), so its climate insensitivity is an assumption. | ensemble `no_thermal` | ◐ |
-| 6.3 | "Does fishing feedback on the food web matter?" | Switching it off changes trap-group MMSY by less than 0.1%. At current exploitation the top-down feedback is weak. | ensemble `no_fishing_feedback` | ✅ |
+| 6.2 | "Thermal response is speculative." | AquaMaps realized-niche curves from FishBase and SeaLifeBase now include lobster and conch. Removing thermal effects raises lobster MMSY 13% and Parrotfish 2 39%. Magnitudes remain an assumption (A18). | ensemble `no_thermal` | ◐ |
+| 6.3 | "How much did the theory changes matter?" | The original SEDAR103-DW-20 form (`gulland_PB`) gives 39–91% higher MMSY for queen triggerfish, hogfish, porgies and Parrotfish 2. The theory-consistent form makes small bycatch groups the effort constraint. | ensemble `gulland_PB` | ✅ |
 
 ## 7. Ecosystem context and management use
 

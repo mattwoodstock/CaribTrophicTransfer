@@ -432,7 +432,7 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
     ["flask", "Simulation self-test", "Simulate data from a known draw, refit, and score bias and interval coverage"],
     ["check", "Out-of-sample validation", "Indices held out by role; leave-one-benchmark-out; retrospective peel"],
     ["chart", "Global sensitivity", "Rank regression (SRRC, PRCC) of MMSY on every sampled input"],
-    ["diagram", "Structural ensemble", "x_msy, TTE, food-web fraction, thermal and fishing feedbacks, pelagic NPP source; equal-weight pooling"],
+    ["diagram", "Structural ensemble", "14 variants: yield theory, production shape, open recruitment, nursery, herbivory, ghost fishing, invasives, TTE, thermal, food-web fraction"],
     ["globe", "Ecosystem overfishing", "Ryther and Fogarty indices (Link & Watson 2019) against published thresholds"],
   ];
   rob.forEach((o, i) => {
@@ -732,7 +732,7 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   card(s, 9.1, 1.35, 3.7, 5.3);
   stat(s, fmt(num(ensG("spiny_lobster").between_variant_cv), 2) + " / " + fmt(num(ensG("queen_triggerfish").between_variant_cv), 2), "between-variant CV: lobster / queen triggerfish", 9.35, 1.55, 3.3);
   stat(s, fmt(num(ensG("parrotfish_2").between_variant_cv), 2), "between-variant CV: Parrotfish 2", 9.35, 3.05, 3.3, HEX.accent2);
-  txt(s, "10 variants: x_msy 0.3/0.4, TTE 0.10/0.20, food-web fraction x0.67/x1.5, no thermal effects, no fishing feedback, satellite pelagic NPP.", { x: 9.35, y: 4.6, w: 3.3, h: 1.9, fontSize: 12, color: "34474F" });
+  txt(s, "14 variants: original Gulland-on-P/B form, Schaefer shape, x -25%, closed lobster population, no nursery / herbivory / ghost fishing / lionfish-Sargassum, TTE 0.10/0.20, no thermal, food-web fraction x0.67/x1.5.", { x: 9.35, y: 4.6, w: 3.3, h: 1.9, fontSize: 11, color: "34474F" });
 
   s = content("Ecosystem-level overfishing indicators", S2);
   figure(s, "fig14_eco_indices.png", 0.5, 1.35, 8.3, 5.3, "Ryther and Fogarty indices");
