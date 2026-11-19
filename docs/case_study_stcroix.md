@@ -26,7 +26,7 @@
 | Landings / effort | by year × gear × group (lb, trips), landings CV 0.2, effort CV 0.1, expansion factor 1.5 ± 25% | **placeholders** (queen conch 2021 = 30,535 lb is published) |
 | Indices | SEDAR 57 lobster trap CPUE, SEDAR 80 queen triggerfish trap CPUE, NCRMP parrotfish density | **placeholders**, all set to `role = validate` (held out of calibration, used only for out-of-sample checks) |
 | Benchmarks | lobster OFL 163,823 lb, queen triggerfish OFL 22,773 lb (used in SIR, CV 0.4); ACLs for comparison only | published |
-| Uncertainty | 3 adaptive importance-sampling rounds × 12,000 = 48,000 prior draws (4 cores); every input CV and observation error sampled; SIR on OFLs and catch feasibility (CV 0.25) | — |
+| Uncertainty | 5 adaptive importance-sampling rounds × 12,000 = 60,000 prior draws (4 cores); every input CV and observation error sampled; SIR on OFLs and catch feasibility (CV 0.25); Pareto-smoothed or truncated weights | — |
 
 ### Prior-predictive check (catch feasibility)
 
@@ -37,7 +37,7 @@ Under wide priors (partition CV 0.5, or 1.0 for poorly known groups), many prior
 ```r
 devtools::load_all(".")
 acquire_project_data("Projects/StCroix_Trap")   # optional: refresh API data (results are committed)
-source("Projects/StCroix_Trap/run_stcroix.R")   # main run + robustness + validation (≈ 26 min on 4 cores)
+source("Projects/StCroix_Trap/run_stcroix.R")   # main run + robustness + validation + MSE (≈ 45 min on 4 cores)
 source("Projects/StCroix_Trap/run_structural_ensemble.R")   # 10 structural variants (≈ 54 min)
 ```
 
@@ -45,73 +45,78 @@ Outputs are written to `Projects/StCroix_Trap/output/tables` (SPF hand-off table
 
 ## 4. Results
 
-The main run took 25.7 minutes. SIR on 48,000 prior draws gave ESS 86, 316 unique resampled draws and a largest single weight of 4.7%. Every retained draw supports all historical landings of the focus groups. Values are medians unless stated, in lb yr⁻¹; landings are expanded by 1.5.
+Full tables, figures and discussion are in the [Technical Memorandum](technical_memo/CaribTTM_Technical_Memorandum.md), Sections 10–11. Values are medians in lb yr⁻¹, Baseline, 2022–2024, with landings expanded by 1.5. **Absolute values for unassessed groups depend on placeholder landings and priors.**
 
-### Group MMSY (Baseline, reference years 2022–2024)
+**Calibration.** 60,000 prior draws in five adaptive rounds took 42.5 minutes. The raw ESS was 20. The weight tail was too heavy for Pareto smoothing (k̂ = 2.2), so the weights were truncated: ESS 125, 307 unique draws, largest weight 1.3%. All retained draws support all historical landings.
 
-| Group | MMSY p05 | **MMSY p50** | MMSY p95 | P* target (40%) | Current catch | B/BMSY | P(overfishing) | Benchmark |
-|---|---|---|---|---|---|---|---|---|
-| Spiny lobster | 178,509 | **273,858** | 446,066 | 256,940 | 112,540 | 1.63 | 0.000 | OFL 163,823 |
-| Queen triggerfish | 15,593 | **25,252** | 39,465 | 24,373 | 14,787 | 1.73 | 0.019 | OFL 22,773 |
-| Parrotfish 2 | 104,972 | **310,629** | 1,380,547 | 269,834 | 68,816 | 2.33 | 0.008 | ACL 72,365 |
-| Surgeonfishes | 80,189 | **263,550** | 867,857 | 232,308 | 25,571 | 2.06 | 0 | — |
-| Grunts | 197,825 | **575,461** | 1,915,195 | 488,713 | 20,159 | 2.32 | 0 | — |
-| Snapper 3 (shallow) | 64,743 | **335,824** | 1,158,577 | 294,619 | 13,342 | 2.11 | 0 | ACL 14,156 |
-| Groupers (shallow) | 30,699 | **104,264** | 319,170 | 98,200 | 14,244 | 2.08 | 0.002 | — |
-| Squirrelfishes | 27,973 | **113,734** | 281,497 | 101,040 | 9,291 | 2.14 | 0 | — |
-| Goatfishes | 11,320 | **37,798** | 115,062 | 29,759 | 5,434 | 2.02 | 0 | — |
-| Boxfishes | 17,669 | **64,233** | 264,068 | 50,460 | 6,602 | 2.13 | 0 | — |
-| Angelfishes | 41,899 | **196,951** | 731,758 | 170,756 | 3,811 | 2.09 | 0 | — |
-| Wrasses (hogfish) | 6,985 | **11,018** | 37,777 | 10,130 | 6,559 | 1.79 | 0.034 | — |
-| Porgies | 3,046 | **6,393** | 18,899 | 5,510 | 3,242 | 1.85 | 0.027 | — |
-| *Outside focus (uncalibrated):* queen conch, yellowtail snapper, deepwater snappers, jacks, pelagics | | | | | | | | |
-| Parrotfish 1 | (prohibited) | | | | 0 | | | ABC = 0 |
+| Group | MMSY p05 | **MMSY p50** | MMSY p95 | Catch | B/B_MSY | P(overfishing) | Benchmark |
+|---|---|---|---|---|---|---|---|
+| Spiny lobster | 120,321 | **249,798** | 441,273 | 121,353 | 2.44 | 0.07 | OFL 163,823 |
+| Queen triggerfish | 12,541 | **23,497** | 37,329 | 15,466 | 1.83 | 0.16 | OFL 22,773 |
+| Parrotfish 2 | 64,134 | **155,615** | 570,872 | 70,634 | 3.06 | 0.09 | ACL 72,365 |
+| Surgeonfishes | 53,671 | **124,686** | 501,952 | 26,847 | 2.57 | 0.00 | — |
+| Grunts | 83,145 | **315,880** | 881,866 | 21,707 | 3.04 | 0 | — |
+| Snapper 3 (shallow) | 44,124 | **187,034** | 467,583 | 14,089 | 2.92 | 0 | ACL 14,156 |
+| Groupers (shallow) | 19,718 | **55,711** | 143,712 | 15,247 | 2.86 | 0.01 | — |
+| Squirrelfishes | 18,253 | **57,639** | 222,069 | 9,400 | 3.06 | 0.00 | — |
+| Goatfishes | 6,805 | **23,597** | 68,086 | 5,757 | 2.55 | 0.02 | — |
+| Boxfishes | 13,577 | **33,743** | 135,635 | 6,918 | 2.80 | 0.01 | — |
+| Angelfishes | 29,389 | **134,861** | 487,461 | 4,113 | 2.76 | 0 | — |
+| Wrasses (hogfish) | 4,157 | **8,201** | 26,263 | 7,003 | 2.03 | **0.35** | — |
+| Porgies | 2,698 | **5,890** | 21,926 | 3,338 | 1.98 | **0.16** | — |
 
-The full table, including the uncalibrated groups, is `spf_group_reference_points.csv`.
+B/B_MSY uses each group's per-recruit B_MSY/K (≈ 0.29–0.38). Conch, yellowtail, deepwater snappers, jacks and pelagics are outside the trap focus and uncalibrated.
 
-### Gear effort ceilings and choke groups (choke candidates restricted to calibrated groups)
+**Gear effort ceilings** (multipliers of 2022–2024 effort):
 
-| Gear | Effort multiplier p05 / **p50** / p95 | at P* target | Choke group (share of draws) |
+| Gear | Ceiling at median MMSY | Ceiling at P* target | Choke group |
 |---|---|---|---|
-| Fish traps | 0.97 / **1.33** / 1.85 | 1.27 | hogfish (37%), queen triggerfish (29%), porgies (27%) |
-| Lobster traps | 1.08 / **1.65** / 3.11 | 1.55 | queen triggerfish (82%), spiny lobster (15%) |
-| Diving | 0.98 / **1.42** / 2.21 | 1.35 | hogfish (48%), queen triggerfish (42%) |
-| Hook and line | 1.01 / **1.42** / 3.72 | 1.37 | queen triggerfish (62%), porgies (37%) |
+| Fish traps | 0.95 | 0.90 | hogfish (54%) |
+| Dive | 0.96 | 0.92 | hogfish (56%) |
+| Lobster traps | 1.28 | 1.21 | queen triggerfish (73%) |
+| Hook and line | 1.21 | 1.10 | queen triggerfish (61%) |
 
-### Scenarios (final projection years 2043–2045)
+**Scenarios, 2043–2045.**
 
-| Scenario | Lobster MMSY | QT MMSY | QT P(overfishing) | Parrotfish 2 MMSY | Hogfish MMSY |
+| Scenario | Lobster MMSY | QT MMSY | QT P(OF) | Hogfish P(OF) | Parrotfish 2 MMSY |
 |---|---|---|---|---|---|
-| Baseline | 311.8k | 28.7k | 0.032 | 397.9k | 12.5k |
-| Climate SSP2-4.5 | 311.6k | 25.8k | 0.043 | 309.8k | 11.3k |
-| Climate SSP5-8.5 | 309.6k | 23.8k | 0.062 | 192.1k | 10.1k |
-| Major hurricane 2030 | 310.3k | 28.6k | 0.032 | 395.2k | 12.5k |
-| Trap effort +30% | 311.8k | 28.7k | 0.062 | 397.9k | 12.5k |
-| Trap reduction −25% | 311.8k | 28.7k | 0.023 | 397.9k | 12.5k |
-| Coral disease (SCTLD) | 308.6k | 28.6k | 0.032 | 394.6k | 12.5k |
-| Combined stress | 308.4k | 23.7k | 0.083 | 191.9k | 10.1k |
+| Baseline | 317k | 27.6k | 0.08 | 0.12 | 194k |
+| Climate SSP2-4.5 | 284k | 24.8k | 0.09 | 0.13 | 155k |
+| Climate SSP5-8.5 | 239k | 22.5k | 0.10 | 0.16 | 112k |
+| Major hurricane 2030 | 316k | 27.5k | 0.09 | 0.12 | 194k |
+| Trap effort +30% | 317k | 27.6k | 0.11 | 0.14 | 194k |
+| Trap effort −25% | 318k | 27.6k | 0.06 | 0.12 | 194k |
+| Coral disease (SCTLD) | 313k | 27.5k | 0.08 | 0.12 | 193k |
+| Combined stress | 238k | 22.3k | 0.16 | 0.18 | 111k |
+| No-take expansion | 318k | 27.6k | 0.06 | 0.09 | 194k |
+| Open-access effort | 318k | 27.6k | 0.20 | 0.24 | 194k |
+| Dive effort +50% | 316k | 27.6k | 0.08 | 0.16 | 194k |
+| Seagrass loss (*Halophila*) | 276k | 27.3k | 0.09 | 0.14 | 177k |
 
-Table: `spf_scenario_reference_points.csv`; figure `fig03`.
+**Validation and robustness:**
+* **Leave-one-benchmark-out.** Queen triggerfish passes: predicted 16,400 lb (90% 10,300–47,900) against an OFL of 22,773. Spiny lobster fails: predicted 774,000 lb.
+* **Self-test.** 90% coverage 0.79–0.93; bias −19% to +12% (queen triggerfish 0%, lobster −6%).
+* **Independent catch-only comparator.** Queen triggerfish 28,400 lb; lobster 205,000 lb.
+* **Value of information** (share of total-focus MMSY variance): biomass surveys 24%, benthic NPP 18%, transfer efficiency 18%, food-web fraction 10%.
+* **Closed-loop MSE.** P(any focus group < 0.5 B_MSY in 2036–2045):
 
-### Robustness and validation
+  | Procedure | Probability |
+  |---|---|
+  | Status quo | 0.33 |
+  | 25% trap reduction | 0.31 |
+  | SPF effort-ceiling rule | 0.31 |
+  | SPF rule, +50% biased assessment | 0.41 |
+  | Catch-rate rule | 0.41 |
 
-| Check | Result | File |
-|---|---|---|
-| SIR diagnostics | ESS 86 of 48,000; 316 unique draws; max weight 4.7%; top-10 draws hold 25% of weight | `sir_diagnostics_summary.csv` |
-| Simulation self-test (100 replicates; data simulated from known truths, refitted) | 90% interval coverage 0.77–0.91; median bias −0.1% (QT), +10% (lobster), −31% (porgies), −37% (hogfish) | `self_test_summary.csv` |
-| Leave-one-benchmark-out | QT OFL predicted 28.7k (90% 14.8–76.3k) vs 22.8k: **pass**. Lobster OFL predicted 1.06M vs 164k: **fail** (lobster scale is not identifiable without its OFL; the Opitz 1980s lobster biomass prior is too high) | `validation_loo_benchmarks.csv`, `fig13` |
-| Held-out indices (placeholder series) | 90% coverage 1.0; MASE 1.2–1.8 (synthetic data, so this only demonstrates the machinery) | `validation_out_of_sample.csv`, `fig12` |
-| Global sensitivity (rank regression on prior draws) | total focus MMSY driven by pavement TTE, invertebrate-competitor biomass, pavement NPP and food-web fraction; group MMSY by its own biomass partition, then pavement TTE and P/B | `global_sensitivity.csv`, `fig11` |
-| Structural ensemble (10 variants: x_msy 0.3/0.4, TTE 0.10/0.20, no fishing feedback, no thermal effects, food-web fraction ×0.67/×1.5, satellite pelagic NPP) | between-variant CV of MMSY: lobster 0.10, QT 0.09, grunts 0.26, Parrotfish 2 0.45. Pooled lobster MMSY 178–419k (p50 280k); QT 15.2–42.3k (p50 25.7k) | `structural_ensemble_*.csv`, `fig15` |
-| Ecosystem overfishing (Link & Watson 2019) | Ryther index 0.59–0.63 t km⁻² yr⁻¹ (below the 1 t threshold); Fogarty 0.54–0.59‰ (inside the 0.22–0.92‰ caution band), 2022–2024 | `ecosystem_overfishing_indices.csv`, `fig14` |
+* **Ecosystem indices.** Ryther 0.61–0.66 t km⁻² yr⁻¹ (below 1); Fogarty 0.56–0.60‰ (caution band).
+* **Ghost fishing** removed 3–11% of landings over 1983–2024.
 
 ### Interpretation
 
-1. **The two assessed trap stocks are anchored and structurally robust.** Lobster MMSY is 1.7× its OFL and queen triggerfish 1.1×. Their MMSY changes by only about 10% across the ten structural variants. Part of the lobster gap is expected: OFL is a catch at F_MSY given the current stock, while MMSY is an equilibrium cap. The leave-one-out test shows that without its OFL the lobster scale is not identified, so SEDAR 57 inputs matter more than any other single data item.
-2. **Queen triggerfish, not lobster, is the binding constraint on lobster traps.** Lobster traps could expand about 65% (median) before a calibrated group reaches its gear-specific MMSY, and the choke in 82% of draws is queen triggerfish bycatch. Fish traps and diving are limited first by hogfish and porgies. These small, low-MMSY groups, which have the largest self-test bias (−31% to −37%, conservative), are where better survey data pays off most for trap management.
-3. **Climate is the largest projected stressor.** By 2043–2045, SSP5-8.5 cuts Parrotfish 2 MMSY by about half and queen triggerfish, hogfish and porgies by 17–19%, through their AquaMaps thermal curves. Lobster has no thermal curve yet (SeaLifeBase pending), so its insensitivity is an assumption, not a result. Under status-quo projected effort, combined stress raises queen-triggerfish P(overfishing) from 3% to 8%.
-4. **Unassessed complex scale remains prior-driven.** Grunts, Snapper 3 and Parrotfish 2 have MMSY well above their ACLs, with wide intervals and high structural sensitivity (CV 0.26–0.45). NCRMP biomass densities (data need C1) are the most direct way to narrow them.
-5. **No calibrated group is overfishing at current placeholder catch**, but the ecosystem-level Fogarty index sits in the caution band throughout 1983–2024.
+1. **Theory-based yield priors give small trap-bycatch groups much less headroom.** Per-recruit x and Pella–Tomlinson production make hogfish, porgies and queen triggerfish the binding constraints. Fish-trap and dive effort are at their multispecies ceilings.
+2. **The assessed stocks are reproduced.** Queen triggerfish matches its OFL and passes out-of-sample validation. Lobster scale depends on its OFL.
+3. **Climate is the largest projected stressor**, cutting MMSY by 16–43% under SSP5-8.5.
+4. **No-take expansion and trap reductions lower choke-group risk by about a quarter.** Open-access effort and optimistic assessments raise it substantially.
 
 ### Figures
 
@@ -119,22 +124,23 @@ All figures are in `Projects/StCroix_Trap/output/figures/`:
 
 | Figure | Content |
 |---|---|
-| `fig01` | energy budget |
-| `fig02` | group MMSY and benchmarks |
-| `fig03` | scenario stoplight (2043–2045) |
-| `fig04`, `fig05` | trajectories |
-| `fig06` | coral quality |
-| `fig07` | effort ceilings |
-| `fig08` | SIR prior vs posterior |
-| `fig09` | environmental drivers |
-| `fig10` | hurricanes |
-| `fig11` | global sensitivity (total focus MMSY, lobster, queen triggerfish) |
-| `fig12` | held-out index validation |
-| `fig13` | leave-one-benchmark-out |
-| `fig14` | ecosystem-overfishing indices |
-| `fig15` | structural ensemble |
-
-The same results are presented in `docs/presentation/CaribTTM_StCroix_Trap.pptx`. The review-readiness summary is in [Review Readiness](review_readiness.md).
+| fig01 | energy budget |
+| fig02 | group MMSY |
+| fig03 | scenario status |
+| fig04–05 | trajectories |
+| fig06 | coral quality |
+| fig07 | effort ceilings |
+| fig08 | SIR prior vs posterior |
+| fig09 | environment |
+| fig10 | hurricanes |
+| fig11 | sensitivity |
+| fig12 | held-out indices |
+| fig13 | leave-one-out |
+| fig14 | ecosystem indices |
+| fig15 | structural ensemble |
+| fig16 | catch-only comparator |
+| fig17 | value of information |
+| fig18 | MSE |
 
 ## 5. What would change the answers most
 

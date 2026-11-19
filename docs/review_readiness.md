@@ -15,7 +15,7 @@ This page anticipates the questions a Center for Independent Experts (CIE) panel
 
 | # | Likely critique | Response | Evidence | Status |
 |---|---|---|---|---|
-| 2.1 | "MMSY = x·P/B·K is a strong assumption." | The Gulland/Schaefer form is standard for data-limited stocks, with x = 0.5 under logistic production. Structural variants with x = 0.3 and 0.4 change lobster MMSY by −22% and −11% and queen triggerfish by −18% and 0%. | `structural_ensemble_by_variant.csv`, `fig15` | ✅ |
+| 2.1 | "MMSY = x·P/B·K is a strong assumption." | Replaced by MMSY = x·M·K on natural mortality, with group-specific x (0.17–0.32) and Pella–Tomlinson shape (B_MSY/K 0.29–0.38) from a per-recruit analysis of FishBase/SEDAR traits (Beddington & Cooke 1983; Zhou et al. 2012). The original form is kept as structural variant `gulland_PB`. | `data-raw/life_history/xmsy_priors.csv`; Assumptions A5–A10 | ✅ |
 | 2.2 | "Trophic transfer efficiency is unknown." | TTE is sampled (0.15 ± 20%) and tested structurally at 0.10 and 0.20. Assessed-stock MMSY changes by only 4–13% (lobster +8% and +4%, queen triggerfish −13% and +5%), because SIR re-scales the partition. Unassessed groups move more. | GSA (`fig11`); ensemble | ✅ |
 | 2.3 | "Does the energy budget conserve mass?" | Demand is partitioned as w·D·pref, so production summed over consumers equals TTE × E. Unit tests check conservation. | `tests/testthat/test-core.R` | ✅ |
 | 2.4 | "Results hinge on one structural choice." | Ten structural variants are pooled with equal weight. Between-variant CV of MMSY: lobster 0.10, queen triggerfish 0.09, grunts 0.26, Parrotfish 2 0.45. Assessed-stock conclusions are structurally robust; unassessed-complex scale is not, and is reported as such. | `structural_ensemble_pooled.csv` | ✅ |
@@ -35,24 +35,24 @@ This page anticipates the questions a Center for Independent Experts (CIE) panel
 
 | # | Likely critique | Response | Evidence | Status |
 |---|---|---|---|---|
-| 4.1 | "SIR weights are degenerate." | Plain SIR on 5,000 draws collapsed (ESS 1). The model now uses adaptive importance sampling with factorized per-group proposals, adapting only conflicted groups, and an exact deterministic-mixture correction (Owen & Zhou 2000). Final run: 48,000 draws, ESS 86, 316 unique, max weight 4.7%, top-10 weight share 25%. | `sir_diagnostics_summary.csv`, `fig08` | ✅ |
+| 4.1 | "SIR weights are degenerate." | Plain SIR on 5,000 draws collapsed (ESS 1). Adaptive factorized importance sampling uses per-group marginal corrections and the exact mixture correction (Owen & Zhou 2000). Final run: 60,000 draws, raw ESS 20. The Pareto tail was too heavy to smooth (k̂ = 2.2), so the weights were truncated (Ionides 2008): ESS 125, 307 unique draws, largest weight 1.3%. The truncation is flagged in the output. | `sir_diagnostics_summary.csv`, `fig08` | ◐ |
 | 4.2 | "Are the posteriors just the priors?" | Posterior shrinkage is reported for every sampled parameter. GSA shows each group's own partition explains most MMSY variance (SRRC ≈ 0.6), which is the parameter the data update. | `posterior_shrinkage.csv`, `global_sensitivity.csv` | ✅ |
-| 4.3 | "Can the method recover known truth?" | Simulation self-test (100 replicates; simulate data from a draw, refit): 90% coverage 0.77–0.91. Median bias is −0.1% for queen triggerfish and +10% for lobster; hogfish (−37%) and porgies (−31%) are biased low, which is conservative for choke-group limits. | `self_test_summary.csv` | ✅ |
+| 4.3 | "Can the method recover known truth?" | Simulation self-test (100 replicates; truths drawn from the prior; simulate, then refit): 90% coverage 0.79–0.93; median bias −19% to +12%; queen triggerfish 0%, lobster −6%. | `self_test_summary.csv` | ✅ |
 | 4.4 | "Everything is calibrated, so nothing is validated." | Data are split by role. All indices are `role = validate` (held out). OFLs are calibrated but tested by leave-one-benchmark-out. A retrospective peel (`retrospective_peel()`) is available. | `R/validation.R` | ✅ |
 
 ## 5. Out-of-sample validation
 
 | # | Likely critique | Response | Evidence | Status |
 |---|---|---|---|---|
-| 5.1 | "Does the model predict data it didn't see?" | Leave-one-benchmark-out: queen triggerfish OFL predicted 28.7k lb (90% 14.8–76.3k) vs 22.8k observed: **pass**. Lobster OFL predicted 1.06M vs 164k: **fail**. | `validation_loo_benchmarks.csv`, `fig13` | ◐ |
+| 5.1 | "Does the model predict data it didn't see?" | Leave-one-benchmark-out: queen triggerfish OFL predicted 16.4k lb (90% 10.3–47.9k) vs 22.8k observed: **pass**. Lobster OFL predicted 774k vs 164k: **fail**. An independent catch-only analysis gives queen triggerfish 28.4k and lobster 205k lb. | `validation_loo_benchmarks.csv`, `method_comparison_catch_only.csv`, `fig13`, `fig16` | ◐ |
 | 5.2 | "Why does lobster fail?" | Without its OFL, lobster scale comes only from the Opitz 1980s biomass prior, which is high for the modern stock. The finding is that lobster scale is identified only by assessment information. The remedy is SEDAR 57 CPUE as a *fit* index and an M prior (B1, B5). | case study §4 | ⬜ |
-| 5.3 | "Held-out index skill?" | The held-out placeholder indices give 90% coverage 1.0 and MASE 1.2–1.8 (worse than a naive forecast). Because the series are synthetic, this demonstrates the machinery only. It becomes a real test once SEDAR 57/80 and NCRMP series are entered. | `validation_out_of_sample.csv`, `fig12` | ⬜ |
+| 5.3 | "Held-out index skill?" | Held-out placeholder indices: 90% coverage 1.0, MASE 1.04–1.16. The series are synthetic, so this demonstrates the machinery only. | `validation_out_of_sample.csv`, `fig12` | ⬜ |
 
 ## 6. Sensitivity and robustness
 
 | # | Likely critique | Response | Evidence | Status |
 |---|---|---|---|---|
-| 6.1 | "Which inputs matter?" | Global sensitivity analysis (SRRC/PRCC, rank R² 0.75–0.83). Total focus MMSY is driven by pavement TTE, invertebrate-competitor biomass, pavement NPP and food-web fraction. Group MMSY is driven by its own partition, then pavement TTE and P/B. | `global_sensitivity.csv`, `fig11` | ✅ |
+| 6.1 | "Which inputs matter?" | Global sensitivity analysis (rank R² 0.76 for total focus MMSY): invertebrate-competitor biomass (negative), pavement TTE, NPP and food-web fraction, reef NPP and lobster partition. Value of information by data stream: biomass surveys 24%, NPP 18%, TTE 18%, food-web fraction 10%. Landings act through calibration, not prior variance. | `global_sensitivity.csv`, `value_of_information_*.csv`, `fig11`, `fig17` | ✅ |
 | 6.2 | "Thermal response is speculative." | AquaMaps thermal curves come from FishBase. Removing thermal effects changes queen triggerfish MMSY by +11% and lobster by 0%. Lobster has no thermal curve yet (SeaLifeBase pending), so its climate insensitivity is an assumption. | ensemble `no_thermal` | ◐ |
 | 6.3 | "Does fishing feedback on the food web matter?" | Switching it off changes trap-group MMSY by less than 0.1%. At current exploitation the top-down feedback is weak. | ensemble `no_fishing_feedback` | ✅ |
 
@@ -60,23 +60,23 @@ This page anticipates the questions a Center for Independent Experts (CIE) panel
 
 | # | Likely critique | Response | Evidence | Status |
 |---|---|---|---|---|
-| 7.1 | "Is the ecosystem overfished overall?" | Ryther index 0.59–0.63 t km⁻² yr⁻¹ (below the 1 t threshold) and Fogarty 0.54–0.59‰ (inside the 0.22–0.92‰ caution band) for 2022–2024 (Link & Watson 2019). Fogarty thresholds are confirmed; the Ryther thresholds should be checked against the primary source before citing. | `ecosystem_overfishing_indices.csv`, `fig14` | ◐ |
-| 7.2 | "Which gear is limiting, and on what?" | Lobster traps could expand about 65% (median, 90% 1.08–3.11×) before a calibrated group reaches its gear-specific MMSY; the choke is queen triggerfish in 82% of draws. Fish traps and diving are limited by hogfish and porgies. | `spf_gear_effort_ceilings.csv`, `fig07` | ◐ |
-| 7.3 | "Projections under change?" | Scenario evaluation uses the final projection years (2043–2045). By then SSP5-8.5 halves Parrotfish 2 MMSY and cuts queen triggerfish, hogfish and porgies by 17–19%. Hurricanes and SCTLD have transient effects. | `spf_scenario_reference_points.csv`, `fig03` | ◐ |
+| 7.1 | "Is the ecosystem overfished overall?" | Ryther index 0.61–0.66 t km⁻² yr⁻¹ (below the practical limit of ~1; Link & Watson 2019). Fogarty 0.56–0.60‰ (inside the 0.22–0.92‰ caution band), 2022–2024. | `ecosystem_overfishing_indices.csv`, `fig14` | ◐ |
+| 7.2 | "Which gear is limiting, and on what?" | Fish traps and diving are at their multispecies ceilings (0.95× and 0.96× current effort), choked by hogfish (54–56% of draws). Lobster traps could expand about 28% (choke: queen triggerfish, 73%). P(overfishing) at current catch: hogfish 0.35, porgies 0.16, queen triggerfish 0.16. | `spf_gear_effort_ceilings.csv`, `fig07` | ◐ |
+| 7.3 | "Projections under change? Do management rules work?" | By 2043–2045, SSP5-8.5 cuts MMSY by 16–43% (lobster −25%, Parrotfish 2 −43%). No-take expansion or a 25% trap cut lowers choke-group risk by about a quarter. Closed-loop MSE, P(any focus group < 0.5 B_MSY): status quo 0.33, SPF ceiling rule 0.31, biased SPF rule 0.41, catch-rate rule 0.41. | `spf_scenario_reference_points.csv`, `mse_performance.csv`, `fig03`, `fig18` | ◐ |
 | 7.4 | "Status labels for uncalibrated groups?" | No status is assigned to them: they are reported as *Outside focus (uncalibrated)*. | `spf_group_reference_points.csv` | ✅ |
 
 ## 8. Reproducibility
 
 | # | Likely critique | Response | Evidence | Status |
 |---|---|---|---|---|
-| 8.1 | "Can results be reproduced?" | It is an R package with unit tests (95 expectations). Parallel runs use L'Ecuyer-CMRG per-draw streams, so they are reproducible regardless of the number of cores. Seeds are stored, and parameters are regenerated from seeds for kept draws. | `tests/`, `test-robustness.R` | ✅ |
+| 8.1 | "Can results be reproduced?" | It is an R package with unit tests (124 expectations, 0 failures). Per-draw RNG streams make parallel runs reproducible. Report tables, including the technical memorandum, are generated from outputs. | `tests/`, `docs/technical_memo/build_memo.R` | ✅ |
 | 8.2 | "Data provenance?" | Every input row carries `data_status` and `reference`. API pulls are committed in `acquired/`, with source metadata. | `stcroix_input_values.md` | ✅ |
 
 ## Open items before review
 
 1. Enter SEDAR 57 lobster and SEDAR 80 queen triggerfish standardized CPUE. Use one as *fit* and keep the other *validate*, or fit both and validate on NCRMP.
 2. Enter real CCL landings and effort by gear, and the expansion factor (A1–A6).
-3. Ingest NCRMP St. Croix fish surveys. The pipeline (`ncrmp_fish` method, stratified estimator) is built and tested; NCEI downloads returned HTTP 503 throughout development.
-4. Add a lobster thermal-performance curve.
-5. Verify the Ryther thresholds against Link & Watson (2019).
-6. Re-run the main run and the ensemble, and refresh this page.
+3. Ingest NCRMP St. Croix fish and invertebrate surveys as absolute-biomass indices. The pipeline is ready; NCEI downloads currently fail.
+4. Replace the placeholder process magnitudes (G1–G9) through structured expert elicitation and fishers' knowledge.
+5. Check the remaining literature citations against their sources (see the Code Review).
+6. Raise the effective sample size: more draws, or a sequential Monte Carlo sampler.

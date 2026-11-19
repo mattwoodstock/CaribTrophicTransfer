@@ -373,7 +373,7 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   stat(s, "x M B0", "Gulland (1971) form on natural mortality; x from per-recruit theory", 7.1, 2.1, 5.4, HEX.accent2);
   bullets(s, [
     "Total production (x = 1) also feeds natural mortality and predators: an upper bound, not MSY",
-    "Per-recruit theory gives x = 0.17-0.31 for St. Croix groups; 0.5 is an upper bound (Beddington & Cooke 1983)",
+    "Per-recruit theory gives x = 0.17-0.32 and B_MSY/K = 0.29-0.38 (Pella-Tomlinson shape); 0.5 is an upper bound (Beddington & Cooke 1983)",
     "Reported: MMSY quantiles, OFL proxy (median), P* target (40th percentile), P(overfishing), B/BMSY",
   ], { x: 7.1, y: 3.6, w: 5.45, h: 3.0, fontSize: 14 });
 
@@ -643,7 +643,7 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   bullets(s, [
     `SSP5-8.5 cuts Parrotfish 2 MMSY ${fmt(100 * (1 - num(sc("Climate_SSP585", "parrotfish_2").MMSY_p50_lb) / num(sc("Baseline", "parrotfish_2").MMSY_p50_lb)))}% and queen triggerfish ${fmt(100 * (1 - num(sc("Climate_SSP585", "queen_triggerfish").MMSY_p50_lb) / num(sc("Baseline", "queen_triggerfish").MMSY_p50_lb)))}% by 2043-45`,
     `Combined stress: queen triggerfish P(overfishing) ${fmt(100 * num(sc("Baseline", "queen_triggerfish").P_overfishing))}% to ${fmt(100 * num(sc("Combined_stress", "queen_triggerfish").P_overfishing))}%`,
-    "Lobster has no thermal curve yet: its climate insensitivity is an assumption",
+    `Lobster MMSY ${fmt(100 * (1 - num(sc("Climate_SSP585", "spiny_lobster").MMSY_p50_lb) / num(sc("Baseline", "spiny_lobster").MMSY_p50_lb)))}% lower (SeaLifeBase thermal curve)`,
   ], { x: 10.05, y: 1.6, w: 2.6, h: 4.9, fontSize: 13 });
 
   // TRAJECTORIES
@@ -714,7 +714,7 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   card(s, 8.2, 1.35, 4.6, 5.3);
   stat(s, `${fmt(Math.min(...cov90), 2)}-${fmt(Math.max(...cov90), 2)}`, "self-test 90% interval coverage across 13 trap groups (100 replicates)", 8.45, 1.55, 4.1);
   stat(s, fmt(num(diagS.ESS)), `effective sample size from ${fmt(num(diagS.n_prior))} prior draws`, 8.45, 3.05, 4.1, HEX.accent2);
-  txt(s, "Left: rank-regression sensitivity of total trap-focus MMSY. Pavement TTE and NPP, competitor biomass and food-web fraction dominate. Hogfish and porgies are biased low in the self-test (about -35%), a conservative error for choke groups.", { x: 8.45, y: 4.55, w: 4.1, h: 2.0, fontSize: 12, color: "34474F" });
+  txt(s, `Left: rank-regression sensitivity of total trap-focus MMSY. Competitor biomass, pavement TTE, NPP and food-web fraction dominate. Self-test median bias ranges ${fmt(100 * Math.min(...selfT.map((r) => num(r.median_rel_error))))}% to +${fmt(100 * Math.max(...selfT.map((r) => num(r.median_rel_error))))}% across groups.`, { x: 8.45, y: 4.55, w: 4.1, h: 2.0, fontSize: 12, color: "34474F" });
 
   s = content("Out-of-sample: queen triggerfish passes, lobster needs its assessment", S2);
   figure(s, "fig13_loo_benchmarks.png", 0.5, 1.35, 7.6, 3.0, "Leave-one-benchmark-out predictions");
@@ -786,7 +786,7 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   s.addText([
     { text: "1. Fit SEDAR 57 / 80 CPUE; keep NCRMP held out for validation", options: { breakLine: true } },
     { text: "2. Load confidential landings and effort by gear (A1-A6)", options: { breakLine: true } },
-    { text: "3. Ingest NCRMP densities (pipeline ready) and add a lobster thermal curve", options: { breakLine: true } },
+    { text: "3. Ingest NCRMP fish and invertebrate biomass (pipeline ready) as absolute indices", options: { breakLine: true } },
     { text: "4. Re-run, refresh validation, hand SPF tables to the frontier team" },
   ], { placeholder: "body" });
 
