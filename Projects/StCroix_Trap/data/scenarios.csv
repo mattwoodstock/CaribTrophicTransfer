@@ -20,3 +20,8 @@ Combined_stress,cov_set,dhw,2030,2030,12,
 Combined_stress,disturbance,major_hurricane,2033,2033,1,
 Combined_stress,disturbance,major_hurricane_other_gears,2033,2033,1,
 Combined_stress,effort_mult,trap_fish;trap_lobster,2025,2045,1.3,
+MPA_expansion,closed_fraction,coral_reef,2026,2045,0.4,No-take reef area raised to 40% (from 25%)
+MPA_expansion,closed_fraction,colonized_pavement,2026,2045,0.3,No-take pavement raised to 30% (from 15%)
+Open_access_effort,effort_response,all,2025,2045,0.5,Effort follows catch rate (elasticity 0.5; Smith 1969 open-access dynamics)
+Parrotfish_harvest_plus50,effort_mult,dive,2025,2045,1.5,Dive effort (main parrotfish gear) +50%: tests herbivory-coral feedback
+Seagrass_loss_Halophila,area_trend,seagrass,2025,2045,-0.02,Native seagrass loss 2%/yr (invasive Halophila stipulacea displacement; PLACEHOLDER rate)

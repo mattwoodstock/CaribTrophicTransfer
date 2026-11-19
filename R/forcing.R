@@ -114,6 +114,14 @@ build_drivers <- function(proj, scenario = "Baseline", par = NULL) {
   drv$coral_loss <- mk(h$habitat) * 0; drv$coral_disease <- mk(h$habitat) * 0
   drv$effort_mult <- mk(if (length(gears)) gears else "none")
   drv$prod_mult <- mk(g$group); drv$imm_mult <- mk(g$group)
+  # traps lost in disturbances that keep fishing (ghost fishing), by gear
+  drv$ghost <- mk(if (length(gears)) gears else "none") * 0
+  ghost_hl <- if (is.null(proj$settings$ghost_half_life)) 1.5 else proj$settings$ghost_half_life
+  ghost_gears <- if (is.null(proj$settings$ghost_gears) || is.na(proj$settings$ghost_gears)) character(0) else
+    strsplit(proj$settings$ghost_gears, ";")[[1]]
+  # no-take fraction of each habitat
+  cf <- if ("closed_fraction" %in% names(h)) h$closed_fraction else rep(0, nrow(h))
+  drv$closed <- matrix(rep(ifelse(is.na(cf), 0, cf), each = ny), ny, nrow(h), dimnames = list(yc, h$habitat))
 
   # NPP index from covariate (relative to historical mean)
   for (i in seq_len(nrow(h))) {
@@ -147,8 +155,12 @@ build_drivers <- function(proj, scenario = "Baseline", par = NULL) {
       }
       if (!is.na(r$gear) && length(gears)) {
         gg <- if (r$gear == "all") gears else intersect(strsplit(r$gear, ";")[[1]], gears)
-        for (ge in gg) drv$effort_mult[, ge] <<- drv$effort_mult[, ge] *
-          .recovery_curve(years, t0, r$effort_loss * inten, r$effort_half_life_yr)
+        for (ge in gg) {
+          drv$effort_mult[, ge] <<- drv$effort_mult[, ge] *
+            .recovery_curve(years, t0, r$effort_loss * inten, r$effort_half_life_yr)
+          if (ge %in% ghost_gears)   # lost traps keep fishing, decaying with the ghost half-life
+            drv$ghost[, ge] <<- 1 - (1 - drv$ghost[, ge]) * .recovery_curve(years, t0, r$effort_loss * inten, ghost_hl)
+        }
       }
       if (!is.na(r$group)) {
         gr <- if (r$group == "all") g$group else intersect(strsplit(r$group, ";")[[1]], g$group)
@@ -188,6 +200,8 @@ build_drivers <- function(proj, scenario = "Baseline", par = NULL) {
         drv$area_mult[yy, tgt_h] <- drv$area_mult[yy, tgt_h] * pmax(0, (1 + r$value)^k)
       },
       area_mult = { drv$area_mult[yy, tgt_h] <- drv$area_mult[yy, tgt_h] * r$value },
+      closed_fraction = { drv$closed[yy, tgt_h] <- pmin(1, pmax(0, r$value)) },
+      effort_response = { drv$effort_response <- r$value },
       tte_mult = { drv$tte_mult[yy, tgt_h] <- drv$tte_mult[yy, tgt_h] * r$value },
       coral_disease = { drv$coral_disease[yy, tgt_h] <- drv$coral_disease[yy, tgt_h] + r$value },
       immigration_mult = {

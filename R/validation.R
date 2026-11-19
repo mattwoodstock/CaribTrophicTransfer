@@ -47,9 +47,24 @@
     Bs <- if (length(grp) > 1) {
       a <- B[, as.character(x$year), grp, drop = FALSE]; apply(a, c(1, 2), sum)
     } else matrix(B[, as.character(x$year), grp], nrow = dim(B)[1])
-    lr <- sweep(-log(pmax(Bs, 1e-12)), 2, log(x$value), "+")
-    lq <- as.vector(lr %*% wv) / sum(wv)
-    nll[, nm] <- sum(log(sig)) + 0.5 * rowSums(sweep((lr - lq)^2, 2, wv, "*"))
+    # observation model: I_t = q (1 + creep)^(t - t0) B_t^beta  (hyperstability beta < 1;
+    # catchability creep for fishery-dependent CPUE; Harley et al. 2001, Maunder & Punt 2004)
+    beta <- if ("hyperstability" %in% names(x) && is.finite(x$hyperstability[1])) x$hyperstability[1] else 1
+    creep <- if ("creep" %in% names(x) && is.finite(x$creep[1])) x$creep[1] else 0
+    lcreep <- log(1 + creep) * (x$year - min(x$year))
+    lr <- sweep(-beta * log(pmax(Bs, 1e-12)), 2, log(x$value) - lcreep, "+")
+    absolute <- "type" %in% names(x) && identical(tolower(x$type[1]), "absolute")
+    if (absolute) {
+      # absolute biomass index (t): q is detectability / availability with a lognormal prior
+      q0 <- if ("q_prior" %in% names(x) && is.finite(x$q_prior[1])) x$q_prior[1] else 1
+      sq <- sqrt(log(1 + (if ("q_cv" %in% names(x) && is.finite(x$q_cv[1])) x$q_cv[1] else 0.5)^2))
+      wq <- 1 / sq^2
+      lq <- (as.vector(lr %*% wv) + wq * log(q0)) / (sum(wv) + wq)
+      nll[, nm] <- sum(log(sig)) + 0.5 * rowSums(sweep((lr - lq)^2, 2, wv, "*")) + 0.5 * wq * (lq - log(q0))^2
+    } else {
+      lq <- as.vector(lr %*% wv) / sum(wv)
+      nll[, nm] <- sum(log(sig)) + 0.5 * rowSums(sweep((lr - lq)^2, 2, wv, "*"))
+    }
   }
   nll
 }
@@ -123,10 +138,14 @@ validate_out_of_sample <- function(res, idx_fit = .fit_indices(res$proj), idx_va
       a <- s1$B[draw, as.character(yrs), grp, drop = FALSE]
       matrix(apply(a, c(1, 2), sum), nrow = length(draw))
     }
-    Bv <- Bsum(v$year)
+    beta <- if ("hyperstability" %in% names(v) && is.finite(v$hyperstability[1])) v$hyperstability[1] else 1
+    creep <- if ("creep" %in% names(v) && is.finite(v$creep[1])) v$creep[1] else 0
+    y0 <- min(c(v$year, if (!is.null(f)) f$year))
+    cf <- function(yrs) (1 + creep)^(yrs - y0)
+    Bv <- sweep(Bsum(v$year)^beta, 2, cf(v$year), "*")
     sig_v <- sqrt(log(1 + pmax(v$cv, st$index_min_cv)^2))
     if (!is.null(f) && nrow(f) >= 2) {
-      Bf <- Bsum(f$year); sig_f <- sqrt(log(1 + pmax(f$cv, st$index_min_cv)^2))
+      Bf <- sweep(Bsum(f$year)^beta, 2, cf(f$year), "*"); sig_f <- sqrt(log(1 + pmax(f$cv, st$index_min_cv)^2))
       lq <- as.vector(sweep(-log(Bf), 2, log(f$value), "+") %*% (1 / sig_f^2)) / sum(1 / sig_f^2)
       pred <- exp(lq) * Bv * exp(matrix(stats::rnorm(length(Bv), 0, rep(sig_v, each = nrow(Bv))), nrow = nrow(Bv)))
       naive <- rep(utils::tail(f$value[order(f$year)], 1), nrow(v))

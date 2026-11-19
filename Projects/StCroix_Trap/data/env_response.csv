@@ -16,3 +16,17 @@ squirrelfishes,sst,thermal_performance,production,,,0,27.262,2.11,,derived: Fish
 surgeonfishes,sst,thermal_performance,production,,,0,27.22,1.96,,derived: FishBase/AquaMaps temperature preference,AquaMaps (via FishBase v24.07) TempPref min/mean/max = 24.1/27.2/28.1 degC; width = (max-min)/2
 wrasses_hogfish,sst,thermal_performance,production,,,0,26.8,2.16,,derived: FishBase/AquaMaps temperature preference,AquaMaps (via FishBase v24.07) TempPref min/mean/max = 23.7/26.8/28.0 degC; width = (max-min)/2
 yellowtail_snapper,sst,thermal_performance,production,,,0,25.9,3.1,,derived: FishBase/AquaMaps temperature preference,AquaMaps (via FishBase v24.07) TempPref min/mean/max = 21.7/25.9/27.9 degC; width = (max-min)/2
+squirrelfishes,lionfish,loglinear,K,0,-0.1,1.0,,,,PLACEHOLDER magnitude,Lionfish predation on small reef fish and recruits (Albins & Hixon 2008; Green et al. 2012); 10% K reduction at full invasion
+goatfishes,lionfish,loglinear,K,0,-0.1,1.0,,,,PLACEHOLDER magnitude,Lionfish predation on small reef fish and recruits (Albins & Hixon 2008; Green et al. 2012); 10% K reduction at full invasion
+wrasses_hogfish,lionfish,loglinear,K,0,-0.1,1.0,,,,PLACEHOLDER magnitude,Lionfish predation on small reef fish and recruits (Albins & Hixon 2008; Green et al. 2012); 10% K reduction at full invasion
+grunts,lionfish,loglinear,K,0,-0.1,1.0,,,,PLACEHOLDER magnitude,Lionfish predation on small reef fish and recruits (Albins & Hixon 2008; Green et al. 2012); 10% K reduction at full invasion
+parrotfish_2,lionfish,loglinear,K,0,-0.1,1.0,,,,PLACEHOLDER magnitude,Lionfish predation on small reef fish and recruits (Albins & Hixon 2008; Green et al. 2012); 10% K reduction at full invasion
+angelfishes,lionfish,loglinear,K,0,-0.1,1.0,,,,PLACEHOLDER magnitude,Lionfish predation on small reef fish and recruits (Albins & Hixon 2008; Green et al. 2012); 10% K reduction at full invasion
+groupers_shallow,lionfish,loglinear,K,0,-0.05,1.0,,,,PLACEHOLDER magnitude,Lionfish competition with native mesopredators (Albins 2013)
+snappers_shallow,lionfish,loglinear,K,0,-0.05,1.0,,,,PLACEHOLDER magnitude,Lionfish competition with native mesopredators (Albins 2013)
+grunts,sargassum,loglinear,K,0,-0.03,1.0,,,,PLACEHOLDER magnitude,Sargassum inundation degrades nearshore seagrass/mangrove nurseries (van Tussenbroek et al. 2017); per unit of relative AFAI index
+snappers_shallow,sargassum,loglinear,K,0,-0.03,1.0,,,,PLACEHOLDER magnitude,Sargassum inundation degrades nearshore seagrass/mangrove nurseries (van Tussenbroek et al. 2017); per unit of relative AFAI index
+queen_conch,sargassum,loglinear,K,0,-0.03,1.0,,,,PLACEHOLDER magnitude,Sargassum inundation degrades nearshore seagrass/mangrove nurseries (van Tussenbroek et al. 2017); per unit of relative AFAI index
+parrotfish_1,sargassum,loglinear,K,0,-0.03,1.0,,,,PLACEHOLDER magnitude,Sargassum inundation degrades nearshore seagrass/mangrove nurseries (van Tussenbroek et al. 2017); per unit of relative AFAI index
+spiny_lobster,sargassum,loglinear,K,0,-0.03,1.0,,,,PLACEHOLDER magnitude,Sargassum inundation degrades nearshore seagrass/mangrove nurseries (van Tussenbroek et al. 2017); per unit of relative AFAI index
+pelagics,sargassum,loglinear,K,0,0.03,1.0,,,,PLACEHOLDER magnitude,Pelagic Sargassum is habitat for dolphinfish and juveniles of other pelagics (Casazza & Ross 2008)

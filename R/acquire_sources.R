@@ -337,3 +337,51 @@ light_limited_npp <- function(depths, npp_ref, kd490, par0, ik = 4, z_ref = 10,
        q = stats::quantile(sims, c(0.05, 0.5, 0.95)),
        depth_summary = stats::quantile(depths, c(0.05, 0.25, 0.5, 0.75, 0.95)))
 }
+
+# ---- Pelagic Sargassum (USF Alternative Floating Algae Index) -----------------
+
+#' Annual pelagic Sargassum index from the USF AFAI product
+#'
+#' Queries one 7-day cumulative AFAI composite per month (NOAA AOML ERDDAP,
+#' Hu et al. 2015; available from mid-2016) and computes, for each composite,
+#' the fraction of valid (cloud-free, non-land) pixels whose AFAI exceeds
+#' `threshold` (floating-algae pixels; Wang & Hu 2016 use a comparable
+#' background-corrected AFAI threshold). The annual index is the mean monthly
+#' fraction; its SD is the among-month SD divided by sqrt(months).
+#' Shallow-shelf pixels can be biased by bottom reflectance, so the default
+#' domain is an offshore box around the shelf.
+#' @param bbox bounding box (lon_min, lat_min, lon_max, lat_max)
+#' @param years years to retrieve (years before the product starts are skipped)
+#' @param threshold AFAI value treated as floating algae (reflectance units)
+#' @param stride spatial stride (grid cells; native 0.015 deg)
+#' @param day day of month of the composite used for each month
+#' @param server ERDDAP server; @param dataset_id dataset
+#' @param verbose print progress
+#' @return data frame year, value (fraction of pixels), sd, n_months
+#' @export
+fetch_afai_index <- function(bbox, years, threshold = 5e-4, stride = 3, day = 15,
+                             server = "https://cwcgom.aoml.noaa.gov/erddap",
+                             dataset_id = "noaa_aoml_atlantic_oceanwatch_AFAI_7D", verbose = TRUE) {
+  m <- erddap_meta(server, dataset_id)
+  out <- list()
+  for (yr in sort(unique(years))) {
+    fr <- c()
+    for (mo in 1:12) {
+      d <- as.Date(sprintf("%d-%02d-%02d", yr, mo, day))
+      if (d < m$coverage[1] || d > m$coverage[2]) next
+      url <- erddap_griddap_url(server, dataset_id, "AFAI", rep(paste0(d, "T12:00:00Z"), 2), bbox, NULL,
+                                c(time = 1, lat = stride, lon = stride), m$lat_descending)
+      f <- tryCatch(.http_get(url), error = function(e) NULL)
+      if (is.null(f)) next
+      g <- parse_erddap_csv(f, "AFAI"); unlink(f)
+      v <- g$value[is.finite(g$value)]
+      if (length(v) >= 50) fr <- c(fr, mean(v > threshold))
+    }
+    if (verbose) message("  AFAI ", yr, ": ", length(fr), " months")
+    if (length(fr) >= 3)
+      out[[length(out) + 1]] <- data.frame(year = yr, value = mean(fr), sd = stats::sd(fr) / sqrt(length(fr)),
+                                           n_months = length(fr))
+  }
+  if (!length(out)) return(data.frame(year = integer(), value = numeric(), sd = numeric(), n_months = integer()))
+  do.call(rbind, out)
+}

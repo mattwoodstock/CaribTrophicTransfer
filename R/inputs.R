@@ -77,7 +77,17 @@ ttm_default_settings <- function() {
     domain_lon_min        = NA,     # domain bounding box used by data acquisition
     domain_lon_max        = NA,
     domain_lat_min        = NA,
-    domain_lat_max        = NA
+    domain_lat_max        = NA,
+    effort_creep          = 0,      # annual catchability increase applied to fishery-dependent (CPUE) indices
+    effort_response       = 0,      # elasticity of projected effort to catch rate (0 = effort set by scenario only)
+    ghost_efficiency      = 0,      # catch rate of a lost (ghost) trap relative to an active trap
+    ghost_efficiency_cv   = 0.5,
+    ghost_half_life       = 1.5,    # years for half of lost traps to stop fishing
+    ghost_gears           = NA,     # ;-separated trap gears that ghost-fish when lost
+    herbivore_groups      = NA,     # ;-separated grazers whose biomass controls coral recovery
+    herbivory_elasticity  = 0,      # gamma in coral growth x (grazing / reference)^gamma (projections)
+    herbivory_elasticity_cv = 0.5,
+    psis                  = TRUE    # Pareto-smoothed importance weights (Vehtari et al. 2024)
   )
 }
 
@@ -172,7 +182,7 @@ validate_ttm_project <- function(proj) {
                   c("food_web_fraction_cv", 0), c("tte", 0.10), c("tte_cv", 0.25),
                   c("quality_covariate", NA), c("quality_ref", 1),
                   c("quality_model", "none"), c("p1_quality_elasticity", 0),
-                  c("npp_covariate", NA), c("init_quality", 1)))
+                  c("npp_covariate", NA), c("init_quality", 1), c("closed_fraction", 0)))
     h <- .fill_col(h, cc[1], if (is.na(cc[2])) NA else
       if (!is.na(suppressWarnings(as.numeric(cc[2])))) as.numeric(cc[2]) else cc[2])
   h$npp_t_C_km2_yr <- convert_productivity(h$npp_value, h$npp_unit)
@@ -192,7 +202,9 @@ validate_ttm_project <- function(proj) {
                    partition_cv = 0.3, B0_fixed_t = NA, B0_fixed_cv = 0.3,
                    init_depletion = 0.6, init_depletion_cv = 0.2, refuge_dependence = 0,
                    immigration_t = 0, immigration_cv = 0, process_sd = 0.1, energy_density_kJ_g = 5,
-                   harvest_allowed = TRUE, trap_relevant = FALSE, data_tier = 3)
+                   harvest_allowed = TRUE, trap_relevant = FALSE, data_tier = 3,
+                   m_nat = NA, m_nat_cv = 0.25, open_recruitment = 0, open_recruitment_cv = 0.25,
+                   recruit_covariate = NA, nursery_habitat = NA, nursery_dependence = 0)
   for (nm in names(defaults)) g <- .fill_col(g, nm, defaults[[nm]])
   g$harvest_allowed <- as.logical(g$harvest_allowed)
   g$trap_relevant <- as.logical(g$trap_relevant)
@@ -268,7 +280,16 @@ validate_ttm_project <- function(proj) {
     for (nm in names(defs)) dd <- .fill_col(dd, nm, defs[[nm]])
     proj$disturbances <- dd
   }
-  if (!is.null(proj$indices)) proj$indices <- .fill_col(proj$indices, "cv", st$index_min_cv)
+  if (!is.null(proj$indices)) {
+    ix <- .fill_col(proj$indices, "cv", st$index_min_cv)
+    ix <- .fill_col(ix, "type", "relative")
+    ix <- .fill_col(ix, "hyperstability", 1)
+    ix <- .fill_col(ix, "creep", if (is.null(st$effort_creep)) 0 else st$effort_creep)
+    if (!"fishery_dependent" %in% names(ix)) ix$fishery_dependent <- grepl("CPUE", ix$index, ignore.case = TRUE)
+    ix$creep[!as.logical(ix$fishery_dependent)] <- 0
+    ix <- .fill_col(ix, "q_prior", 1); ix <- .fill_col(ix, "q_cv", 0.5)
+    proj$indices <- ix
+  }
 
   years <- seq(st$hist_start, st$proj_end)
   proj$years <- years

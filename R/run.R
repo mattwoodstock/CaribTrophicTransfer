@@ -329,14 +329,16 @@ apply_sir <- function(res, n_resample = length(res$draws)) {
   tot <- rowSums(nll_all)
   if (!is.null(res$stage1$log_is_correction)) tot <- tot - res$stage1$log_is_correction
   lw <- -(tot - min(tot))
-  wts <- exp(lw); wts <- wts / sum(wts)
+  k_hat <- NA_real_; ess_raw <- { w0 <- exp(lw); w0 <- w0 / sum(w0); 1 / sum(w0^2) }
+  if (!isFALSE(res$proj$settings$psis)) {
+    ps <- psis_smooth(lw); lw <- ps$lw; k_hat <- ps$k
+  }
+  wts <- exp(lw - max(lw)); wts <- wts / sum(wts)
   ess <- 1 / sum(wts^2)
   set.seed(res$proj$settings$seed + 1)
   pick <- sample(seq_along(wts), n_resample, replace = TRUE, prob = wts)
-  res$sir <- list(nll = nll_all, weights = wts, ess = ess, resampled = pick,
-                  n_unique = length(unique(pick)))
-  ws <- sort(wts, decreasing = TRUE); m <- max(5, floor(0.2 * length(ws)))
-  res$sir$pareto_k_hat <- mean(log(ws[seq_len(m - 1)]) - log(ws[m]))
+  res$sir <- list(nll = nll_all, weights = wts, ess = ess, ess_raw = ess_raw, resampled = pick,
+                  n_unique = length(unique(pick)), pareto_k_hat = k_hat)
   res$draws <- pick
   res$weights <- rep(1 / n_resample, n_resample)
   if (ess < 20) warning(sprintf("SIR effective sample size is low (%.1f); increase n_draws or review priors/CVs", ess))

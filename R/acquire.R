@@ -492,7 +492,7 @@ hurricane_disturbances <- function(tracks, bbox, years, template, radius_km = 20
 #' `data_sources.csv` columns: `target`, `method`, `enabled`, and method
 #' arguments in `args` as `key=value` pairs separated by `;`.
 #' Supported methods: `erddap`, `npp_ensemble`, `vgpm_ensemble`, `cmip6_delta`,
-#' `deep_shelf_light`, `ncrmp_fish`, `opendap`, `copernicus`, `nccos_habitat`,
+#' `deep_shelf_light`, `sargassum_afai`, `ncrmp_fish`, `opendap`, `copernicus`, `nccos_habitat`,
 #' `hurdat2`.
 #' @param project_dir project directory
 #' @param only optional subset of targets
@@ -541,6 +541,26 @@ acquire_project_data <- function(project_dir, only = NULL, verbose = TRUE) {
                               units = .pick(a$units, cc$units_out, ""),
                               source = paste("ERDDAP", .pick(a$dataset_id, cc$dataset_id)),
                               data_status = "API"))
+      },
+      sargassum_afai = {
+        x <- fetch_afai_index(bbox, yrs, threshold = as.numeric(.pick(a$threshold, 5e-4)),
+                              stride = as.integer(.pick(a$stride_space, 3)), verbose = verbose)
+        if (!nrow(x)) stop("No AFAI composites retrieved")
+        mu <- mean(x$value)
+        cv <- data.frame(year = x$year, variable = r$target, value = x$value / mu, sd = pmax(x$sd / mu, 0.05),
+                         units = "relative (fraction of AFAI-positive pixels / product-period mean)",
+                         source = "ERDDAP noaa_aoml_atlantic_oceanwatch_AFAI_7D (USF AFAI)", data_status = "API")
+        # before the product: no basin-scale blooms before 2011 (Gower et al. 2013; Wang et al. 2019);
+        # 2011-2015 from the relative belt magnitudes of Wang et al. (2019), flagged as placeholders
+        rel <- c(`2011` = 0.6, `2012` = 0.3, `2013` = 0.1, `2014` = 0.6, `2015` = 0.9)
+        pre <- setdiff(yrs[yrs < min(x$year)], x$year)
+        if (length(pre)) {
+          v <- ifelse(pre < 2011, 0, rel[as.character(pre)]); v[is.na(v)] <- 0
+          cv <- rbind(data.frame(year = pre, variable = r$target, value = v, sd = ifelse(pre < 2011, 0.02, pmax(0.3, v)),
+                                 units = cv$units[1], source = "Wang et al. 2019 relative belt magnitude (pre-AFAI)",
+                                 data_status = ifelse(pre < 2011, "literature: no basin-scale blooms before 2011", "PLACEHOLDER")), cv)
+        }
+        list(cov = cv)
       },
       npp_ensemble = {
         keys <- if (!is.null(a$keys)) strsplit(a$keys, "\\|")[[1]] else c("modis_vgpm_npp", "viirs_snpp_npp", "viirs_noaa20_npp")

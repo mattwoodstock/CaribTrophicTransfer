@@ -15,3 +15,4 @@
 "2026-11-18 17:51:18 UTC","deep_shelf","deep_shelf_light","depth_range=30","FAILED"
 "2026-11-18 17:51:24 UTC","deep_shelf","deep_shelf_light","depth_range=30","FAILED"
 "2026-11-18 17:51:36 UTC","deep_shelf","deep_shelf_light","depth_min=30;depth_max=100;npp_ref=793;z_ref=10;ik=4;area_cv=0.3;habitat=deep_hardbottom","ok"
+"2026-11-19 20:07:42 UTC","sargassum","sargassum_afai","bbox=-65.4;17.3;-64.0;18.3;threshold=0.0005;stride_space=3","ok"

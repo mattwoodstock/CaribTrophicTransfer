@@ -45,3 +45,13 @@ fogarty_high,0.92,
 sir_adaptive_rounds,3,Adaptive importance-sampling rounds (proposal refit on partition priors; exact mixture correction)
 sir_feasibility_groups,trap,Calibration focuses on the trap fishery: only trap-relevant groups (and assessed stocks) constrain the posterior
 cores,4,Parallel cores for Stage-1 draws
+effort_creep,0.02,Annual catchability creep applied to fishery-dependent CPUE indices (~2%/yr; Palomares & Pauly 2019)
+effort_response,0,Elasticity of projected effort to catch rate; 0 = scenario-driven effort (see Open_access_effort scenario)
+ghost_efficiency,0.2,"Catch rate of a lost trap relative to an active one (PLACEHOLDER; USVI derelict-trap studies, Renchen et al. 2014)"
+ghost_efficiency_cv,0.5,
+ghost_half_life,1.5,Years for half of lost traps to stop fishing (PLACEHOLDER)
+ghost_gears,trap_fish;trap_lobster,Gears whose lost traps keep fishing
+herbivore_groups,parrotfish_1;parrotfish_2;surgeonfishes,Grazers controlling coral recovery (Mumby et al. 2006)
+herbivory_elasticity,1,Coral growth x (grazing/reference)^gamma in projections (PLACEHOLDER magnitude)
+herbivory_elasticity_cv,0.5,
+psis,TRUE,Pareto-smoothed importance weights

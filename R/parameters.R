@@ -112,6 +112,14 @@ draw_parameters <- function(proj, stochastic = TRUE) {
   par$immigration <- setNames(rlnorm_cv(ng, g$immigration_t, cv0(g$immigration_cv)), g$group)
   par$coral_growth <- rlnorm_cv(1, st$coral_growth, cv0(st$coral_growth_cv))
   par$dist_loss_mult <- rlnorm_cv(1, 1, cv0(if (is.null(st$disturbance_loss_cv)) 0 else st$disturbance_loss_cv))
+  # natural mortality (K and MMSY basis), open recruitment, feedback parameters
+  mn <- ifelse(is.na(g$m_nat), NA, rlnorm_cv(ng, ifelse(is.na(g$m_nat), 1, g$m_nat), cv0(g$m_nat_cv)))
+  par$m_nat <- setNames(ifelse(is.na(mn), par$pb, mn), g$group)
+  par$open_rec <- setNames(ifelse(g$open_recruitment > 0,
+                                  if (stochastic) rbeta_cv(ng, pmax(g$open_recruitment, 1e-3), g$open_recruitment_cv)
+                                  else g$open_recruitment, 0), g$group)
+  par$ghost_eff <- rlnorm_cv(1, st$ghost_efficiency, cv0(st$ghost_efficiency_cv))
+  par$herbivory_elasticity <- rlnorm_cv(1, st$herbivory_elasticity, cv0(st$herbivory_elasticity_cv))
   par$process_dev_seed <- if (stochastic) sample.int(.Machine$integer.max, 1) else NA
   par$stochastic <- stochastic
   par

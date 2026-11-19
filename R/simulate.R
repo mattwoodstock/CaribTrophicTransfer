@@ -9,11 +9,17 @@
 #                         (R = last-year catch removed from the TL it was produced at)
 #   4. Partitioning       share_i,h,k = w_i D_i,k pref_i,h / sum_j(w_j D_j,k pref_j,h)
 #                         P_i = sum_h,k TTE_h * share_i,h,k * E_h,k
-#   5. Carrying capacity  K_i = P_i * env_i / (P/B)_i * Qbar_i^refuge_i
-#   6. Reference point    MMSY_i = x_i * (P/B)_i * K_i     (x = 0.5 -> Schaefer/Gulland)
-#   7. Biomass dynamics   dB/dt = r_i B (1 - B/K_i) - C_i + I_i,  r_i = 4 x_i (P/B)_i
-#                         integrated with `substeps` exact logistic sub-steps (stable for
-#                         any r) with catch removed after each sub-step + lognormal process error
+#   5. Carrying capacity  K_i = P_i * env_i / M_i * Qbar_i^refuge_i * N_i^nu_i
+#                         (M = natural mortality, default P/B; N = nursery-habitat index)
+#   6. Reference point    MMSY_i = x_i * M_i * K_i   (Gulland 1971: x = 0.5; group x from
+#                         per-recruit theory, see life_history_xmsy())
+#   7. Biomass dynamics   dB/dt = (1-phi) r B (1 - B/K) + phi 2xM (K s_t - B) - C - G + I
+#                         r = 4 x M; phi = open-recruitment fraction with supply index s_t;
+#                         G = unaccounted ghost-trap mortality after trap losses.
+#                         Exact logistic + exact linear sub-steps (`substeps`), catch removed
+#                         after each sub-step, from the fishable (non-MPA) fraction only.
+#   8. Feedbacks          coral recovery scales with herbivore grazing (B/K0)^gamma
+#                         (Mumby et al. 2006); projected effort can respond to catch rates.
 # ==============================================================================
 
 .tl_weights <- function(tl) {
@@ -79,9 +85,12 @@
 #' @param drv drivers from [build_drivers()]
 #' @param q optional catchability matrix (gear x group); if NULL it is
 #'   estimated from the historical period.
+#' @param mp optional management procedure for closed-loop simulation: a
+#'   function `mp(year, state)` called at the start of every projection year
+#'   that returns an effort multiplier per gear (see [run_mse()]).
 #' @return list of year x group (and year x habitat / year x gear x group) matrices.
 #' @export
-simulate_ttm <- function(proj, par, drv, q = NULL) {
+simulate_ttm <- function(proj, par, drv, q = NULL, mp = NULL) {
   st <- proj$settings; h <- proj$habitats; g <- proj$groups
   years <- proj$years; yc <- as.character(years); ny <- length(years)
   hist_end <- st$hist_end
@@ -93,7 +102,11 @@ simulate_ttm <- function(proj, par, drv, q = NULL) {
   tl <- group_trophic_level(D); names(tl) <- gn
   WTL <- .tl_weights(tl)
   bfrac <- rowSums(D[, 1:4, drop = FALSE])
-  pb <- par$pb; x <- par$x_msy; r <- 4 * x * pb
+  pb <- par$pb; x <- par$x_msy
+  mnat <- if (is.null(par$m_nat)) pb else par$m_nat
+  r <- 4 * x * mnat
+  phi <- if (is.null(par$open_rec)) rep(0, ng) else par$open_rec
+  mu_open <- 2 * x * mnat
   gears <- proj$gear_names; nge <- length(gears)
   S <- max(1, st$substeps)
   env <- env_multipliers(proj, drv, par)
@@ -128,6 +141,31 @@ simulate_ttm <- function(proj, par, drv, q = NULL) {
   qy <- utils::tail(hy, st$q_years)
   Eref <- colMeans(Eff[as.character(qy), , drop = FALSE])
   if (nge) for (t in which(years > hist_end)) Eff[t, ] <- Eref * drv$effort_mult[t, gears]
+  eff_resp <- if (!is.null(drv$effort_response)) drv$effort_response else
+    if (is.null(st$effort_response)) 0 else st$effort_response
+  dyn <- setNames(rep(1, max(1, nge)), colnames(Eff))
+  # no-take (MPA) fraction by habitat and the fishable fraction of each group
+  closed <- if (!is.null(drv$closed)) drv$closed else
+    matrix(rep(h$closed_fraction, each = ny), ny, nrow(h), dimnames = list(yc, h$habitat))
+  # nursery habitats
+  nurs <- lapply(seq_len(ng), function(i) {
+    v <- g$nursery_habitat[i]
+    if (is.na(v) || v == "" || g$nursery_dependence[i] <= 0) integer(0) else match(intersect(strsplit(v, ";")[[1]], h$habitat), h$habitat)
+  })
+  nurs_ref <- rep(NA_real_, ng)
+  # recruitment supply index for open populations
+  supply <- matrix(1, ny, ng, dimnames = list(yc, gn))
+  for (i in which(phi > 0 & !is.na(g$recruit_covariate))) {
+    v <- g$recruit_covariate[i]
+    if (v %in% colnames(drv$cov)) { z <- drv$cov[, v]; supply[, i] <- pmax(0, z / mean(z[years <= hist_end])) }
+  }
+  # herbivory - coral feedback
+  herb <- if (is.null(st$herbivore_groups) || is.na(st$herbivore_groups)) integer(0) else
+    match(intersect(strsplit(st$herbivore_groups, ";")[[1]], gn), gn)
+  gam_h <- if (is.null(par$herbivory_elasticity)) 0 else par$herbivory_elasticity
+  graze <- rep(NA_real_, ny); graze_ref <- NA_real_
+  ghost_eff <- if (is.null(par$ghost_eff)) 0 else par$ghost_eff
+  Fgear_prev <- NULL
 
   # ---- containers ----------------------------------------------------------
   mat <- function() matrix(NA_real_, ny, ng, dimnames = list(yc, gn))
@@ -136,7 +174,8 @@ simulate_ttm <- function(proj, par, drv, q = NULL) {
   out$Cg <- array(0, dim(Chist), dimnames = dimnames(Chist))
   out$P1 <- matrix(NA_real_, ny, nrow(h), dimnames = list(yc, h$habitat))
   out$Q <- out$P1
-  out$TL <- tl; out$bfrac <- bfrac; out$Eff <- Eff
+  out$TL <- tl; out$bfrac <- bfrac
+  out$fopen <- mat(); out$ghost <- mat(); out$nursery <- mat()
 
   # ---- habitat quality state ----------------------------------------------
   Qstate <- h$init_quality
@@ -153,7 +192,7 @@ simulate_ttm <- function(proj, par, drv, q = NULL) {
   fixed <- which(g$partition_method == "fixed_biomass")
   Rzero_b <- matrix(0, length(bi), 4); Rzero_p <- matrix(0, length(pi_), 4)
 
-  B <- NULL; Cprev <- rep(0, ng)
+  B <- NULL; Cprev <- rep(0, ng); fopen_ref <- NULL; cpue_ref <- NULL
   hist_target <- hist_taken <- max_short <- setNames(numeric(ng), gn)
   for (t in seq_len(ny)) {
     yr <- years[t]
@@ -169,6 +208,8 @@ simulate_ttm <- function(proj, par, drv, q = NULL) {
           dhw <- if (dhw_var %in% colnames(cov)) cov[t, dhw_var] else 0
           bleach <- min(0.95, par$bleach_mort_per_dhw * max(0, dhw - st$bleach_dhw_threshold))
           cg <- if (is.null(par$coral_growth)) st$coral_growth else par$coral_growth
+          if (gam_h > 0 && yr > hist_end && is.finite(graze_ref) && t > 1 && is.finite(graze[t - 1]))
+            cg <- cg * min(2, (graze[t - 1] / graze_ref)^gam_h)
           cc <- cc + cg * cc * (1 - cc / st$coral_max_cover)
           cc <- cc * (1 - bleach) * (1 - min(0.95, drv$coral_disease[t, j])) *
                 (1 - drv$coral_loss[t, j])
@@ -201,7 +242,7 @@ simulate_ttm <- function(proj, par, drv, q = NULL) {
     envP <- env$production[t, ] * drv$prod_mult[t, ]
     #    calibrate fixed-biomass weights once so that K0 (first year) = B0_fixed
     if (t == 1 && length(fixed)) {
-      kmult <- envP / pb * hab_k * env$K[t, ]
+      kmult <- envP / mnat * hab_k * env$K[t, ]
       for (it in 1:100) {
         Pc <- .group_production(Eb0, Ep0, tte[bi], tte_p, w, D, HP)
         ratio <- par$B0_fixed[fixed] / pmax(Pc[fixed] * kmult[fixed], 1e-12)
@@ -213,23 +254,48 @@ simulate_ttm <- function(proj, par, drv, q = NULL) {
     P  <- .group_production(Eb, Ep, tte[bi], tte_p, w, D, HP)
     P0 <- .group_production(Eb0, Ep0, tte[bi], tte_p, w, D, HP)
     # 5. capacity
-    K  <- pmax(P * envP / pb * hab_k * env$K[t, ], 1e-9)
-    K0 <- pmax(P0 * envP / pb * hab_k * env$K[t, ], 1e-9)
+    # nursery-habitat index (area x quality of nursery habitats, relative to the first year)
+    nmult <- rep(1, ng)
+    for (i in which(lengths(nurs) > 0)) {
+      ni <- sum(area[nurs[[i]]] * Q[nurs[[i]]])
+      if (is.na(nurs_ref[i])) nurs_ref[i] <- ni
+      nmult[i] <- (ni / max(nurs_ref[i], 1e-12))^g$nursery_dependence[i]
+    }
+    out$nursery[t, ] <- nmult
+    K  <- pmax(P * envP / mnat * hab_k * env$K[t, ] * nmult, 1e-9)
+    K0 <- pmax(P0 * envP / mnat * hab_k * env$K[t, ] * nmult, 1e-9)
     out$P[t, ] <- P * envP; out$P0[t, ] <- P0 * envP
     out$K[t, ] <- K; out$K0[t, ] <- K0
-    out$MMSY[t, ] <- x * pb * K; out$MMSY0[t, ] <- x * pb * K0
+    out$MMSY[t, ] <- x * mnat * K; out$MMSY0[t, ] <- x * mnat * K0
     if (t == 1) B <- par$init_depletion * K0
     # 6. catch + biomass dynamics
     imm <- (if (is.null(par$immigration)) g$immigration_t else par$immigration) * drv$imm_mult[t, ]
     Bstart <- B
+    fopen <- 1 - ifelse(bfrac > 0, bfrac * as.vector(use %*% closed[t, bi]), 0)
+    out$fopen[t, ] <- fopen
+    sup <- supply[t, ] * nmult
+    # ghost fishing by traps lost in disturbances (unaccounted mortality, not landings)
+    Fghost <- rep(0, ng)
+    if (ghost_eff > 0 && !is.null(drv$ghost) && !is.null(Fgear_prev)) {
+      for (ge in intersect(colnames(drv$ghost), rownames(Fgear_prev))) {
+        L <- drv$ghost[t, ge]
+        if (L > 0) Fghost <- Fghost + ghost_eff * min(3, L / max(0.05, 1 - L)) * Fgear_prev[ge, ]
+      }
+    }
+    step_bio <- function(B, dt) {
+      B <- .logistic_step(B, (1 - phi) * r, K, dt)
+      op <- phi > 0
+      if (any(op)) B[op] <- K[op] * sup[op] + (B[op] - K[op] * sup[op]) * exp(-phi[op] * mu_open[op] * dt)
+      B * exp(-Fghost * dt)
+    }
     if (yr <= hist_end) {
       Cg_target <- Chist[t, , , drop = FALSE][1, , ]
       if (is.null(dim(Cg_target))) Cg_target <- matrix(Cg_target, nrow = dim(Chist)[2], dimnames = list(dimnames(Chist)[[2]], gn))
       Ctot_target <- colSums(Cg_target)
       Ctake <- numeric(ng)
       for (s in seq_len(S)) {
-        B <- .logistic_step(B, r, K, 1 / S)
-        cs <- pmin(Ctot_target / S, 0.9 * B)
+        B <- step_bio(B, 1 / S)
+        cs <- pmin(Ctot_target / S, 0.9 * fopen * B)
         B <- pmax(B - cs + imm / S, 1e-6 * K0)
         Ctake <- Ctake + cs
       }
@@ -242,12 +308,25 @@ simulate_ttm <- function(proj, par, drv, q = NULL) {
       out$F[t, ] <- -log(pmax(1e-9, 1 - pmin(0.99, Ctake / pmax((Bstart + B) / 2, 1e-9))))
     } else {
       if (is.null(q)) q <- .estimate_q(out, Eff, years, qy, gears, gn)
+      if (is.null(fopen_ref)) fopen_ref <- colMeans(out$fopen[as.character(qy), , drop = FALSE])
+      # effort dynamics: effort responds to last year's catch rate relative to the reference years
+      if (eff_resp != 0 && nge && t > 1) {
+        cpue_prev <- rowSums(matrix(out$Cg[t - 1, , ], nrow = nge)) / pmax(Eff[t - 1, ], 1e-12)
+        dyn <- pmin(3, pmax(0.2, dyn * (pmax(cpue_prev, 1e-12) / pmax(cpue_ref, 1e-12))^eff_resp))
+        Eff[t, ] <- Eff[t, ] * dyn
+      }
+      if (is.function(mp)) {
+        em <- mp(yr, list(t = t, years = years, out = out, B = B, K = K, MMSY = out$MMSY[t, ], Eff = Eff,
+                          Eref = Eref, gears = gears, groups = g, q = q, hist_end = hist_end))
+        if (!is.null(em)) Eff[t, ] <- Eff[t, ] * em[colnames(Eff)]
+      }
       Fg <- q * Eff[t, ]  # gear x group
+      Fg <- sweep(Fg, 2, fopen / pmax(fopen_ref, 1e-6), "*")   # change in no-take area since the reference years
       Fg[, !g$harvest_allowed] <- 0
       Ft <- colSums(Fg)
       Ctake <- numeric(ng)
       for (s in seq_len(S)) {
-        B <- .logistic_step(B, r, K, 1 / S)
+        B <- step_bio(B, 1 / S)
         cs <- B * (1 - exp(-Ft / S))
         B <- pmax(B - cs + imm / S, 1e-6 * K0)
         Ctake <- Ctake + cs
@@ -258,13 +337,24 @@ simulate_ttm <- function(proj, par, drv, q = NULL) {
     }
     B <- B * exp(eps[t, ] - (g$process_sd^2) / 2)
     out$B[t, ] <- Bstart
+    out$ghost[t, ] <- Fghost * (Bstart + B) / 2
     Cprev <- out$C[t, ]
+    Bmid <- pmax((Bstart + B) / 2, 1e-9)
+    if (nge) Fgear_prev <- sweep(matrix(out$Cg[t, , ], nrow = nge, dimnames = list(dimnames(out$Cg)[[2]], gn)), 2, Bmid, "/")
+    if (length(herb)) {
+      graze[t] <- sum(Bmid[herb]) / sum(out$K0[t, herb])
+      if (yr == hist_end) graze_ref <- mean(graze[years %in% qy], na.rm = TRUE)
+    }
+    if (yr == hist_end && nge) cpue_ref <- colMeans(matrix(sapply(as.character(qy), function(yy)
+      rowSums(matrix(out$Cg[yy, , ], nrow = nge)) / pmax(Eff[yy, ], 1e-12)), nrow = nge) |> t())
   }
   # SRA-style check: largest annual share of landings the simulated stock could NOT support
   out$catch_shortfall <- ifelse(hist_target > 0, max_short, NA_real_)
   out$catch_shortfall_total <- ifelse(hist_target > 0, 1 - hist_taken / hist_target, NA_real_)
   out$q <- if (is.null(q)) .estimate_q(out, Eff, years, qy, gears, gn) else q
   out$weights <- w
+  out$Eff <- Eff
+  out$graze <- graze
   out
 }
 

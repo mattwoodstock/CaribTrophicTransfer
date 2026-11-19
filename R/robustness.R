@@ -22,6 +22,18 @@
   if (!is.null(par$landings_mult)) v["landings_obs_err"] <- exp(mean(log(par$landings_mult)))
   if (!is.null(par$dist_loss_mult)) v["dist_loss_mult"] <- par$dist_loss_mult
   if (!is.null(par$dist_intensity_mult)) v["dist_intensity_err"] <- exp(mean(log(par$dist_intensity_mult)))
+  if (!is.null(par$m_nat)) {
+    mv <- par$m_nat[fmp]; keep <- !is.na(g$m_nat[fmp])
+    if (any(keep)) v <- c(v, setNames(mv[keep], paste0("M:", g$group[fmp][keep])))
+  }
+  if (!is.null(par$open_rec) && any(par$open_rec > 0))
+    v <- c(v, setNames(par$open_rec[par$open_rec > 0], paste0("open_rec:", g$group[par$open_rec > 0])))
+  if (!is.null(par$ghost_eff) && par$ghost_eff > 0) v["ghost_efficiency"] <- par$ghost_eff
+  if (!is.null(par$herbivory_elasticity) && par$herbivory_elasticity > 0) v["herbivory_elasticity"] <- par$herbivory_elasticity
+  if (!is.null(par$env_sens) && !is.null(proj$env_response)) {
+    er <- proj$env_response; ix <- which(er$variable %in% c("lionfish", "sargassum") & er$sensitivity_cv > 0)
+    if (length(ix)) v <- c(v, setNames(par$env_sens[ix], paste0("env:", er$variable[ix], ":", er$group[ix])))
+  }
   v
 }
 
@@ -73,9 +85,9 @@ sensitivity_analysis <- function(res, outputs = NULL, top = 15) {
 #' posterior shrinkage of each input
 #'
 #' * ESS = 1 / sum(w^2).
-#' * Pareto-k: Hill estimator of the tail index of the largest 20% of
-#'   importance weights; k > 0.7 indicates unreliable importance sampling
-#'   (Vehtari et al. 2015 heuristics).
+#' * Pareto-k: generalized-Pareto shape of the importance-weight tail from
+#'   PSIS ([psis_smooth()]); k > 0.7 indicates unreliable importance sampling
+#'   (Vehtari et al. 2024). ESS_raw is before Pareto smoothing.
 #' * Shrinkage = 1 - var_posterior / var_prior for each sampled input: values
 #'   near 1 are strongly informed by the data, near 0 prior-dominated.
 #' @param res `ttm_results` with SIR applied
@@ -83,9 +95,11 @@ sensitivity_analysis <- function(res, outputs = NULL, top = 15) {
 sir_diagnostics <- function(res) {
   if (is.null(res$sir)) stop("No SIR in results")
   w <- res$sir$weights
-  ws <- sort(w, decreasing = TRUE); m <- max(5, floor(0.2 * length(ws)))
-  top <- ws[seq_len(m)]; k_hat <- mean(log(top[-m]) - log(top[m]))
-  summ <- data.frame(n_prior = length(w), ESS = 1 / sum(w^2), unique_resampled = res$sir$n_unique,
+  ws <- sort(w, decreasing = TRUE)
+  k_hat <- if (!is.null(res$sir$pareto_k_hat)) res$sir$pareto_k_hat else NA_real_
+  summ <- data.frame(n_prior = length(w), ESS = 1 / sum(w^2),
+                     ESS_raw = if (is.null(res$sir$ess_raw)) NA else res$sir$ess_raw,
+                     unique_resampled = res$sir$n_unique,
                      max_weight = max(w), top10_weight_share = sum(ws[seq_len(min(10, length(ws)))]),
                      pareto_k_hat = k_hat)
   X <- res$stage1$params
