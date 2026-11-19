@@ -11,6 +11,7 @@
 | [St. Croix Case Study](case_study_stcroix.md) | application to the St. Croix trap fishery: data, results, caveats, data-replacement checklist |
 | [Review Readiness](review_readiness.md) | anticipated CIE critiques mapped to responses, evidence files and open items |
 | [Ecological Review](ecological_review.md) | theory, expert and stakeholder gaps; processes added; what remains |
+| [Assumptions Register](assumptions.md) | every assumption: value, basis (citation or expert judgement), type, how tested |
 | [Data Needs](data_needs.md) | every placeholder still to be replaced, grouped by data type, with priority and suggested source |
 | [St. Croix Input Values](stcroix_input_values.md) | full input tables (auto-generated) |
 | [References](references.md) | literature cited |

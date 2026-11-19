@@ -391,12 +391,14 @@ prior_results <- function(res) {
 #' @export
 prior_reference_points <- function(res) {
   s1 <- res$stage1; g <- res$proj$groups
-  q <- function(x, p) unname(stats::quantile(x, p, na.rm = TRUE))
+  lc <- s1$log_is_correction   # weight proposal draws back to the prior
+  wp <- if (is.null(lc)) rep(1, nrow(s1$MMSY_ref)) else exp(lc - max(lc))
+  q <- function(x, p) { ok <- is.finite(x); .wquantile(x[ok], wp[ok] / sum(wp[ok]), p) }
   data.frame(group = g$group, group_type = g$group_type,
              MMSY_p05_t = apply(s1$MMSY_ref, 2, q, 0.05), MMSY_p50_t = apply(s1$MMSY_ref, 2, q, 0.5),
              MMSY_p95_t = apply(s1$MMSY_ref, 2, q, 0.95), B0_p50_t = apply(s1$K0_ref, 2, q, 0.5),
              catch_p50_t = apply(s1$C_ref, 2, q, 0.5),
-             P_infeasible_landings = colMeans(res$catch_shortfall > 0.05, na.rm = TRUE),
+             P_infeasible_landings = colSums(wp * (res$catch_shortfall > 0.05), na.rm = TRUE) / sum(wp),
              MMSY_p50_lb = t_to_lb(apply(s1$MMSY_ref, 2, q, 0.5)), row.names = NULL)
 }
 

@@ -9,7 +9,7 @@
 #          assumption for 1.5-2 in. mesh; lobster: 8.9 cm CL legal minimum),
 #          hook-and-line groups retained at maturity, steepness h ~ N(0.75, 0.1).
 # Output : data-raw/life_history/xmsy_priors.csv; updates groups.csv columns
-#          x_msy, x_msy_cv, m_nat, m_nat_cv.
+#          x_msy, x_msy_cv, m_nat, m_nat_cv, bmsy_k (B_MSY / B0 for the Pella-Tomlinson shape).
 #   Rscript Projects/StCroix_Trap/data-raw/build_life_history_priors.R   (from repo root)
 # ==============================================================================
 if (requireNamespace("CaribTTM", quietly = TRUE)) library(CaribTTM) else devtools::load_all(".", quiet = TRUE)
@@ -35,8 +35,17 @@ lh <- merge(lh, gm, by = "group", all.x = TRUE)
 write.csv(lh, file.path(pd, "data-raw/life_history/xmsy_priors.csv"), row.names = FALSE)
 print(lh, digits = 3)
 
+# open population (spiny lobster): recruitment largely imported, so local steepness -> 1;
+# blend open (h = 0.99) and local (h = 0.75) per-recruit x with the open-recruitment fraction 0.8
+lo <- per_recruit_xmsy(0.34, 0.24, 18.5, lc = 8.9, lm = 8, h = 0.99, a = 0.0035, b = 2.75)
+lc_ <- per_recruit_xmsy(0.34, 0.24, 18.5, lc = 8.9, lm = 8, h = 0.75, a = 0.0035, b = 2.75)
+k <- lh$group == "spiny_lobster"
+lh$x_msy[k] <- 0.8 * lo$x + 0.2 * lc_$x; lh$x_msy_cv[k] <- 0.15
+lh$Bmsy_over_B0[k] <- lc_$Bmsy_over_B0     # shape of the local (closed) production component
+write.csv(lh, file.path(pd, "data-raw/life_history/xmsy_priors.csv"), row.names = FALSE)
+
 g <- read.csv(file.path(pd, "data/groups.csv"), stringsAsFactors = FALSE, check.names = FALSE)
-for (nm in c("m_nat", "m_nat_cv")) if (!nm %in% names(g)) g[[nm]] <- NA
+for (nm in c("m_nat", "m_nat_cv", "bmsy_k")) if (!nm %in% names(g)) g[[nm]] <- NA
 fallback_x <- stats::median(lh$x_msy)
 for (i in which(g$group_type == "fmp" & g$group != "queen_conch")) {
   k <- match(g$group[i], lh$group)
@@ -44,10 +53,13 @@ for (i in which(g$group_type == "fmp" & g$group != "queen_conch")) {
   if (!is.na(k)) {
     g$x_msy[i] <- round(lh$x_msy[k], 3); g$x_msy_cv[i] <- round(max(0.2, lh$x_msy_cv[k]), 2)
     g$m_nat[i] <- round(lh$M[k], 3); g$m_nat_cv[i] <- if (g$group[i] == "spiny_lobster") 0.2 else 0.3
+    g$bmsy_k[i] <- round(lh$Bmsy_over_B0[k], 3)   # Pella-Tomlinson shape matches the per-recruit B_MSY/B0
   } else {
     g$x_msy[i] <- round(fallback_x, 3); g$x_msy_cv[i] <- 0.4
-    tag <- "x_msy: median per-recruit prior of other groups (no FishBase growth data)"
+    g$bmsy_k[i] <- round(stats::median(lh$Bmsy_over_B0), 3)
+    tag <- "ASSUMPTION: x_msy and bmsy_k = median per-recruit values of the other groups (no FishBase growth data)"
   }
   if (!grepl("per-recruit", g$reference[i])) g$reference[i] <- paste0(g$reference[i], "; ", tag)
+  if (!grepl("bmsy_k", g$reference[i]) && !is.na(k)) g$reference[i] <- paste0(g$reference[i], "; bmsy_k = per-recruit B_MSY/B0")
 }
 write.csv(g, file.path(pd, "data/groups.csv"), row.names = FALSE, na = "")

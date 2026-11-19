@@ -1,30 +1,30 @@
-group,coral_reef,colonized_pavement,seagrass,macroalgae,sand,mangrove,deep_hardbottom
-spiny_lobster,1,0.8,0.6,0.4,0.2,0.3,0.5
-queen_conch,0,0.3,1,0.5,0.8,0,0
-parrotfish_1,1,0.7,0.3,0.3,0,0.5,0.2
-parrotfish_2,1,0.8,0.5,0.5,0,0.2,0.3
-surgeonfishes,1,1,0.3,0.4,0,0,0.3
-queen_triggerfish,0.8,1,0.5,0.3,0.6,0,0.6
-grunts,1,0.6,1,0.3,0.7,0.6,0.2
-snappers_shallow,1,0.7,0.6,0.3,0.4,0.7,0.3
-yellowtail_snapper,1,0.8,0.5,0.3,0.2,0.2,0.6
-snappers_deep,0,0.3,0,0,0,0,1
-groupers_shallow,1,0.8,0.1,0.2,0,0,0.7
-squirrelfishes,1,0.6,0,0,0,0,0.5
-goatfishes,0.2,0.4,0.8,0.3,1,0,0.2
-boxfishes,0.7,0.5,0.8,0.3,0.6,0,0
-angelfishes,1,0.8,0,0.2,0,0,0.5
-wrasses_hogfish,0.8,1,0.5,0.3,0.3,0,0.3
-jacks,0.6,0.5,0.2,0.1,0.3,0.2,0.5
-porgies,0.3,0.5,0.8,0.3,1,0,0.2
-zooplankton,1,1,1,1,1,1,1
-benthic_grazers,1,1,1,1,0.5,0.5,0.6
-benthic_detritivores_filter,0.6,0.8,1,0.8,1,1,0.8
-small_reef_fish,1,0.8,0.5,0.5,0.2,0.5,0.6
-small_pelagics,0,0,0,0,0,0,0
-other_reef_predators,1,0.8,0.5,0.4,0.4,0.5,0.6
-sharks_apex,0.8,0.6,0.4,0.2,0.3,0.3,0.8
-pelagics,0,0,0,0,0,0,0
-benthic_predatory_inverts,1,1,1,0.8,0.8,0.8,0.8
-other_invertivore_fishes,0.6,0.6,1,0.5,1,0.6,0.3
-squids_pelagic_predators,0,0,0,0,0,0,0
+group,coral_reef,colonized_pavement,seagrass,macroalgae,sand,mangrove,deep_hardbottom,data_status,reference
+spiny_lobster,1,0.8,0.6,0.4,0.2,0.3,0.5,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+queen_conch,0,0.3,1,0.5,0.8,0,0,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+parrotfish_1,1,0.7,0.3,0.3,0,0.5,0.2,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+parrotfish_2,1,0.8,0.5,0.5,0,0.2,0.3,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+surgeonfishes,1,1,0.3,0.4,0,0,0.3,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+queen_triggerfish,0.8,1,0.5,0.3,0.6,0,0.6,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+grunts,1,0.6,1,0.3,0.7,0.6,0.2,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+snappers_shallow,1,0.7,0.6,0.3,0.4,0.7,0.3,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+yellowtail_snapper,1,0.8,0.5,0.3,0.2,0.2,0.6,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+snappers_deep,0,0.3,0,0,0,0,1,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+groupers_shallow,1,0.8,0.1,0.2,0,0,0.7,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+squirrelfishes,1,0.6,0,0,0,0,0.5,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+goatfishes,0.2,0.4,0.8,0.3,1,0,0.2,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+boxfishes,0.7,0.5,0.8,0.3,0.6,0,0,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+angelfishes,1,0.8,0,0.2,0,0,0.5,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+wrasses_hogfish,0.8,1,0.5,0.3,0.3,0,0.3,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+jacks,0.6,0.5,0.2,0.1,0.3,0.2,0.5,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+porgies,0.3,0.5,0.8,0.3,1,0,0.2,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+zooplankton,1,1,1,1,1,1,1,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+benthic_grazers,1,1,1,1,0.5,0.5,0.6,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+benthic_detritivores_filter,0.6,0.8,1,0.8,1,1,0.8,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+small_reef_fish,1,0.8,0.5,0.5,0.2,0.5,0.6,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+small_pelagics,0,0,0,0,0,0,0,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+other_reef_predators,1,0.8,0.5,0.4,0.4,0.5,0.6,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+sharks_apex,0.8,0.6,0.4,0.2,0.3,0.3,0.8,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+pelagics,0,0,0,0,0,0,0,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+benthic_predatory_inverts,1,1,1,0.8,0.8,0.8,0.8,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+other_invertivore_fishes,0.6,0.6,1,0.5,1,0.6,0.3,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv
+squids_pelagic_predators,0,0,0,0,0,0,0,ASSUMPTION (expert judgement),Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv

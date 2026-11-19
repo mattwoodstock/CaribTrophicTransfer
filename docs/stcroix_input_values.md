@@ -14,12 +14,12 @@ Values flagged `PLACEHOLDER` must be replaced with real data before management u
 | ref_years | 3 | Years averaged for reference points (2022-2024) |
 | substeps | 12 | Monthly Euler steps for biomass dynamics |
 | c_to_ww | 9 | g wet weight per g C (Pauly & Christensen 1995) |
-| c_to_ww_cv | 0.1 |  |
-| n_draws | 5000 | Monte Carlo draws |
+| c_to_ww_cv | 0.1 | ASSUMPTION: 10% uncertainty on the C:WW conversion |
+| n_draws | 12000 | Monte Carlo draws per sampling round (prior + adaptive rounds) |
 | seed | 103 | Random seed (SEDAR 103) |
 | diet_concentration | 40 | Dirichlet concentration for diet uncertainty |
 | catch_expansion | 1.5 | Reported-to-total landings expansion (PR logbook expansion ~2.0; USVI unquantified - SEDAR103-DW-20) |
-| catch_expansion_cv | 0.25 |  |
+| catch_expansion_cv | 0.25 | ASSUMPTION: +/-25% on the unquantified USVI expansion factor |
 | fishing_feedback | TRUE | Remove previous-year catch from TL pools |
 | pstar | 0.40 | Percentile of MMSY used as management target (SEDAR103-DW-20 example) |
 | gear_alloc_method | catch_share | catch_share or slide |
@@ -28,137 +28,157 @@ Values flagged `PLACEHOLDER` must be replaced with real data before management u
 | coral_max_cover | 0.30 | Coral cover carrying capacity (proportion) |
 | bleach_dhw_threshold | 4 | DHW (degC-weeks) where bleaching mortality starts |
 | bleach_mort_per_dhw | 0.03 | Proportional coral loss per DHW above threshold |
-| bleach_mort_cv | 0.3 |  |
+| bleach_mort_cv | 0.3 | ASSUMPTION: 30% uncertainty on bleaching mortality per DHW |
 | dhw_variable | dhw | Covariate name holding annual max DHW |
 | sir_resample | 2000 | Number of SIR resamples (0 = off) |
 | index_min_cv | 0.2 | Minimum CV applied to index observations |
 | sir_catch_feasibility | TRUE | Stock-reduction-analysis penalty when simulated stock cannot support observed landings |
-| catch_feasibility_cv | 0.1 |  |
+| catch_feasibility_cv | 0.25 | Tolerance of the catch-feasibility penalty (self-reported landings with ~20% error) |
 | bbmsy_overfished | 0.5 | B/BMSY threshold for Overfished status (MSST proxy) |
 | domain_lon_min | -65.0 | St. Croix shelf bounding box (data acquisition) |
-| domain_lon_max | -64.4 |  |
-| domain_lat_min | 17.6 |  |
-| domain_lat_max | 17.95 |  |
+| domain_lon_max | -64.4 | St. Croix shelf bounding box (east) |
+| domain_lat_min | 17.6 | St. Croix shelf bounding box (south) |
+| domain_lat_max | 17.95 | St. Croix shelf bounding box (north) |
 | use_acquired | TRUE | Merge API-acquired data in data/acquired/ (user values take precedence) |
 | landings_cv | 0.2 | Observation CV of each landings record (self-reported trip tickets) |
 | effort_cv | 0.1 | Observation CV of each effort record |
 | pref_cv | 0.2 | CV on habitat preferences |
-| coral_growth_cv | 0.3 |  |
+| coral_growth_cv | 0.3 | ASSUMPTION: 30% uncertainty on intrinsic coral growth |
+| disturbance_loss_cv | 0.5 | Uncertainty (CV) of a common multiplier on hurricane loss magnitudes (placeholder losses) |
+| holdout_from_year |  | Set (e.g. 2015) to hold later index observations out of calibration; validation designs are also evaluated by re-weighting |
+| ryther_low | 1 | Practical not-to-exceed Ryther index ~1 t/km2/yr (range 0.3-1.1; Link & Watson 2019) |
+| ryther_high | 3 | Extreme Ryther threshold (3 t/km2/yr; Link & Watson 2019) |
+| fogarty_low | 0.22 | Fogarty ratio thresholds (per mil; Link & Watson 2019) |
+| fogarty_high | 0.92 | Upper Fogarty threshold (0.92 per mil; Link & Watson 2019) |
+| sir_adaptive_rounds | 4 | Adaptive importance-sampling rounds (proposal refit on partition priors; exact mixture correction) |
+| sir_feasibility_groups | trap | Calibration focuses on the trap fishery: only trap-relevant groups (and assessed stocks) constrain the posterior |
+| cores | 4 | Parallel cores for Stage-1 draws |
+| effort_creep | 0.02 | Annual catchability creep applied to fishery-dependent CPUE indices (~2%/yr; Palomares & Pauly 2019) |
+| effort_response | 0 | Elasticity of projected effort to catch rate; 0 = scenario-driven effort (see Open_access_effort scenario) |
+| ghost_efficiency | 0.2 | PLACEHOLDER: lost-trap catch rate relative to active traps (derelict traps in USVI kept fishing: Renchen et al. 2010; Clark et al. 2012; Arthur et al. 2014) |
+| ghost_efficiency_cv | 0.5 | ASSUMPTION: wide (50%) uncertainty on ghost-trap efficiency |
+| ghost_half_life | 1.5 | ASSUMPTION: years for half of lost traps to stop fishing (trap degradation; replace with USVI decay data) |
+| ghost_gears | trap_fish;trap_lobster | Gears whose lost traps keep fishing |
+| herbivore_groups | parrotfish_1;parrotfish_2;surgeonfishes | Grazers controlling coral recovery (Mumby et al. 2006) |
+| herbivory_elasticity | 1 | Coral growth x (grazing/reference)^gamma in projections (PLACEHOLDER magnitude) |
+| herbivory_elasticity_cv | 0.5 | ASSUMPTION: wide (50%) uncertainty on herbivory elasticity |
+| psis | TRUE | Pareto-smoothed importance weights |
+| ghost_background_loss | 0.10 | Annual trap loss outside storms ~10% (about 650 of 6,500 traps per year in St. Thomas/St. John; Clark et al. 2012) |
 
 ## habitats.csv
 
-| habitat | type | area_km2 | area_cv | npp_value | npp_unit | npp_cv | food_web_fraction | food_web_fraction_cv | tte | tte_cv | quality_model | quality_covariate | quality_ref | init_quality | p1_quality_elasticity | npp_covariate | data_status | reference |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| coral_reef | benthic |  |  | 1500 | t_C_km2_yr | 0.5 | 0.35 | 0.3 | 0.15 | 0.2 | coral | coral_cover | 0.08 | 0.14 | 0 |  | area from NCCOS API; NPP published range | NPP: Caribbean reef net production 986-4108 t C (Adey & Steneck 1985 St. Croix); 1200-3000 (Ramachandran Nair & Pillai 1972) |
-| colonized_pavement | benthic |  |  | 181 | mmol_O2_m2_d | 0.4 | 0.35 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | area from NCCOS API; NPP published | Turf/macroalgae-dominated hardbottom; lagoon-wide Pn 181 +/- 28 mmol O2 m-2 d-1 (Naumann et al. 2013) |
-| seagrass | benthic |  |  | 4.2 | g_DW_m2_d | 0.5 | 0.35 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | area from NCCOS API; NPP published | Thalassia production 4.2 g DW m-2 d-1 (Juman 2005); CARICOMP <200->2000 g DW m-2 yr-1 (van Tussenbroek et al. 2014) |
-| macroalgae | benthic |  |  | 582 | mmol_O2_m2_d | 0.5 | 0.25 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | area from NCCOS API; NPP published | Caribbean macroalgal beds Pn 582 mmol O2 m-2 d-1 (Wanders 1976 via Naumann et al. 2013) |
-| sand | benthic |  |  | 7 | mmol_O2_m2_d | 0.6 | 0.5 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | area from NCCOS API; NPP published | Microphytobenthos Pn 7 +/- 4 mmol O2 m-2 d-1 (Naumann et al. 2013) |
-| mangrove | benthic |  |  | 400 | mmol_O2_m2_d | 0.3 | 0.2 | 0.4 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | area from NCCOS API; NPP published | Caribbean mangrove Pn 400 +/- 83 mmol O2 m-2 d-1 (Gattuso et al. 1998); food_web_fraction = litter export |
-| deep_hardbottom | benthic |  |  | 250 | t_C_km2_yr | 0.6 | 0.35 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | area from NCCOS API; NPP PLACEHOLDER | Mesophotic (30-100 m) hardbottom incl. Lang Bank; light-limited production assumed ~1/6 of shallow reef |
-| pelagic | pelagic | 1500 | 0.2 | 85 | g_C_m2_yr | 0.25 | 0.4 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 | npp_pelagic_index | area PLACEHOLDER; NPP derived | Shelf + 10 km buffer; regional satellite NPP ensemble (SEDAR103-DW-20 App. A; Ryan-Keogh et al. 2023) ~70-100 g C m-2 yr-1 |
+| habitat | type | area_km2 | area_cv | npp_value | npp_unit | npp_cv | food_web_fraction | food_web_fraction_cv | tte | tte_cv | quality_model | quality_covariate | quality_ref | init_quality | p1_quality_elasticity | npp_covariate | closed_fraction | data_status | reference |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| coral_reef | benthic |  |  | 1500 | t_C_km2_yr | 0.5 | 0.35 | 0.3 | 0.15 | 0.2 | coral | coral_cover | 0.08 | 0.14 | 0 |  | 0.25 | area from NCCOS API; NPP published range; closed_fraction PLACEHOLDER (approximate BIRNM + EEMP no-take share; replace with GIS overlay) | NPP: Caribbean reef net production 986-4108 t C (Adey & Steneck 1985 St. Croix); 1200-3000 for Indian Ocean reefs (Nair & Pillai 1972) |
+| colonized_pavement | benthic |  |  | 181 | mmol_O2_m2_d | 0.4 | 0.35 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | 0.15 | area from NCCOS API; NPP published; closed_fraction PLACEHOLDER (approximate BIRNM + EEMP no-take share; replace with GIS overlay) | Turf/macroalgae-dominated hardbottom; lagoon-wide Pn 181 +/- 28 mmol O2 m-2 d-1 (Naumann et al. 2013) |
+| seagrass | benthic |  |  | 4.2 | g_DW_m2_d | 0.5 | 0.35 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 | light_seagrass | 0.1 | area from NCCOS API; NPP published; closed_fraction PLACEHOLDER (approximate BIRNM + EEMP no-take share; replace with GIS overlay) | Thalassia production 4.2 g DW m-2 d-1 (Juman 2005); CARICOMP <200->2000 g DW m-2 yr-1 (van Tussenbroek et al. 2014); annual NPP index from bottom light (OC-CCI Kd490; build_light_index.R; depth ASSUMPTION) |
+| macroalgae | benthic |  |  | 582 | mmol_O2_m2_d | 0.5 | 0.25 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 | light_macroalgae | 0.15 | area from NCCOS API; NPP published; closed_fraction PLACEHOLDER (approximate BIRNM + EEMP no-take share; replace with GIS overlay) | Caribbean macroalgal beds Pn 582 mmol O2 m-2 d-1 (Wanders 1976 via Naumann et al. 2013); annual NPP index from bottom light (OC-CCI Kd490; build_light_index.R; depth ASSUMPTION) |
+| sand | benthic |  |  | 7 | mmol_O2_m2_d | 0.6 | 0.5 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | 0.2 | area from NCCOS API; NPP published; closed_fraction PLACEHOLDER (approximate BIRNM + EEMP no-take share; replace with GIS overlay) | Microphytobenthos Pn 7 +/- 4 mmol O2 m-2 d-1 (Naumann et al. 2013) |
+| mangrove | benthic |  |  | 400 | mmol_O2_m2_d | 0.3 | 0.2 | 0.4 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | 0 | area from NCCOS API; NPP published | Caribbean mangrove Pn 400 +/- 83 mmol O2 m-2 d-1 (Gattuso et al. 1998); food_web_fraction = litter export |
+| deep_hardbottom | benthic |  |  |  |  |  | 0.35 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 |  | 0.1 | API: area from ETOPO 30-100 m; NPP light-limited from Kd490 + PAR; closed_fraction PLACEHOLDER (approximate BIRNM + EEMP no-take share; replace with GIS overlay) | Mesophotic hardbottom 30-100 m (incl. Lang Bank). NPP = colonized pavement NPP scaled by light at depth (Morel et al. 2007 KdPAR; tanh P-I curve) |
+| pelagic | pelagic | 1500 | 0.2 | 85 | g_C_m2_yr | 0.25 | 0.4 | 0.3 | 0.15 | 0.2 | none |  | 1 | 1 | 0 | npp_pelagic_index | 0 | area PLACEHOLDER; NPP derived | Shelf + 10 km buffer; regional satellite NPP ensemble (SEDAR103-DW-20 App. A; Ryan-Keogh et al. 2023) ~70-100 g C m-2 yr-1 |
 
 ## groups.csv
 
-| group | fmp_complex | guild | group_type | include | harvest_allowed | trap_relevant | data_tier | pb | pb_cv | x_msy | x_msy_cv | partition_method | partition_value | partition_cv | B0_fixed_t | B0_fixed_cv | init_depletion | init_depletion_cv | refuge_dependence | immigration_t | process_sd | energy_density_kJ_g | data_status | reference |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| spiny_lobster | Spiny lobster | Invertivores | fmp | TRUE | TRUE | TRUE | 1 | 0.8 | 0.2 | 0.5 | 0.2 | biomass | 1 | 0.5 |  |  | 0.5 | 0.25 | 0.5 | 0 | 0.15 | 4.5 | P/B literature; biomass prior PLACEHOLDER; prior re-centred by catch-feasibility check | M ~0.34 (SEDAR 57); assessed stock (SEDAR 57 Update) |
-| queen_conch | Queen conch | Herbivores | fmp | TRUE | TRUE | FALSE | 2 | 0.6 | 0.25 | 0.4 | 0.25 | biomass | 3 | 0.5 |  |  | 0.4 | 0.3 | 0 | 0 | 0.15 | 4 | PLACEHOLDER; prior re-centred by catch-feasibility check | Low x_msy reflects depensation/Allee effects |
-| parrotfish_1 | Parrotfish 1 (blue midnight rainbow) | Herbivores | fmp | TRUE | FALSE | TRUE | 3 | 1 | 0.25 | 0.5 | 0.2 | biomass | 0.8 | 0.5 |  |  | 0.8 | 0.15 | 0.5 | 0 | 0.1 | 4.5 | PLACEHOLDER | Harvest prohibited in St. Croix FMP (ABC = 0) |
-| parrotfish_2 | Parrotfish 2 | Herbivores | fmp | TRUE | TRUE | TRUE | 2 | 1 | 0.25 | 0.5 | 0.2 | biomass | 2.5 | 0.5 |  |  | 0.6 | 0.25 | 0.5 | 0 | 0.1 | 4.5 | PLACEHOLDER (NCRMP density would replace) | St. Croix FMP Parrotfish 2 complex (stoplight redband redtail queen princess etc.) |
-| surgeonfishes | Surgeonfish | Herbivores | fmp | TRUE | TRUE | TRUE | 3 | 1 | 0.25 | 0.5 | 0.2 | biomass | 3 | 0.5 |  |  | 0.7 | 0.2 | 0.4 | 0 | 0.1 | 4.5 | PLACEHOLDER |  |
-| queen_triggerfish | Triggerfish (queen triggerfish) | Invertivores | fmp | TRUE | TRUE | TRUE | 1 | 0.6 | 0.25 | 0.5 | 0.2 | biomass | 0.25 | 0.5 |  |  | 0.6 | 0.25 | 0.3 | 0 | 0.12 | 4.5 | P/B literature; biomass prior PLACEHOLDER; prior re-centred by catch-feasibility check | SEDAR 80 assessed; trap-dominated fishery |
-| grunts | Grunts | Invertivores | fmp | TRUE | TRUE | TRUE | 3 | 1 | 0.25 | 0.5 | 0.2 | biomass | 3 | 0.5 |  |  | 0.6 | 0.2 | 0.6 | 0 | 0.1 | 4.5 | PLACEHOLDER |  |
-| snappers_shallow | Snapper 3 (lane gray mutton schoolmaster) | Mesopredators | fmp | TRUE | TRUE | TRUE | 3 | 0.7 | 0.25 | 0.5 | 0.2 | biomass | 1 | 0.5 |  |  | 0.5 | 0.25 | 0.5 | 0 | 0.12 | 5 | PLACEHOLDER |  |
-| yellowtail_snapper | Snapper 4 (yellowtail) | Mesopredators | fmp | TRUE | TRUE | FALSE | 2 | 0.8 | 0.25 | 0.5 | 0.2 | biomass | 0.8 | 0.5 |  |  | 0.6 | 0.25 | 0.3 | 0 | 0.12 | 5 | PLACEHOLDER | SEDAR 84 St. Croix yellowtail snapper |
-| snappers_deep | Snapper 1 & 2 (deepwater) | Piscivores | fmp | TRUE | TRUE | FALSE | 3 | 0.4 | 0.25 | 0.5 | 0.2 | biomass | 2 | 0.5 |  |  | 0.5 | 0.25 | 0.1 | 0 | 0.12 | 5 | PLACEHOLDER; prior re-centred by catch-feasibility check | Hook-and-line fishery; minor trap bycatch |
-| groupers_shallow | Groupers (red hind coney graysby) | Piscivores | fmp | TRUE | TRUE | TRUE | 2 | 0.5 | 0.25 | 0.5 | 0.2 | biomass | 1 | 0.5 |  |  | 0.4 | 0.25 | 0.7 | 0 | 0.15 | 5 | PLACEHOLDER | Lang Bank red hind seasonal closure Dec-Feb |
-| squirrelfishes | Squirrelfish | Invertivores | fmp | TRUE | TRUE | TRUE | 3 | 0.9 | 0.25 | 0.5 | 0.2 | biomass | 1 | 0.5 |  |  | 0.7 | 0.2 | 0.6 | 0 | 0.1 | 4.5 | PLACEHOLDER |  |
-| goatfishes | Goatfish | Invertivores | fmp | TRUE | TRUE | TRUE | 3 | 1 | 0.25 | 0.5 | 0.2 | biomass | 0.5 | 0.5 |  |  | 0.7 | 0.2 | 0.2 | 0 | 0.1 | 4.5 | PLACEHOLDER |  |
-| boxfishes | Boxfish | Invertivores | fmp | TRUE | TRUE | TRUE | 3 | 0.8 | 0.25 | 0.5 | 0.2 | biomass | 0.3 | 0.5 |  |  | 0.7 | 0.2 | 0.2 | 0 | 0.1 | 4 | PLACEHOLDER |  |
-| angelfishes | Angelfish | Invertivores | fmp | TRUE | TRUE | TRUE | 3 | 0.7 | 0.25 | 0.5 | 0.2 | biomass | 0.5 | 0.5 |  |  | 0.7 | 0.2 | 0.5 | 0 | 0.1 | 4.5 | PLACEHOLDER | Spongivores |
-| wrasses_hogfish | Wrasses (hogfish) | Invertivores | fmp | TRUE | TRUE | TRUE | 3 | 0.8 | 0.25 | 0.5 | 0.2 | biomass | 0.5 | 0.5 |  |  | 0.5 | 0.25 | 0.3 | 0 | 0.1 | 4.5 | PLACEHOLDER |  |
-| jacks | Jacks | Piscivores | fmp | TRUE | TRUE | FALSE | 3 | 0.9 | 0.25 | 0.5 | 0.2 | biomass | 0.8 | 0.5 |  |  | 0.6 | 0.25 | 0 | 0 | 0.15 | 5.5 | PLACEHOLDER |  |
-| porgies | Porgies | Invertivores | fmp | TRUE | TRUE | TRUE | 3 | 0.8 | 0.25 | 0.5 | 0.2 | biomass | 0.2 | 0.5 |  |  | 0.7 | 0.2 | 0.1 | 0 | 0.1 | 4.5 | PLACEHOLDER |  |
-| pelagics | Pelagics (dolphinfish wahoo) | Pelagic piscivores | fmp | TRUE | TRUE | FALSE | 3 | 1.5 | 0.3 | 0.5 | 0.2 | biomass | 0.3 | 0.5 |  |  | 0.7 | 0.2 | 0 | 25 | 0.2 | 6 | PLACEHOLDER | Highly migratory; immigration term represents regional supply (Greater Caribbean model) |
-| zooplankton |  | Non-fishery | nonfishery | TRUE | FALSE | FALSE | 3 | 30 | 0.3 | 0.5 | 0.1 | biomass | 6 | 0.5 |  |  | 0.95 | 0.03 | 0 | 0 | 0.05 | 3 | literature-typical |  |
-| benthic_grazers |  | Non-fishery | nonfishery | TRUE | FALSE | FALSE | 3 | 3 | 0.3 | 0.5 | 0.1 | biomass | 60 | 0.5 |  |  | 0.95 | 0.03 | 0.2 | 0 | 0.05 | 3 | literature-typical | Urchins gastropods herbivorous crabs |
-| benthic_detritivores_filter |  | Non-fishery | nonfishery | TRUE | FALSE | FALSE | 3 | 2 | 0.3 | 0.5 | 0.1 | biomass | 100 | 0.5 |  |  | 0.95 | 0.03 | 0 | 0 | 0.05 | 3 | literature-typical | Infauna polychaetes sponges filter feeders |
-| small_reef_fish |  | Non-fishery | nonfishery | TRUE | FALSE | FALSE | 3 | 2.5 | 0.3 | 0.5 | 0.1 | biomass | 10 | 0.5 |  |  | 0.95 | 0.03 | 0.5 | 0 | 0.05 | 4.5 | literature-typical | Damselfishes gobies blennies cardinalfishes |
-| small_pelagics |  | Non-fishery | nonfishery | TRUE | FALSE | FALSE | 3 | 2 | 0.3 | 0.5 | 0.1 | biomass | 2 | 0.5 |  |  | 0.95 | 0.03 | 0 | 0 | 0.05 | 5 | literature-typical | Clupeids ballyhoo flyingfish |
-| other_reef_predators |  | Non-fishery | nonfishery | TRUE | FALSE | FALSE | 3 | 0.8 | 0.3 | 0.5 | 0.1 | biomass | 6 | 0.5 |  |  | 0.95 | 0.03 | 0.3 | 0 | 0.05 | 5 | literature-typical | Lizardfish morays barracuda lionfish trumpetfish scorpionfish |
-| sharks_apex |  | Non-fishery | nonfishery | TRUE | FALSE | FALSE | 3 | 0.2 | 0.3 | 0.5 | 0.1 | biomass | 0.2 | 0.5 |  |  | 0.95 | 0.03 | 0 | 0 | 0.05 | 5 | literature-typical | Reef sharks large predators |
-| benthic_predatory_inverts |  | Non-fishery | nonfishery | TRUE | FALSE | FALSE | 3 | 2 | 0.3 | 0.5 | 0.1 | biomass | 20 | 0.5 |  |  | 0.95 | 0.03 | 0.2 | 0 | 0.05 | 4.5 | literature-typical | Crabs octopus predatory gastropods shrimps sea stars |
-| other_invertivore_fishes |  | Non-fishery | nonfishery | TRUE | FALSE | FALSE | 3 | 1.2 | 0.3 | 0.5 | 0.1 | biomass | 8 | 0.5 |  |  | 0.95 | 0.03 | 0.2 | 0 | 0.05 | 4.5 | literature-typical | Pufferfishes mojarras small wrasses flounders (non-FMP) |
-| squids_pelagic_predators |  | Non-fishery | nonfishery | TRUE | FALSE | FALSE | 3 | 2.5 | 0.3 | 0.5 | 0.1 | biomass | 3 | 0.5 |  |  | 0.95 | 0.03 | 0 | 0 | 0.05 | 4.5 | literature-typical | Squids needlefish small tunas (non-FMP) |
+| group | fmp_complex | guild | group_type | include | harvest_allowed | trap_relevant | data_tier | pb | pb_cv | x_msy | x_msy_cv | partition_method | partition_value | partition_cv | B0_fixed_t | B0_fixed_cv | init_depletion | init_depletion_cv | refuge_dependence | immigration_t | process_sd | energy_density_kJ_g | open_recruitment | open_recruitment_cv | recruit_covariate | nursery_habitat | nursery_dependence | data_status | reference | m_nat | m_nat_cv | bmsy_k |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| spiny_lobster | Spiny lobster | Invertivores | fmp | TRUE | TRUE | TRUE | 1 | 1 | 0.2 | 0.323 | 0.2 | biomass | 3.27 | 0.5 |  |  | 0.5 | 0.25 | 0.5 | 0 | 0.15 | 4.5 | 0.8 | 0.25 |  | macroalgae;seagrass | 0.3 | derived: Opitz (1996) balanced model; nursery_dependence PLACEHOLDER; open_recruitment PLACEHOLDER magnitude; x_msy/M derived (life-history) | Opitz 1996 Table 3.22 Lobsters (B 3.27 g/m2, P/B 1.0); SEDAR 57 M ~0.34; x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); open recruitment 0.8 (larval supply largely from upstream; Kough, Paris & Butler 2013); x blends per-recruit h=0.99 (open) and h=0.75 (local); nursery dependence expert-informed (Nagelkerken et al. 2002; Mumby et al. 2004; Adams et al. 2006) - PLACEHOLDER magnitude; bmsy_k = per-recruit B_MSY/B0 | 0.34 | 0.2 | 0.315 |
+| queen_conch | Queen conch | Herbivores | fmp | TRUE | TRUE | FALSE | 2 | 0.6 | 0.25 | 0.4 | 0.25 | biomass | 3 | 1 |  |  | 0.4 | 0.3 | 0 | 0 | 0.15 | 4 |  |  |  | seagrass | 0.5 | PLACEHOLDER; prior re-centred by catch-feasibility check; wide prior (floor-density or no direct data); nursery_dependence PLACEHOLDER | Low x_msy reflects depensation/Allee effects; nursery dependence expert-informed (Nagelkerken et al. 2002; Mumby et al. 2004; Adams et al. 2006) - PLACEHOLDER magnitude |  |  |  |
+| parrotfish_1 | Parrotfish 1 (blue midnight rainbow) | Herbivores | fmp | TRUE | FALSE | TRUE | 3 | 0.36 | 0.25 | 0.18 | 0.2 | biomass | 18 | 0.5 |  |  | 0.8 | 0.15 | 0.5 | 0 | 0.1 | 4.5 |  |  |  | mangrove;seagrass | 0.4 | derived: Opitz (1996) VI species biomass x mass-balance factor; nursery_dependence PLACEHOLDER; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 75.31 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 0.38, FishBase M_Then 0.34); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); nursery dependence expert-informed (Nagelkerken et al. 2002; Mumby et al. 2004; Adams et al. 2006) - PLACEHOLDER magnitude; bmsy_k = per-recruit B_MSY/B0 | 0.339 | 0.3 | 0.346 |
+| parrotfish_2 | Parrotfish 2 | Herbivores | fmp | TRUE | TRUE | TRUE | 2 | 0.926 | 0.25 | 0.226 | 0.29 | biomass | 7.62 | 0.5 |  |  | 0.6 | 0.25 | 0.5 | 0 | 0.1 | 4.5 |  |  |  | seagrass | 0.2 | derived: Opitz (1996) VI species biomass x mass-balance factor; nursery_dependence PLACEHOLDER; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 31.93 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 1.05, FishBase M_Then 0.82); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); nursery dependence expert-informed (Nagelkerken et al. 2002; Mumby et al. 2004; Adams et al. 2006) - PLACEHOLDER magnitude; bmsy_k = per-recruit B_MSY/B0 | 0.73 | 0.3 | 0.328 |
+| surgeonfishes | Surgeonfish | Herbivores | fmp | TRUE | TRUE | TRUE | 3 | 0.79 | 0.25 | 0.214 | 0.23 | biomass | 2.94 | 0.5 |  |  | 0.7 | 0.2 | 0.4 | 0 | 0.1 | 4.5 |  |  |  |  |  | derived: Opitz (1996) VI species biomass x mass-balance factor; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 12.30 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 0.71, FishBase M_Then 0.88); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); bmsy_k = per-recruit B_MSY/B0 | 0.78 | 0.3 | 0.352 |
+| queen_triggerfish | Triggerfish (queen triggerfish) | Invertivores | fmp | TRUE | TRUE | TRUE | 1 | 0.442 | 0.31 | 0.189 | 0.2 | biomass | 0.219 | 0.5 |  |  | 0.6 | 0.25 | 0.3 | 0 | 0.12 | 4.5 |  |  |  |  |  | derived: Opitz (1996) VI species biomass x mass-balance factor; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 0.92 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 0.60, FishBase M_Then 0.33); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); bmsy_k = per-recruit B_MSY/B0 | 0.325 | 0.3 | 0.352 |
+| grunts | Grunts | Invertivores | fmp | TRUE | TRUE | TRUE | 3 | 0.677 | 0.39 | 0.221 | 0.2 | biomass | 6.4 | 0.5 |  |  | 0.6 | 0.2 | 0.6 | 0 | 0.1 | 4.5 |  |  |  | seagrass;mangrove | 0.5 | derived: Opitz (1996) VI species biomass x mass-balance factor; nursery_dependence PLACEHOLDER; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 26.80 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 1.00, FishBase M_Then 0.46); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); nursery dependence expert-informed (Nagelkerken et al. 2002; Mumby et al. 2004; Adams et al. 2006) - PLACEHOLDER magnitude; bmsy_k = per-recruit B_MSY/B0 | 0.4 | 0.3 | 0.361 |
+| snappers_shallow | Snapper 3 (lane gray mutton schoolmaster) | Mesopredators | fmp | TRUE | TRUE | TRUE | 3 | 0.378 | 0.53 | 0.177 | 0.2 | biomass | 6.04 | 0.5 |  |  | 0.5 | 0.25 | 0.5 | 0 | 0.12 | 5 |  |  |  | mangrove;seagrass | 0.4 | derived: Opitz (1996) VI species biomass x mass-balance factor; nursery_dependence PLACEHOLDER; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 25.32 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 0.64, FishBase M_Then 0.22); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); nursery dependence expert-informed (Nagelkerken et al. 2002; Mumby et al. 2004; Adams et al. 2006) - PLACEHOLDER magnitude; bmsy_k = per-recruit B_MSY/B0 | 0.206 | 0.3 | 0.356 |
+| yellowtail_snapper | Snapper 4 (yellowtail) | Mesopredators | fmp | TRUE | TRUE | FALSE | 2 | 0.414 | 0.44 | 0.255 | 0.2 | biomass | 6.04 | 0.5 |  |  | 0.6 | 0.25 | 0.3 | 0 | 0.12 | 5 |  |  |  | seagrass | 0.3 | derived: Opitz (1996) VI species biomass x mass-balance factor; nursery_dependence PLACEHOLDER; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 25.33 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 0.64, FishBase M_Then 0.27); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); nursery dependence expert-informed (Nagelkerken et al. 2002; Mumby et al. 2004; Adams et al. 2006) - PLACEHOLDER magnitude; bmsy_k = per-recruit B_MSY/B0 | 0.268 | 0.3 | 0.349 |
+| snappers_deep | Snapper 1 & 2 (deepwater) | Piscivores | fmp | TRUE | TRUE | FALSE | 3 | 0.402 | 0.25 | 0.269 | 0.2 | biomass | 2 | 1 |  |  | 0.5 | 0.25 | 0.1 | 0 | 0.12 | 5 |  |  |  |  |  | PLACEHOLDER; prior re-centred by catch-feasibility check; wide prior (floor-density or no direct data); x_msy/M derived (life-history) | Hook-and-line fishery; minor trap bycatch; P/B = geomean(Opitz 0.40, FishBase M_Then 0.40); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); bmsy_k = per-recruit B_MSY/B0 | 0.374 | 0.3 | 0.342 |
+| groupers_shallow | Groupers (red hind coney graysby) | Piscivores | fmp | TRUE | TRUE | TRUE | 2 | 0.314 | 0.38 | 0.174 | 0.2 | biomass | 2.08 | 0.5 |  |  | 0.4 | 0.25 | 0.7 | 0 | 0.15 | 5 |  |  |  |  |  | derived: Opitz (1996) VI species biomass x mass-balance factor; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 8.72 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 0.46, FishBase M_Then 0.21); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); bmsy_k = per-recruit B_MSY/B0 | 0.236 | 0.3 | 0.352 |
+| squirrelfishes | Squirrelfish | Invertivores | fmp | TRUE | TRUE | TRUE | 3 | 1.03 | 0.25 | 0.249 | 0.32 | biomass | 0.666 | 0.5 |  |  | 0.7 | 0.2 | 0.6 | 0 | 0.1 | 4.5 |  |  |  |  |  | derived: Opitz (1996) VI species biomass x mass-balance factor; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 2.79 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 0.90, FishBase M_Then 1.19); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); bmsy_k = per-recruit B_MSY/B0 | 0.973 | 0.3 | 0.328 |
+| goatfishes | Goatfish | Invertivores | fmp | TRUE | TRUE | TRUE | 3 | 0.699 | 0.36 | 0.214 | 0.2 | biomass | 0.528 | 0.5 |  |  | 0.7 | 0.2 | 0.2 | 0 | 0.1 | 4.5 |  |  |  |  |  | derived: Opitz (1996) VI species biomass x mass-balance factor; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 2.21 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 1.00, FishBase M_Then 0.49); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); bmsy_k = per-recruit B_MSY/B0 | 0.541 | 0.3 | 0.344 |
+| boxfishes | Boxfish | Invertivores | fmp | TRUE | TRUE | TRUE | 3 | 0.8 | 0.25 | 0.214 | 0.4 | biomass | 0.708 | 0.5 |  |  | 0.7 | 0.2 | 0.2 | 0 | 0.1 | 4 |  |  |  |  |  | derived: Opitz (1996) VI species biomass x mass-balance factor; x_msy/bmsy_k ASSUMPTION (median of other groups) | Opitz 1996 Table 3.6 (raw 2.97 g/m2) x 0.239 (Table 3.22 balance); x_msy: median per-recruit prior of other groups (no FishBase growth data) |  |  | 0.352 |
+| angelfishes | Angelfish | Invertivores | fmp | TRUE | TRUE | TRUE | 3 | 0.411 | 0.53 | 0.192 | 0.2 | biomass | 3.54 | 0.5 |  |  | 0.7 | 0.2 | 0.5 | 0 | 0.1 | 4.5 |  |  |  |  |  | derived: Opitz (1996) VI species biomass x mass-balance factor; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 14.85 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 0.70, FishBase M_Then 0.24); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); bmsy_k = per-recruit B_MSY/B0 | 0.284 | 0.3 | 0.363 |
+| wrasses_hogfish | Wrasses (hogfish) | Invertivores | fmp | TRUE | TRUE | TRUE | 3 | 0.515 | 0.44 | 0.198 | 0.2 | biomass | 0.0475 | 1 |  |  | 0.5 | 0.25 | 0.3 | 0 | 0.1 | 4.5 |  |  |  | seagrass | 0.2 | derived: Opitz (1996) VI species biomass x mass-balance factor; wide prior (floor-density or no direct data); nursery_dependence PLACEHOLDER; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 0.20 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 0.80, FishBase M_Then 0.33); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); nursery dependence expert-informed (Nagelkerken et al. 2002; Mumby et al. 2004; Adams et al. 2006) - PLACEHOLDER magnitude; bmsy_k = per-recruit B_MSY/B0 | 0.284 | 0.3 | 0.356 |
+| jacks | Jacks | Piscivores | fmp | TRUE | TRUE | FALSE | 3 | 0.481 | 0.73 | 0.26 | 0.2 | biomass | 7.89 | 0.5 |  |  | 0.6 | 0.25 | 0 | 0 | 0.15 | 5.5 |  |  |  |  |  | derived: Opitz (1996) VI species biomass x mass-balance factor; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 33.05 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 1.00, FishBase M_Then 0.23); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); bmsy_k = per-recruit B_MSY/B0 | 0.275 | 0.3 | 0.379 |
+| porgies | Porgies | Invertivores | fmp | TRUE | TRUE | TRUE | 3 | 0.527 | 0.42 | 0.203 | 0.2 | biomass | 0.0612 | 1 |  |  | 0.7 | 0.2 | 0.1 | 0 | 0.1 | 4.5 |  |  |  |  |  | derived: Opitz (1996) VI species biomass x mass-balance factor; wide prior (floor-density or no direct data); x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 0.26 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 0.80, FishBase M_Then 0.35); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); bmsy_k = per-recruit B_MSY/B0 | 0.334 | 0.3 | 0.356 |
+| pelagics | Pelagics (dolphinfish wahoo) | Pelagic piscivores | fmp | TRUE | TRUE | FALSE | 3 | 0.841 | 0.58 | 0.309 | 0.22 | biomass | 0.3 | 1 |  |  | 0.7 | 0.2 | 0 | 25 | 0.2 | 6 |  |  |  |  |  | PLACEHOLDER; wide prior (floor-density or no direct data); x_msy/M derived (life-history) | Highly migratory; immigration term represents regional supply (Greater Caribbean model); P/B = geomean(Opitz 1.50, FishBase M_Then 0.47); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); bmsy_k = per-recruit B_MSY/B0 | 0.438 | 0.3 | 0.29 |
+| zooplankton |  | Non-fishery | nonfishery | TRUE | FALSE | FALSE | 3 | 40 | 0.3 | 0.5 | 0.1 | biomass | 32 | 0.5 |  |  | 0.95 | 0.03 | 0 | 0 | 0.05 | 3 |  |  |  |  |  | derived: Opitz (1996) balanced model | Opitz 1996 Table 3.22 (biomass-weighted P/B of matched groups) |  |  |  |
+| benthic_grazers |  | Non-fishery | nonfishery | TRUE | FALSE | FALSE | 3 | 1.26 | 0.3 | 0.5 | 0.1 | biomass | 209 | 0.5 |  |  | 0.95 | 0.03 | 0.2 | 0 | 0.05 | 3 |  |  |  |  |  | derived: Opitz (1996) balanced model | Opitz 1996 Table 3.22 (biomass-weighted P/B of matched groups) |  |  |  |
+| benthic_detritivores_filter |  | Non-fishery | nonfishery | TRUE | FALSE | FALSE | 3 | 1.74 | 0.3 | 0.5 | 0.1 | biomass | 1160 | 0.5 |  |  | 0.95 | 0.03 | 0 | 0 | 0.05 | 3 |  |  |  |  |  | derived: Opitz (1996) balanced model | Opitz 1996 Table 3.22 (biomass-weighted P/B of matched groups) |  |  |  |
+| small_reef_fish |  | Non-fishery | nonfishery | TRUE | FALSE | FALSE | 3 | 2.02 | 0.3 | 0.5 | 0.1 | biomass | 12 | 0.5 |  |  | 0.95 | 0.03 | 0.5 | 0 | 0.05 | 4.5 |  |  |  |  |  | derived: Opitz (1996) balanced model | Opitz 1996 Table 3.22 (biomass-weighted P/B of matched groups) |  |  |  |
+| small_pelagics |  | Non-fishery | nonfishery | TRUE | FALSE | FALSE | 3 | 3.2 | 0.3 | 0.5 | 0.1 | biomass | 14.6 | 0.5 |  |  | 0.95 | 0.03 | 0 | 0 | 0.05 | 5 |  |  |  |  |  | derived: Opitz (1996) balanced model | Opitz 1996 Table 3.22 (biomass-weighted P/B of matched groups) |  |  |  |
+| other_reef_predators |  | Non-fishery | nonfishery | TRUE | FALSE | FALSE | 3 | 0.38 | 0.3 | 0.5 | 0.1 | biomass | 2.52 | 0.5 |  |  | 0.95 | 0.03 | 0.3 | 0 | 0.05 | 5 |  |  |  |  |  | derived: Opitz (1996) balanced model | Opitz 1996 Table 3.22 (biomass-weighted P/B of matched groups) |  |  |  |
+| sharks_apex |  | Non-fishery | nonfishery | TRUE | FALSE | FALSE | 3 | 0.298 | 0.3 | 0.5 | 0.1 | biomass | 0.714 | 0.5 |  |  | 0.95 | 0.03 | 0 | 0 | 0.05 | 5 |  |  |  |  |  | derived: Opitz (1996) balanced model | Opitz 1996 Table 3.22 (biomass-weighted P/B of matched groups) |  |  |  |
+| benthic_predatory_inverts |  | Non-fishery | nonfishery | TRUE | FALSE | FALSE | 3 | 1.39 | 0.3 | 0.5 | 0.1 | biomass | 62.4 | 0.5 |  |  | 0.95 | 0.03 | 0.2 | 0 | 0.05 | 4.5 |  |  |  |  |  | derived: Opitz (1996) balanced model | Opitz 1996 Table 3.22 (biomass-weighted P/B of matched groups) |  |  |  |
+| other_invertivore_fishes |  | Non-fishery | nonfishery | TRUE | FALSE | FALSE | 3 | 1.2 | 0.3 | 0.5 | 0.1 | biomass | 8 | 0.5 |  |  | 0.95 | 0.03 | 0.2 | 0 | 0.05 | 4.5 |  |  |  |  |  | ASSUMPTION (no matched Opitz group; wide prior) | Pufferfishes, mojarras, small wrasses, flounders (non-FMP). B = 8 t/km2 and P/B = 1.2 are assumed values within the range of Opitz (1996) small invertivore fish groups; partition CV 0.5 |  |  |  |
+| squids_pelagic_predators |  | Non-fishery | nonfishery | TRUE | FALSE | FALSE | 3 | 1.3 | 0.3 | 0.5 | 0.1 | biomass | 1.5 | 0.5 |  |  | 0.95 | 0.03 | 0 | 0 | 0.05 | 4.5 |  |  |  |  |  | derived: Opitz (1996) balanced model | Opitz 1996 Table 3.22 (biomass-weighted P/B of matched groups) |  |  |  |
 
 ## diet.csv
 
-| group | B_TL1 | B_TL2 | B_TL3 | B_TL4 | P_TL1 | P_TL2 | P_TL3 | P_TL4 | reference |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| spiny_lobster | 0.1 | 0.7 | 0.2 | 0 | 0 | 0 | 0 | 0 | Randall 1967; Opitz 1996 (mollusks echinoderms crustaceans) |
-| queen_conch | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | Algae/detritus grazer |
-| parrotfish_1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | Herbivore/detritivore |
-| parrotfish_2 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | Herbivore/detritivore |
-| surgeonfishes | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | Herbivore |
-| queen_triggerfish | 0 | 0.85 | 0.15 | 0 | 0 | 0 | 0 | 0 | Urchins crabs mollusks (Randall 1967) |
-| grunts | 0 | 0.8 | 0.1 | 0 | 0 | 0.1 | 0 | 0 | Nocturnal benthic invertivores (seagrass foraging) |
-| snappers_shallow | 0 | 0.3 | 0.5 | 0 | 0 | 0 | 0.2 | 0 | Crustaceans + fish |
-| yellowtail_snapper | 0 | 0.2 | 0.3 | 0 | 0 | 0.3 | 0.2 | 0 | Plankton + benthic prey |
-| snappers_deep | 0 | 0 | 0.4 | 0 | 0 | 0.2 | 0.4 | 0 | Fish + pelagic invertebrates |
-| groupers_shallow | 0 | 0.3 | 0.6 | 0 | 0 | 0 | 0.1 | 0 | Crabs + reef fish |
-| squirrelfishes | 0 | 0.7 | 0 | 0 | 0 | 0.3 | 0 | 0 | Nocturnal crustacean feeders |
-| goatfishes | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | Infaunal invertivores |
-| boxfishes | 0.2 | 0.8 | 0 | 0 | 0 | 0 | 0 | 0 | Benthic invertebrates + algae |
-| angelfishes | 0.1 | 0.9 | 0 | 0 | 0 | 0 | 0 | 0 | Sponges (TL2 benthic) |
-| wrasses_hogfish | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | Mollusks crustaceans |
-| jacks | 0 | 0 | 0.5 | 0 | 0 | 0 | 0.5 | 0 | Piscivores |
-| porgies | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | Benthic invertebrates |
-| pelagics | 0 | 0 | 0 | 0 | 0 | 0 | 0.6 | 0.4 | Dolphinfish/wahoo: small pelagics squid |
-| zooplankton | 0.1 | 0 | 0 | 0 | 0.9 | 0 | 0 | 0 | Phytoplankton + benthic detritus |
-| benthic_grazers | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |  |
-| benthic_detritivores_filter | 0.7 | 0 | 0 | 0 | 0.3 | 0 | 0 | 0 |  |
-| small_reef_fish | 0.3 | 0.4 | 0 | 0 | 0 | 0.3 | 0 | 0 |  |
-| small_pelagics | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 |  |
-| other_reef_predators | 0 | 0.2 | 0.6 | 0 | 0 | 0 | 0.2 | 0 |  |
-| sharks_apex | 0 | 0 | 0.3 | 0.3 | 0 | 0 | 0.2 | 0.2 |  |
-| benthic_predatory_inverts | 0.2 | 0.6 | 0.2 | 0 | 0 | 0 | 0 | 0 |  |
-| other_invertivore_fishes | 0 | 0.9 | 0 | 0 | 0 | 0.1 | 0 | 0 |  |
-| squids_pelagic_predators | 0 | 0 | 0 | 0 | 0 | 0.5 | 0.5 | 0 |  |
+| group | B_TL1 | B_TL2 | B_TL3 | B_TL4 | P_TL1 | P_TL2 | P_TL3 | P_TL4 | data_status | reference |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| spiny_lobster | 0.1 | 0.7 | 0.2 | 0 | 0 | 0 | 0 | 0 | derived (Randall 1967 food habits; pools matched to FishBase TL) | Randall 1967; Opitz 1996 (mollusks echinoderms crustaceans) |
+| queen_conch | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | derived (Randall 1967 food habits; pools matched to FishBase TL) | Algae/detritus grazer (diet category from Randall 1967; pools set to match FishBase trophic level) |
+| parrotfish_1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | derived (Randall 1967 food habits; pools matched to FishBase TL) | Herbivore/detritivore (diet category from Randall 1967; pools set to match FishBase trophic level) |
+| parrotfish_2 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | derived (Randall 1967 food habits; pools matched to FishBase TL) | Herbivore/detritivore (diet category from Randall 1967; pools set to match FishBase trophic level) |
+| surgeonfishes | 0.832 | 0.168 | 0 | 0 | 0 | 0 | 0 | 0 | derived (Randall 1967 food habits; pools matched to FishBase TL) | Herbivore; shifted to FishBase TL 2.17 (was 2.00) |
+| queen_triggerfish | 0 | 0.281 | 0.619 | 0.1 | 0 | 0 | 0 | 0 | derived (Randall 1967 food habits; pools matched to FishBase TL) | Urchins crabs mollusks (Randall 1967); shifted to FishBase TL 3.82 (was 3.15) |
+| grunts | 0 | 0.494 | 0.367 | 0.038 | 0 | 0.062 | 0.038 | 0 | derived (Randall 1967 food habits; pools matched to FishBase TL) | Nocturnal benthic invertivores (seagrass foraging); shifted to FishBase TL 3.48 (was 3.10) |
+| snappers_shallow | 0 | 0.137 | 0.391 | 0.272 | 0 | 0 | 0.091 | 0.109 | derived (Randall 1967 food habits; pools matched to FishBase TL) | Crustaceans + fish; shifted to FishBase TL 4.24 (was 3.70) |
+| yellowtail_snapper | 0 | 0.094 | 0.247 | 0.159 | 0 | 0.141 | 0.253 | 0.106 | derived (Randall 1967 food habits; pools matched to FishBase TL) | Plankton + benthic prey; shifted to FishBase TL 4.03 (was 3.50) |
+| snappers_deep | 0 | 0 | 0.352 | 0.048 | 0 | 0.176 | 0.376 | 0.048 | derived (Randall 1967 food habits; pools matched to FishBase TL) | Fish + pelagic invertebrates; shifted to FishBase TL 3.92 (was 3.80) |
+| groupers_shallow | 0 | 0.151 | 0.451 | 0.298 | 0 | 0 | 0.05 | 0.05 | derived (Randall 1967 food habits; pools matched to FishBase TL) | Crabs + reef fish; shifted to FishBase TL 4.20 (was 3.70) |
+| squirrelfishes | 0 | 0.349 | 0.351 | 0 | 0 | 0.15 | 0.15 | 0 | derived (Randall 1967 food habits; pools matched to FishBase TL) | Nocturnal crustacean feeders; shifted to FishBase TL 3.50 (was 3.00) |
+| goatfishes | 0 | 0.69 | 0.31 | 0 | 0 | 0 | 0 | 0 | derived (Randall 1967 food habits; pools matched to FishBase TL) | Infaunal invertivores; shifted to FishBase TL 3.31 (was 3.00) |
+| boxfishes | 0.114 | 0.542 | 0.344 | 0 | 0 | 0 | 0 | 0 | derived (Randall 1967 food habits; pools matched to FishBase TL) | Benthic invertebrates + algae; shifted to FishBase TL 3.23 (was 2.80) |
+| angelfishes | 0.08 | 0.743 | 0.176 | 0 | 0 | 0 | 0 | 0 | derived (Randall 1967 food habits; pools matched to FishBase TL) | Sponges (TL2 benthic); shifted to FishBase TL 3.10 (was 2.90) |
+| wrasses_hogfish | 0 | 0.349 | 0.651 | 0 | 0 | 0 | 0 | 0 | derived (Randall 1967 food habits; pools matched to FishBase TL) | Mollusks crustaceans; shifted to FishBase TL 3.65 (was 3.00) |
+| jacks | 0 | 0 | 0.358 | 0.142 | 0 | 0 | 0.358 | 0.142 | derived (Randall 1967 food habits; pools matched to FishBase TL) | Piscivores; shifted to FishBase TL 4.28 (was 4.00) |
+| porgies | 0 | 0.564 | 0.436 | 0 | 0 | 0 | 0 | 0 | derived (Randall 1967 food habits; pools matched to FishBase TL) | Benthic invertebrates; shifted to FishBase TL 3.44 (was 3.00) |
+| pelagics | 0 | 0 | 0 | 0 | 0 | 0 | 0.6 | 0.4 | derived (Randall 1967 food habits; pools matched to FishBase TL) | Dolphinfish/wahoo: small pelagics squid (diet category from Randall 1967; pools set to match FishBase trophic level) |
+| zooplankton | 0.1 | 0 | 0 | 0 | 0.9 | 0 | 0 | 0 | derived (Randall 1967 food habits; pools matched to FishBase TL) | Phytoplankton + benthic detritus (diet category from Randall 1967; pools set to match FishBase trophic level) |
+| benthic_grazers | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | derived (aggregated to TL pools; ASSUMPTION: pooling) | Pooled from the Opitz (1996) Virgin Islands Ecopath diet matrix to trophic-level pools |
+| benthic_detritivores_filter | 0.7 | 0 | 0 | 0 | 0.3 | 0 | 0 | 0 | derived (aggregated to TL pools; ASSUMPTION: pooling) | Pooled from the Opitz (1996) Virgin Islands Ecopath diet matrix to trophic-level pools |
+| small_reef_fish | 0.3 | 0.4 | 0 | 0 | 0 | 0.3 | 0 | 0 | derived (aggregated to TL pools; ASSUMPTION: pooling) | Pooled from the Opitz (1996) Virgin Islands Ecopath diet matrix to trophic-level pools |
+| small_pelagics | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | derived (aggregated to TL pools; ASSUMPTION: pooling) | Pooled from the Opitz (1996) Virgin Islands Ecopath diet matrix to trophic-level pools |
+| other_reef_predators | 0 | 0.2 | 0.6 | 0 | 0 | 0 | 0.2 | 0 | derived (aggregated to TL pools; ASSUMPTION: pooling) | Pooled from the Opitz (1996) Virgin Islands Ecopath diet matrix to trophic-level pools |
+| sharks_apex | 0 | 0 | 0.3 | 0.3 | 0 | 0 | 0.2 | 0.2 | derived (aggregated to TL pools; ASSUMPTION: pooling) | Pooled from the Opitz (1996) Virgin Islands Ecopath diet matrix to trophic-level pools |
+| benthic_predatory_inverts | 0.2 | 0.6 | 0.2 | 0 | 0 | 0 | 0 | 0 | derived (aggregated to TL pools; ASSUMPTION: pooling) | Pooled from the Opitz (1996) Virgin Islands Ecopath diet matrix to trophic-level pools |
+| other_invertivore_fishes | 0 | 0.9 | 0 | 0 | 0 | 0.1 | 0 | 0 | derived (aggregated to TL pools; ASSUMPTION: pooling) | Pooled from the Opitz (1996) Virgin Islands Ecopath diet matrix to trophic-level pools |
+| squids_pelagic_predators | 0 | 0 | 0 | 0 | 0 | 0.5 | 0.5 | 0 | derived (aggregated to TL pools; ASSUMPTION: pooling) | Pooled from the Opitz (1996) Virgin Islands Ecopath diet matrix to trophic-level pools |
 
 ## habitat_preference.csv
 
-| group | coral_reef | colonized_pavement | seagrass | macroalgae | sand | mangrove | deep_hardbottom |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| spiny_lobster | 1 | 0.8 | 0.6 | 0.4 | 0.2 | 0.3 | 0.5 |
-| queen_conch | 0 | 0.3 | 1 | 0.5 | 0.8 | 0 | 0 |
-| parrotfish_1 | 1 | 0.7 | 0.3 | 0.3 | 0 | 0.5 | 0.2 |
-| parrotfish_2 | 1 | 0.8 | 0.5 | 0.5 | 0 | 0.2 | 0.3 |
-| surgeonfishes | 1 | 1 | 0.3 | 0.4 | 0 | 0 | 0.3 |
-| queen_triggerfish | 0.8 | 1 | 0.5 | 0.3 | 0.6 | 0 | 0.6 |
-| grunts | 1 | 0.6 | 1 | 0.3 | 0.7 | 0.6 | 0.2 |
-| snappers_shallow | 1 | 0.7 | 0.6 | 0.3 | 0.4 | 0.7 | 0.3 |
-| yellowtail_snapper | 1 | 0.8 | 0.5 | 0.3 | 0.2 | 0.2 | 0.6 |
-| snappers_deep | 0 | 0.3 | 0 | 0 | 0 | 0 | 1 |
-| groupers_shallow | 1 | 0.8 | 0.1 | 0.2 | 0 | 0 | 0.7 |
-| squirrelfishes | 1 | 0.6 | 0 | 0 | 0 | 0 | 0.5 |
-| goatfishes | 0.2 | 0.4 | 0.8 | 0.3 | 1 | 0 | 0.2 |
-| boxfishes | 0.7 | 0.5 | 0.8 | 0.3 | 0.6 | 0 | 0 |
-| angelfishes | 1 | 0.8 | 0 | 0.2 | 0 | 0 | 0.5 |
-| wrasses_hogfish | 0.8 | 1 | 0.5 | 0.3 | 0.3 | 0 | 0.3 |
-| jacks | 0.6 | 0.5 | 0.2 | 0.1 | 0.3 | 0.2 | 0.5 |
-| porgies | 0.3 | 0.5 | 0.8 | 0.3 | 1 | 0 | 0.2 |
-| zooplankton | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
-| benthic_grazers | 1 | 1 | 1 | 1 | 0.5 | 0.5 | 0.6 |
-| benthic_detritivores_filter | 0.6 | 0.8 | 1 | 0.8 | 1 | 1 | 0.8 |
-| small_reef_fish | 1 | 0.8 | 0.5 | 0.5 | 0.2 | 0.5 | 0.6 |
-| small_pelagics | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| other_reef_predators | 1 | 0.8 | 0.5 | 0.4 | 0.4 | 0.5 | 0.6 |
-| sharks_apex | 0.8 | 0.6 | 0.4 | 0.2 | 0.3 | 0.3 | 0.8 |
-| pelagics | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| benthic_predatory_inverts | 1 | 1 | 1 | 0.8 | 0.8 | 0.8 | 0.8 |
-| other_invertivore_fishes | 0.6 | 0.6 | 1 | 0.5 | 1 | 0.6 | 0.3 |
-| squids_pelagic_predators | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| group | coral_reef | colonized_pavement | seagrass | macroalgae | sand | mangrove | deep_hardbottom | data_status | reference |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| spiny_lobster | 1 | 0.8 | 0.6 | 0.4 | 0.2 | 0.3 | 0.5 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| queen_conch | 0 | 0.3 | 1 | 0.5 | 0.8 | 0 | 0 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| parrotfish_1 | 1 | 0.7 | 0.3 | 0.3 | 0 | 0.5 | 0.2 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| parrotfish_2 | 1 | 0.8 | 0.5 | 0.5 | 0 | 0.2 | 0.3 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| surgeonfishes | 1 | 1 | 0.3 | 0.4 | 0 | 0 | 0.3 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| queen_triggerfish | 0.8 | 1 | 0.5 | 0.3 | 0.6 | 0 | 0.6 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| grunts | 1 | 0.6 | 1 | 0.3 | 0.7 | 0.6 | 0.2 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| snappers_shallow | 1 | 0.7 | 0.6 | 0.3 | 0.4 | 0.7 | 0.3 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| yellowtail_snapper | 1 | 0.8 | 0.5 | 0.3 | 0.2 | 0.2 | 0.6 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| snappers_deep | 0 | 0.3 | 0 | 0 | 0 | 0 | 1 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| groupers_shallow | 1 | 0.8 | 0.1 | 0.2 | 0 | 0 | 0.7 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| squirrelfishes | 1 | 0.6 | 0 | 0 | 0 | 0 | 0.5 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| goatfishes | 0.2 | 0.4 | 0.8 | 0.3 | 1 | 0 | 0.2 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| boxfishes | 0.7 | 0.5 | 0.8 | 0.3 | 0.6 | 0 | 0 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| angelfishes | 1 | 0.8 | 0 | 0.2 | 0 | 0 | 0.5 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| wrasses_hogfish | 0.8 | 1 | 0.5 | 0.3 | 0.3 | 0 | 0.3 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| jacks | 0.6 | 0.5 | 0.2 | 0.1 | 0.3 | 0.2 | 0.5 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| porgies | 0.3 | 0.5 | 0.8 | 0.3 | 1 | 0 | 0.2 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| zooplankton | 1 | 1 | 1 | 1 | 1 | 1 | 1 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| benthic_grazers | 1 | 1 | 1 | 1 | 0.5 | 0.5 | 0.6 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| benthic_detritivores_filter | 0.6 | 0.8 | 1 | 0.8 | 1 | 1 | 0.8 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| small_reef_fish | 1 | 0.8 | 0.5 | 0.5 | 0.2 | 0.5 | 0.6 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| small_pelagics | 0 | 0 | 0 | 0 | 0 | 0 | 0 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| other_reef_predators | 1 | 0.8 | 0.5 | 0.4 | 0.4 | 0.5 | 0.6 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| sharks_apex | 0.8 | 0.6 | 0.4 | 0.2 | 0.3 | 0.3 | 0.8 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| pelagics | 0 | 0 | 0 | 0 | 0 | 0 | 0 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| benthic_predatory_inverts | 1 | 1 | 1 | 0.8 | 0.8 | 0.8 | 0.8 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| other_invertivore_fishes | 0.6 | 0.6 | 1 | 0.5 | 1 | 0.6 | 0.3 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
+| squids_pelagic_predators | 0 | 0 | 0 | 0 | 0 | 0 | 0 | ASSUMPTION (expert judgement) | Relative habitat affinity (0-1) from species habitat descriptions (Randall 1967; FishBase/SeaLifeBase habitat fields); replace with NCRMP occupancy by habitat stratum; uncertainty via settings pref_cv |
 
 ## gears.csv
 
@@ -173,19 +193,39 @@ Values flagged `PLACEHOLDER` must be replaced with real data before management u
 
 | group | variable | type | target | baseline | sensitivity | sensitivity_cv | t_opt | t_width | threshold | data_status | reference |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| spiny_lobster | sst | linear | production |  | -0.2 | 0.5 |  |  |  | PLACEHOLDER | Per degC anomaly (legacy TTM thermal sensitivity) |
-| queen_conch | sst | linear | production |  | -0.15 | 0.5 |  |  |  | PLACEHOLDER |  |
-| parrotfish_1 | sst | linear | production |  | -0.15 | 0.5 |  |  |  | PLACEHOLDER |  |
-| parrotfish_2 | sst | linear | production |  | -0.15 | 0.5 |  |  |  | PLACEHOLDER |  |
-| surgeonfishes | sst | linear | production |  | -0.1 | 0.5 |  |  |  | PLACEHOLDER |  |
-| queen_triggerfish | sst | linear | production |  | -0.05 | 0.5 |  |  |  | PLACEHOLDER |  |
-| grunts | sst | linear | production |  | -0.1 | 0.5 |  |  |  | PLACEHOLDER |  |
-| snappers_shallow | sst | linear | production |  | -0.08 | 0.5 |  |  |  | PLACEHOLDER |  |
-| yellowtail_snapper | sst | linear | production |  | -0.08 | 0.5 |  |  |  | PLACEHOLDER |  |
-| groupers_shallow | sst | thermal_performance | production |  |  |  | 27.5 | 2 |  | PLACEHOLDER | Example Gaussian thermal performance curve |
-| snappers_deep | sst | linear | production |  | -0.03 | 0.5 |  |  |  | PLACEHOLDER |  |
-| pelagics | sst | linear | production |  | -0.02 | 0.5 |  |  |  | PLACEHOLDER |  |
 | pelagics | npp_pelagic_index | loglinear | K |  | 0.5 | 0.5 |  |  |  | PLACEHOLDER | Example: pelagic forage availability |
+| angelfishes | sst | thermal_performance | production |  |  | 0 | 27.028 | 2.04 |  | derived: FishBase/AquaMaps temperature preference | AquaMaps (via FishBase v24.07) TempPref min/mean/max = 24.0/27.0/28.1 degC; width = (max-min)/2 |
+| boxfishes | sst | thermal_performance | production |  |  | 0 | 25.749 | 2.53 |  | derived: FishBase/AquaMaps temperature preference | AquaMaps (via FishBase v24.07) TempPref min/mean/max = 22.9/25.7/28.0 degC; width = (max-min)/2 |
+| goatfishes | sst | thermal_performance | production |  |  | 0 | 26.554 | 2.37 |  | derived: FishBase/AquaMaps temperature preference | AquaMaps (via FishBase v24.07) TempPref min/mean/max = 23.3/26.6/28.0 degC; width = (max-min)/2 |
+| groupers_shallow | sst | thermal_performance | production |  |  | 0 | 27.018 | 1.76 |  | derived: FishBase/AquaMaps temperature preference | AquaMaps (via FishBase v24.07) TempPref min/mean/max = 24.5/27.0/28.0 degC; width = (max-min)/2 |
+| grunts | sst | thermal_performance | production |  |  | 0 | 26.909 | 1.55 |  | derived: FishBase/AquaMaps temperature preference | AquaMaps (via FishBase v24.07) TempPref min/mean/max = 24.9/26.9/28.0 degC; width = (max-min)/2 |
+| jacks | sst | thermal_performance | production |  |  | 0 | 26.79 | 2.44 |  | derived: FishBase/AquaMaps temperature preference | AquaMaps (via FishBase v24.07) TempPref min/mean/max = 23.1/26.8/28.0 degC; width = (max-min)/2 |
+| parrotfish_1 | sst | thermal_performance | production |  |  | 0 | 27.3 | 2.2 |  | derived: FishBase/AquaMaps temperature preference | AquaMaps (via FishBase v24.07) TempPref min/mean/max = 23.7/27.3/28.1 degC; width = (max-min)/2 |
+| parrotfish_2 | sst | thermal_performance | production |  |  | 0 | 27.447 | 1.03 |  | derived: FishBase/AquaMaps temperature preference | AquaMaps (via FishBase v24.07) TempPref min/mean/max = 26.2/27.4/28.2 degC; width = (max-min)/2 |
+| pelagics | sst | thermal_performance | production |  |  | 0 | 26.05 | 5.1 |  | derived: FishBase/AquaMaps temperature preference | AquaMaps (via FishBase v24.07) TempPref min/mean/max = 18.1/26.1/28.4 degC; width = (max-min)/2 |
+| porgies | sst | thermal_performance | production |  |  | 0 | 26.381 | 2.47 |  | derived: FishBase/AquaMaps temperature preference | AquaMaps (via FishBase v24.07) TempPref min/mean/max = 22.9/26.4/27.9 degC; width = (max-min)/2 |
+| queen_triggerfish | sst | thermal_performance | production |  |  | 0 | 25.9 | 2.75 |  | derived: FishBase/AquaMaps temperature preference | AquaMaps (via FishBase v24.07) TempPref min/mean/max = 22.5/25.9/28.0 degC; width = (max-min)/2 |
+| snappers_shallow | sst | thermal_performance | production |  |  | 0 | 25.938 | 2.72 |  | derived: FishBase/AquaMaps temperature preference | AquaMaps (via FishBase v24.07) TempPref min/mean/max = 22.4/25.9/27.8 degC; width = (max-min)/2 |
+| squirrelfishes | sst | thermal_performance | production |  |  | 0 | 27.262 | 2.11 |  | derived: FishBase/AquaMaps temperature preference | AquaMaps (via FishBase v24.07) TempPref min/mean/max = 23.9/27.3/28.1 degC; width = (max-min)/2 |
+| surgeonfishes | sst | thermal_performance | production |  |  | 0 | 27.22 | 1.96 |  | derived: FishBase/AquaMaps temperature preference | AquaMaps (via FishBase v24.07) TempPref min/mean/max = 24.1/27.2/28.1 degC; width = (max-min)/2 |
+| wrasses_hogfish | sst | thermal_performance | production |  |  | 0 | 26.8 | 2.16 |  | derived: FishBase/AquaMaps temperature preference | AquaMaps (via FishBase v24.07) TempPref min/mean/max = 23.7/26.8/28.0 degC; width = (max-min)/2 |
+| yellowtail_snapper | sst | thermal_performance | production |  |  | 0 | 25.9 | 3.1 |  | derived: FishBase/AquaMaps temperature preference | AquaMaps (via FishBase v24.07) TempPref min/mean/max = 21.7/25.9/27.9 degC; width = (max-min)/2 |
+| squirrelfishes | lionfish | loglinear | K | 0 | -0.1 | 1 |  |  |  | PLACEHOLDER magnitude | Lionfish predation on small reef fish and recruits (Albins & Hixon 2008; Green et al. 2012); 10% K reduction at full invasion |
+| goatfishes | lionfish | loglinear | K | 0 | -0.1 | 1 |  |  |  | PLACEHOLDER magnitude | Lionfish predation on small reef fish and recruits (Albins & Hixon 2008; Green et al. 2012); 10% K reduction at full invasion |
+| wrasses_hogfish | lionfish | loglinear | K | 0 | -0.1 | 1 |  |  |  | PLACEHOLDER magnitude | Lionfish predation on small reef fish and recruits (Albins & Hixon 2008; Green et al. 2012); 10% K reduction at full invasion |
+| grunts | lionfish | loglinear | K | 0 | -0.1 | 1 |  |  |  | PLACEHOLDER magnitude | Lionfish predation on small reef fish and recruits (Albins & Hixon 2008; Green et al. 2012); 10% K reduction at full invasion |
+| parrotfish_2 | lionfish | loglinear | K | 0 | -0.1 | 1 |  |  |  | PLACEHOLDER magnitude | Lionfish predation on small reef fish and recruits (Albins & Hixon 2008; Green et al. 2012); 10% K reduction at full invasion |
+| angelfishes | lionfish | loglinear | K | 0 | -0.1 | 1 |  |  |  | PLACEHOLDER magnitude | Lionfish predation on small reef fish and recruits (Albins & Hixon 2008; Green et al. 2012); 10% K reduction at full invasion |
+| groupers_shallow | lionfish | loglinear | K | 0 | -0.05 | 1 |  |  |  | PLACEHOLDER magnitude | Lionfish competition with native mesopredators (Albins 2013) |
+| snappers_shallow | lionfish | loglinear | K | 0 | -0.05 | 1 |  |  |  | PLACEHOLDER magnitude | Lionfish competition with native mesopredators (Albins 2013) |
+| grunts | sargassum | loglinear | K | 0 | -0.03 | 1 |  |  |  | PLACEHOLDER magnitude | Sargassum inundation degrades nearshore seagrass/mangrove nurseries (van Tussenbroek et al. 2017); per unit of relative AFAI index |
+| snappers_shallow | sargassum | loglinear | K | 0 | -0.03 | 1 |  |  |  | PLACEHOLDER magnitude | Sargassum inundation degrades nearshore seagrass/mangrove nurseries (van Tussenbroek et al. 2017); per unit of relative AFAI index |
+| queen_conch | sargassum | loglinear | K | 0 | -0.03 | 1 |  |  |  | PLACEHOLDER magnitude | Sargassum inundation degrades nearshore seagrass/mangrove nurseries (van Tussenbroek et al. 2017); per unit of relative AFAI index |
+| parrotfish_1 | sargassum | loglinear | K | 0 | -0.03 | 1 |  |  |  | PLACEHOLDER magnitude | Sargassum inundation degrades nearshore seagrass/mangrove nurseries (van Tussenbroek et al. 2017); per unit of relative AFAI index |
+| spiny_lobster | sargassum | loglinear | K | 0 | -0.03 | 1 |  |  |  | PLACEHOLDER magnitude | Sargassum inundation degrades nearshore seagrass/mangrove nurseries (van Tussenbroek et al. 2017); per unit of relative AFAI index |
+| pelagics | sargassum | loglinear | K | 0 | 0.03 | 1 |  |  |  | PLACEHOLDER magnitude | Pelagic Sargassum is habitat for dolphinfish and juveniles of other pelagics (Casazza & Ross 2008) |
+| spiny_lobster | sst | thermal_performance | production |  |  | 0 | 26.7 | 2.15 |  | derived: SeaLifeBase/AquaMaps temperature preference | AquaMaps (via SeaLifeBase v24.07, SpecCode 26102) TempPref min/mean/max = 23.7/26.7/28.0 degC; width = (max-min)/2 |
+| queen_conch | sst | thermal_performance | production |  |  | 0 | 27 | 1.35 |  | derived: SeaLifeBase/AquaMaps temperature preference | AquaMaps (via SeaLifeBase v24.07, SpecCode 2799) TempPref min/mean/max = 25.3/27.0/28.0 degC; width = (max-min)/2 |
 
 ## disturbances.csv
 
@@ -224,17 +264,22 @@ Values flagged `PLACEHOLDER` must be replaced with real data before management u
 | Climate_SSP585 | cov_set | dhw | 2033 | 2033 | 14 | Bleaching year (PLACEHOLDER) |
 | Climate_SSP585 | cov_set | dhw | 2038 | 2038 | 14 | Bleaching year (PLACEHOLDER) |
 | Climate_SSP585 | cov_set | dhw | 2043 | 2043 | 16 | Bleaching year (PLACEHOLDER) |
-| Major_hurricane_2030 | disturbance | major_hurricane | 2030 | 2030 | 1 |  |
-| Major_hurricane_2030 | disturbance | major_hurricane_other_gears | 2030 | 2030 | 1 |  |
+| Major_hurricane_2030 | disturbance | major_hurricane | 2030 | 2030 | 1 | Hurricane template from disturbances.csv (PLACEHOLDER loss magnitudes) |
+| Major_hurricane_2030 | disturbance | major_hurricane_other_gears | 2030 | 2030 | 1 | Hurricane template from disturbances.csv (PLACEHOLDER loss magnitudes) |
 | Trap_effort_plus30 | effort_mult | trap_fish;trap_lobster | 2025 | 2045 | 1.3 | Unmanaged trap effort surge |
 | Trap_reduction_minus25 | effort_mult | trap_fish;trap_lobster | 2025 | 2045 | 0.75 | Trap reduction program (cf. St. Thomas) |
 | Coral_disease_SCTLD | coral_disease | coral_reef | 2025 | 2032 | 0.08 | Continued SCTLD-driven coral loss (PLACEHOLDER rate) |
-| Combined_stress | cov_from | sst=sst_ssp585 | 2025 | 2045 |  |  |
-| Combined_stress | cov_from | npp_pelagic_index=npp_pelagic_index_ssp585 | 2025 | 2045 |  |  |
-| Combined_stress | cov_set | dhw | 2030 | 2030 | 12 |  |
-| Combined_stress | disturbance | major_hurricane | 2033 | 2033 | 1 |  |
-| Combined_stress | disturbance | major_hurricane_other_gears | 2033 | 2033 | 1 |  |
-| Combined_stress | effort_mult | trap_fish;trap_lobster | 2025 | 2045 | 1.3 |  |
+| Combined_stress | cov_from | sst=sst_ssp585 | 2025 | 2045 |  | CMIP6 SSP5-8.5 delta projection (API) |
+| Combined_stress | cov_from | npp_pelagic_index=npp_pelagic_index_ssp585 | 2025 | 2045 |  | CMIP6 SSP5-8.5 delta projection (API) |
+| Combined_stress | cov_set | dhw | 2030 | 2030 | 12 | Bleaching year (PLACEHOLDER magnitude) |
+| Combined_stress | disturbance | major_hurricane | 2033 | 2033 | 1 | Hurricane template from disturbances.csv (PLACEHOLDER loss magnitudes) |
+| Combined_stress | disturbance | major_hurricane_other_gears | 2033 | 2033 | 1 | Hurricane template from disturbances.csv (PLACEHOLDER loss magnitudes) |
+| Combined_stress | effort_mult | trap_fish;trap_lobster | 2025 | 2045 | 1.3 | Trap effort x1.3 (hypothetical) |
+| MPA_expansion | closed_fraction | coral_reef | 2026 | 2045 | 0.4 | No-take reef area raised to 40% (from 25%) |
+| MPA_expansion | closed_fraction | colonized_pavement | 2026 | 2045 | 0.3 | No-take pavement raised to 30% (from 15%) |
+| Open_access_effort | effort_response | all | 2025 | 2045 | 0.5 | Effort follows catch rate (elasticity 0.5; Smith 1969 open-access dynamics) |
+| Parrotfish_harvest_plus50 | effort_mult | dive | 2025 | 2045 | 1.5 | Dive effort (main parrotfish gear) +50%: tests herbivory-coral feedback |
+| Seagrass_loss_Halophila | area_trend | seagrass | 2025 | 2045 | -0.02 | Native seagrass loss 2%/yr (invasive Halophila stipulacea displacement; PLACEHOLDER rate) |
 
 ## landings.csv (summary: mean 2022-2024, lb; PLACEHOLDER)
 
@@ -438,6 +483,132 @@ Values flagged `PLACEHOLDER` must be replaced with real data before management u
 | 2021 | coral_cover | 0.045 | proportion | approximate |
 | 2023 | coral_cover | 0.035 | proportion | approximate |
 | 2024 | coral_cover | 0.03 | proportion | approximate |
+| 1983 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 1984 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 1985 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 1986 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 1987 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 1988 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 1989 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 1990 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 1991 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 1992 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 1993 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 1994 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 1995 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 1996 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 1997 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 1998 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 1999 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2000 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2001 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2002 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2003 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2004 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2005 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2006 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2007 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2008 | lionfish | 0 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2009 | lionfish | 0.2 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2010 | lionfish | 0.5 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2011 | lionfish | 0.8 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2012 | lionfish | 1 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2013 | lionfish | 1 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2014 | lionfish | 1 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2015 | lionfish | 1 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2016 | lionfish | 1 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2017 | lionfish | 1 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2018 | lionfish | 1 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2019 | lionfish | 1 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2020 | lionfish | 1 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2021 | lionfish | 1 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2022 | lionfish | 1 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2023 | lionfish | 1 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 2024 | lionfish | 1 | relative invasion stage (0 = absent, 1 = established) | PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010) |
+| 1983 | light_seagrass | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1984 | light_seagrass | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1985 | light_seagrass | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1986 | light_seagrass | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1987 | light_seagrass | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1988 | light_seagrass | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1989 | light_seagrass | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1990 | light_seagrass | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1991 | light_seagrass | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1992 | light_seagrass | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1993 | light_seagrass | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1994 | light_seagrass | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1995 | light_seagrass | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1996 | light_seagrass | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1997 | light_seagrass | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1998 | light_seagrass | 1.0067 | relative bottom light (1998-2024 mean = 1) | derived |
+| 1999 | light_seagrass | 1.0189 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2000 | light_seagrass | 1.0059 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2001 | light_seagrass | 1.0119 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2002 | light_seagrass | 0.9994 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2003 | light_seagrass | 0.9937 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2004 | light_seagrass | 0.9903 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2005 | light_seagrass | 0.997 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2006 | light_seagrass | 0.9944 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2007 | light_seagrass | 0.9941 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2008 | light_seagrass | 0.9957 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2009 | light_seagrass | 0.9818 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2010 | light_seagrass | 0.9797 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2011 | light_seagrass | 0.995 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2012 | light_seagrass | 1.0056 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2013 | light_seagrass | 1.0019 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2014 | light_seagrass | 1.0083 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2015 | light_seagrass | 1.003 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2016 | light_seagrass | 1.0044 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2017 | light_seagrass | 0.9958 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2018 | light_seagrass | 0.9861 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2019 | light_seagrass | 1.0041 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2020 | light_seagrass | 1.0087 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2021 | light_seagrass | 0.9954 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2022 | light_seagrass | 1.0001 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2023 | light_seagrass | 1.0076 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2024 | light_seagrass | 1.0143 | relative bottom light (1998-2024 mean = 1) | derived |
+| 1983 | light_macroalgae | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1984 | light_macroalgae | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1985 | light_macroalgae | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1986 | light_macroalgae | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1987 | light_macroalgae | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1988 | light_macroalgae | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1989 | light_macroalgae | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1990 | light_macroalgae | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1991 | light_macroalgae | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1992 | light_macroalgae | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1993 | light_macroalgae | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1994 | light_macroalgae | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1995 | light_macroalgae | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1996 | light_macroalgae | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1997 | light_macroalgae | 1 | relative bottom light (1998-2024 mean = 1) | ASSUMPTION |
+| 1998 | light_macroalgae | 1.0134 | relative bottom light (1998-2024 mean = 1) | derived |
+| 1999 | light_macroalgae | 1.038 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2000 | light_macroalgae | 1.0117 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2001 | light_macroalgae | 1.0238 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2002 | light_macroalgae | 0.9987 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2003 | light_macroalgae | 0.9873 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2004 | light_macroalgae | 0.9807 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2005 | light_macroalgae | 0.9939 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2006 | light_macroalgae | 0.9887 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2007 | light_macroalgae | 0.9882 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2008 | light_macroalgae | 0.9914 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2009 | light_macroalgae | 0.9639 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2010 | light_macroalgae | 0.9598 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2011 | light_macroalgae | 0.99 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2012 | light_macroalgae | 1.0111 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2013 | light_macroalgae | 1.0038 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2014 | light_macroalgae | 1.0166 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2015 | light_macroalgae | 1.006 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2016 | light_macroalgae | 1.0088 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2017 | light_macroalgae | 0.9915 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2018 | light_macroalgae | 0.9723 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2019 | light_macroalgae | 1.0082 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2020 | light_macroalgae | 1.0174 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2021 | light_macroalgae | 0.9908 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2022 | light_macroalgae | 1.0001 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2023 | light_macroalgae | 1.0153 | relative bottom light (1998-2024 mean = 1) | derived |
+| 2024 | light_macroalgae | 1.0288 | relative bottom light (1998-2024 mean = 1) | derived |
 
 ## indices.csv
 

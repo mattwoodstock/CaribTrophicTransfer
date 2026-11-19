@@ -39,7 +39,8 @@
 
 #' Global sensitivity analysis of reference points to inputs
 #'
-#' Uses the Stage-1 prior Monte Carlo draws (every draw samples every input).
+#' Uses the Stage-1 Monte Carlo draws (every draw samples every input),
+#' resampled to the prior when adaptive importance sampling was used.
 #' For each output, reports standardized rank regression coefficients (SRRC,
 #' rank-transformed multiple regression; R^2 indicates how much of the output
 #' variance is explained by a monotone-additive model) and partial rank
@@ -49,8 +50,24 @@
 #'   per draw; default: total FMP MMSY and MMSY of each assessed/trap group
 #' @param top number of inputs to keep per output (ranked by |SRRC|)
 #' @export
+# Rows of the stored Stage-1 draws resampled to represent the PRIOR. With adaptive
+# importance sampling the stored draws follow the proposal mixture, so they are
+# resampled with probability proportional to prior / proposal (stored log ratio).
+.prior_rows <- function(res, n = NULL, seed = 5) {
+  lc <- res$stage1$log_is_correction
+  N <- if (!is.null(res$stage1$MMSY_ref)) nrow(res$stage1$MMSY_ref) else length(lc)
+  if (is.null(lc) || all(lc == 0)) return(seq_len(N))
+  if (is.null(n)) n <- N
+  w <- exp(lc - max(lc)); w <- w / sum(w)
+  old <- if (exists(".Random.seed", envir = .GlobalEnv)) get(".Random.seed", envir = .GlobalEnv) else NULL
+  set.seed(seed); idx <- sample.int(N, n, replace = TRUE, prob = w)
+  if (!is.null(old)) assign(".Random.seed", old, envir = .GlobalEnv)
+  idx
+}
+
 sensitivity_analysis <- function(res, outputs = NULL, top = 15) {
-  X <- res$stage1$params
+  pr <- .prior_rows(res)
+  X <- res$stage1$params[pr, , drop = FALSE]
   if (is.null(X)) stop("No parameter matrix stored; rerun run_ttm() with this package version")
   g <- res$proj$groups; fmp <- intersect(focus_groups(res$proj), g$group[g$harvest_allowed])
   if (is.null(outputs)) {
@@ -63,7 +80,7 @@ sensitivity_analysis <- function(res, outputs = NULL, top = 15) {
   R <- apply(X, 2, rank)
   out <- list()
   for (nm in names(outputs)) {
-    y <- outputs[[nm]](res$stage1)
+    y <- outputs[[nm]](res$stage1)[pr]
     ok <- is.finite(y)
     ry <- rank(y[ok]); Rx <- scale(R[ok, , drop = FALSE]); ry <- as.numeric(scale(ry))
     fit <- stats::lm.fit(cbind(1, Rx), ry)
@@ -109,8 +126,10 @@ sir_diagnostics <- function(res) {
     keep <- apply(X, 2, function(z) all(is.finite(z)) && stats::sd(z) > 0)
     X <- X[, keep, drop = FALSE]
     mu <- colSums(X * w); vpost <- colSums(w * sweep(X, 2, mu)^2)
-    vprior <- apply(X, 2, stats::var)
-    shrink <- data.frame(input = colnames(X), prior_mean = colMeans(X), posterior_mean = mu,
+    lc <- res$stage1$log_is_correction   # prior moments undo the adaptive proposal
+    wp <- if (is.null(lc)) rep(1 / nrow(X), nrow(X)) else { z <- exp(lc - max(lc)); z / sum(z) }
+    mp <- colSums(X * wp); vprior <- colSums(wp * sweep(X, 2, mp)^2)
+    shrink <- data.frame(input = colnames(X), prior_mean = mp, posterior_mean = mu,
                          shrinkage = pmax(0, 1 - vpost / vprior), row.names = NULL)
     shrink <- shrink[order(-shrink$shrinkage), ]
   }
@@ -139,11 +158,15 @@ self_test <- function(res, n_rep = 100, groups = NULL, seed = 11) {
   feas <- if (is.null(res$catch_shortfall)) rep(TRUE, nrow(s1$MMSY_ref)) else
     apply(res$catch_shortfall[, fg, drop = FALSE], 1, function(z) all(is.na(z) | z < 0.05))
   cand <- which(feas)
+  # stored draws come from the (adaptive) proposal mixture: draw truths from the prior by
+  # weighting candidates with the importance ratio prior / proposal
+  lc <- if (is.null(s1$log_is_correction)) rep(0, length(feas)) else s1$log_is_correction
+  pw <- exp(lc[cand] - max(lc[cand])); pw <- pw / sum(pw)
   idx <- .fit_indices(proj)
   bm <- proj$benchmarks; bm <- if (!is.null(bm) && "use_in_sir" %in% names(bm)) bm[as.logical(bm$use_in_sir) %in% TRUE, ] else NULL
   rows <- list()
   for (r in seq_len(n_rep)) {
-    tr <- sample(cand, 1)
+    tr <- if (length(cand) == 1) cand else sample(cand, 1, prob = pw)
     pseudo_idx <- idx
     if (!is.null(idx) && nrow(idx)) {
       for (i in seq_len(nrow(idx))) {
@@ -189,7 +212,7 @@ self_test <- function(res, n_rep = 100, groups = NULL, seed = 11) {
 #'
 #' * Ryther index = total catch / area (t km-2 yr-1)
 #' * Fogarty ratio = total catch (t) / total primary production (t C), in per mil
-#' Thresholds from settings (`ryther_thresholds`, `fogarty_thresholds`;
+#' Thresholds from settings (`ryther_low`/`ryther_high`, `fogarty_low`/`fogarty_high`;
 #' defaults 1-3 t km-2 yr-1 and 0.22-0.92 per mil). Computed per draw and year.
 #' @param res `ttm_results`
 #' @param scenario scenario
@@ -275,8 +298,10 @@ run_structural_ensemble <- function(proj, variants = default_structural_variants
 
 #' Default structural variants for the ensemble
 #'
-#' base (life-history x on natural mortality); `gulland_PB` (the original
-#' SEDAR103-DW-20 form, x = 0.5 on P/B); x reduced by 25%; closed population
+#' base (life-history x on natural mortality, Pella-Tomlinson shape from the
+#' per-recruit B_MSY/B0); `gulland_PB` (the original SEDAR103-DW-20 form,
+#' x = 0.5 on P/B with Schaefer dynamics); `schaefer_shape` (B_MSY = K/2);
+#' x reduced by 25%; closed population
 #' (no external recruitment); no nursery dependence; no herbivory-coral
 #' feedback; no ghost fishing; no lionfish / Sargassum effects; transfer
 #' efficiency 10% and 20%; no direct thermal effects; food-web fraction x0.67
@@ -288,8 +313,9 @@ default_structural_variants <- function() {
   list(
     base = id,
     gulland_PB = function(p) {   # original SEDAR103-DW-20 form: x = 0.5 on P/B (no per-recruit, no M basis)
-      f <- p$groups$group_type == "fmp"; p$groups$x_msy[f] <- 0.5; p$groups$x_msy_cv[f] <- 0.2; p$groups$m_nat[f] <- NA
+      f <- p$groups$group_type == "fmp"; p$groups$x_msy[f] <- 0.5; p$groups$x_msy_cv[f] <- 0.2; p$groups$m_nat[f] <- NA; p$groups$bmsy_k[f] <- 0.5
       validate_ttm_project(p) },
+    schaefer_shape = function(p) { p$groups$bmsy_k <- 0.5; validate_ttm_project(p) },
     x_msy_low = function(p) { f <- p$groups$group_type == "fmp"; p$groups$x_msy[f] <- 0.75 * p$groups$x_msy[f]; validate_ttm_project(p) },
     closed_population = function(p) { p$groups$open_recruitment <- 0; validate_ttm_project(p) },
     no_nursery = function(p) { p$groups$nursery_dependence <- 0; validate_ttm_project(p) },

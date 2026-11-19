@@ -77,13 +77,14 @@ Two columns, `key` and `value` (plus optional `notes`).
 | `cores` | – | 1 | 4 | parallel cores for Stage-1 draws (Unix); results identical to serial |
 | `disturbance_loss_cv` | CV | 0 | 0.5 | common multiplier on disturbance loss magnitudes (uncertain hurricane impacts) |
 | `holdout_from_year` | year | NA | NA | index observations from this year on are held out of calibration |
-| `ryther_low`, `ryther_high` | t km⁻² yr⁻¹ | 1, 3 | 1, 3 | Ryther-index thresholds (Link & Watson 2019; verify) |
+| `ryther_low`, `ryther_high` | t km⁻² yr⁻¹ | 1, 3 | 1, 3 | Ryther-index thresholds: ~1 t km⁻² yr⁻¹ practical not-to-exceed (range 0.3–1.1), 3 extreme (Link & Watson 2019) |
 | `fogarty_low`, `fogarty_high` | per mil | 0.22, 0.92 | 0.22, 0.92 | Fogarty-ratio thresholds (Link & Watson 2019) |
 | `domain_lon_min`, `domain_lon_max`, `domain_lat_min`, `domain_lat_max` | decimal degrees | – | −65.0, −64.4, 17.6, 17.95 | domain bounding box for data acquisition |
 | `effort_creep` | yr⁻¹ | 0 | 0.02 | catchability creep for fishery-dependent CPUE indices (Palomares & Pauly 2019) |
 | `effort_response` | elasticity | 0 | 0 | projected effort follows catch rate (open access); the `Open_access_effort` scenario uses 0.5 |
-| `ghost_efficiency`, `ghost_efficiency_cv` | ratio, CV | 0, 0.5 | 0.2, 0.5 (placeholder) | catch rate of a lost trap relative to an active one (Renchen et al. 2014) |
+| `ghost_efficiency`, `ghost_efficiency_cv` | ratio, CV | 0, 0.5 | 0.2, 0.5 (placeholder) | catch rate of a lost trap relative to an active one (Renchen et al. 2010; Clark et al. 2012; Arthur et al. 2014) |
 | `ghost_half_life` | yr | 1.5 | 1.5 (placeholder) | years for half of lost traps to stop fishing |
+| `ghost_background_loss` | yr⁻¹ | 0 | 0.10 | annual trap loss outside storms (≈650 of 6,500 traps per year in St. Thomas/St. John; Clark et al. 2012) |
 | `ghost_gears` | gear list | – | `trap_fish;trap_lobster` | gears whose lost traps ghost-fish |
 | `herbivore_groups` | group list | – | `parrotfish_1;parrotfish_2;surgeonfishes` | grazers that control coral recovery |
 | `herbivory_elasticity`, `herbivory_elasticity_cv` | exponent, CV | 0, 0.5 | 1, 0.5 (placeholder) | coral growth × (grazing / reference)^γ in projections (Mumby et al. 2006) |
@@ -118,16 +119,18 @@ One row per habitat. At most one row has `type = pelagic`.
 
 **St. Croix values.** The NPP column gives the value as entered. Benthic `area_km2` cells are left **blank** in `habitats.csv` and filled from the NOAA NCCOS 2002 USVI benthic habitat map via the ArcGIS REST API (`acquire_project_data()`). Class areas are summed into model habitats with `nccos_class_map()`. The pelagic area (shelf + 10 km buffer) is user-specified.
 
-| habitat | area km² | NPP (as entered) | NPP t C km⁻² yr⁻¹ | f | TTE | source |
-|---|---|---|---|---|---|---|
-| coral_reef | 41.7 (API) | 1500 t C km⁻² yr⁻¹ | 1500 | 0.35 | 0.15 | Adey & Steneck 1985 (St. Croix, Pn 986–4108); Ramachandran Nair & Pillai 1972 (1200–3000) |
-| colonized_pavement | 192.0 (API) | 181 mmol O₂ m⁻² d⁻¹ | 793 | 0.35 | 0.15 | Naumann et al. 2013 (lagoon-wide Pn) |
-| seagrass | 59.4 (API) | 4.2 g DW m⁻² d⁻¹ | 521 | 0.35 | 0.15 | Juman 2005 (*Thalassia*, Tobago); CARICOMP range |
-| macroalgae | 13.1 (API) | 582 mmol O₂ m⁻² d⁻¹ | 2549 | 0.25 | 0.15 | Wanders 1976 |
-| sand | 12.7 (API) | 7 mmol O₂ m⁻² d⁻¹ | 30.7 | 0.50 | 0.15 | Naumann et al. 2013 (microphytobenthos) |
-| mangrove | 1.33 (API) | 400 mmol O₂ m⁻² d⁻¹ | 1752 | 0.20 | 0.15 | Gattuso et al. 1998 (litter export fraction) |
-| deep_hardbottom | 388.3 (API; NCCOS 'Unknown' deeper shelf) | 250 t C km⁻² yr⁻¹ | 250 | 0.35 | 0.15 | placeholder (light-limited mesophotic) |
-| pelagic | 1500 | 85 g C m⁻² yr⁻¹ | 85 | 0.40 | 0.15 | SEDAR103-DW-20 App. A ensemble (Ryan-Keogh et al. 2023) |
+<!-- BEGIN AUTO:habitats -->
+| habitat | area km² | NPP (as entered) | NPP t C km⁻² yr⁻¹ | f | TTE | closed | NPP index | status | source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| coral_reef | 41.7 | 1500 t_C_km2_yr | 1500 | 0.35 | 0.15 | 0.25 |  | area from NCCOS API; NPP published range; closed_fraction PLACEHOLDER (approximate BIRNM + EEMP no-take share; replace with GIS overlay) | NPP: Caribbean reef net production 986-4108 t C (Adey & Steneck 1985 St. Croix); 1200-3000 for Indian Ocean reefs (Nair & Pillai 1972) |
+| colonized_pavement | 192 | 181 mmol_O2_m2_d | 793 | 0.35 | 0.15 | 0.15 |  | area from NCCOS API; NPP published; closed_fraction PLACEHOLDER (approximate BIRNM + EEMP no-take share; replace with GIS overlay) | Turf/macroalgae-dominated hardbottom; lagoon-wide Pn 181 +/- 28 mmol O2 m-2 d-1 (Naumann et al. 2013) |
+| seagrass | 59.4 | 4.2 g_DW_m2_d | 521 | 0.35 | 0.15 | 0.1 | light_seagrass | area from NCCOS API; NPP published; closed_fraction PLACEHOLDER (approximate BIRNM + EEMP no-take share; replace with GIS overlay) | Thalassia production 4.2 g DW m-2 d-1 (Juman 2005); CARICOMP <200->2000 g DW m-2 yr-1 (van Tussenbroek et al. 2014); annual NPP index from bottom light (OC-CCI Kd490; build_light_index.R; depth ASSUMPTION) |
+| macroalgae | 13.1 | 582 mmol_O2_m2_d | 2550 | 0.25 | 0.15 | 0.15 | light_macroalgae | area from NCCOS API; NPP published; closed_fraction PLACEHOLDER (approximate BIRNM + EEMP no-take share; replace with GIS overlay) | Caribbean macroalgal beds Pn 582 mmol O2 m-2 d-1 (Wanders 1976 via Naumann et al. 2013); annual NPP index from bottom light (OC-CCI Kd490; build_light_index.R; depth ASSUMPTION) |
+| sand | 12.7 | 7 mmol_O2_m2_d | 30.7 | 0.5 | 0.15 | 0.2 |  | area from NCCOS API; NPP published; closed_fraction PLACEHOLDER (approximate BIRNM + EEMP no-take share; replace with GIS overlay) | Microphytobenthos Pn 7 +/- 4 mmol O2 m-2 d-1 (Naumann et al. 2013) |
+| mangrove | 1.3 | 400 mmol_O2_m2_d | 1750 | 0.2 | 0.15 | 0 |  | area from NCCOS API; NPP published | Caribbean mangrove Pn 400 +/- 83 mmol O2 m-2 d-1 (Gattuso et al. 1998); food_web_fraction = litter export |
+| deep_hardbottom | 41.4 | 170.4 t_C_km2_yr | 170 | 0.35 | 0.15 | 0.1 |  | API: area from ETOPO 30-100 m; NPP light-limited from Kd490 + PAR; closed_fraction PLACEHOLDER (approximate BIRNM + EEMP no-take share; replace with GIS overlay) | Mesophotic hardbottom 30-100 m (incl. Lang Bank). NPP = colonized pavement NPP scaled by light at depth (Morel et al. 2007 KdPAR; tanh P-I curve) |
+| pelagic | 1500 | 85 g_C_m2_yr | 85 | 0.4 | 0.15 | 0 | npp_pelagic_index | area PLACEHOLDER; NPP derived | Shelf + 10 km buffer; regional satellite NPP ensemble (SEDAR103-DW-20 App. A; Ryan-Keogh et al. 2023) ~70-100 g C m-2 yr-1 |
+<!-- END AUTO:habitats -->
 
 The coral reef habitat uses `quality_model = coral` with `quality_covariate = coral_cover`, `quality_ref = 0.08` (≈ 2013 NCRMP cover) and `init_quality = 0.14`.
 
@@ -163,6 +166,7 @@ One row per functional group.
 | `refuge_dependence` | exponent | | 0 | capacity ∝ habitat quality^ρ |
 | `immigration_t` | t yr⁻¹ | | 0 | external supply (connectivity model) |
 | `m_nat`, `m_nat_cv` | yr⁻¹, CV | | blank (= P/B), 0.25 | natural mortality: basis of K = P/M and MMSY = x·M·K. St. Croix: geometric mean of FishBase Then et al. M over each group's species; lobster 0.34 (SEDAR 57) |
+| `bmsy_k` | 0.2–0.6 | | 0.5 | B_MSY / K, which sets the Pella–Tomlinson production shape (0.5 = Schaefer). St. Croix: per-recruit B_MSY/B₀ for each group (0.29–0.38). Boxfishes use the median (assumption). Conch uses 0.5. |
 | `x_msy`, `x_msy_cv` | 0–1, CV | | 0.5, 0.2 | MSY/(M·B₀). St. Croix: per-recruit life-history prior (`data-raw/build_life_history_priors.R`), 0.17–0.31; lobster 0.32 (open population); conch 0.4 |
 | `open_recruitment`, `open_recruitment_cv` | 0–1, CV | | 0, 0.25 | fraction of production from externally supplied recruits. St. Croix: spiny lobster 0.8 (Kough, Paris & Butler 2013) |
 | `recruit_covariate` | covariate name | | – | optional larval-supply index for open recruitment |
@@ -171,31 +175,32 @@ One row per functional group.
 | `process_sd` | log-sd | | 0.1 | annual process error |
 | `energy_density_kJ_g` | kJ g⁻¹ WW | | 5 | for energy-based reporting |
 
-**St. Croix values** (FMP groups; non-fishery groups are listed in `stcroix_input_values.md`):
+**St. Croix values** (FMP groups; generated from `groups.csv`; the full table with sources is in `stcroix_input_values.md`):
 
-| group | FMP complex | guild | tier | P/B | x | partition (t km⁻²) | init dep. | refuge | trap |
-|---|---|---|---|---|---|---|---|---|---|
-| spiny_lobster | Spiny lobster | Invertivores | 1 | 0.8 | 0.5 | 0.6 | 0.5 | 0.5 | ✔ |
-| queen_conch | Queen conch | Herbivores | 2 | 0.6 | 0.4 | 1.5 | 0.4 | 0 | |
-| parrotfish_1 | Parrotfish 1 (prohibited) | Herbivores | 3 | 1.0 | 0.5 | 0.8 | 0.8 | 0.5 | ✔ |
-| parrotfish_2 | Parrotfish 2 | Herbivores | 2 | 1.0 | 0.5 | 2.5 | 0.6 | 0.5 | ✔ |
-| surgeonfishes | Surgeonfish | Herbivores | 3 | 1.0 | 0.5 | 3 | 0.7 | 0.4 | ✔ |
-| queen_triggerfish | Triggerfish (queen) | Invertivores | 1 | 0.6 | 0.5 | 0.15 | 0.6 | 0.3 | ✔ |
-| grunts | Grunts | Invertivores | 3 | 1.0 | 0.5 | 3 | 0.6 | 0.6 | ✔ |
-| snappers_shallow | Snapper 3 | Mesopredators | 3 | 0.7 | 0.5 | 1.0 | 0.5 | 0.5 | ✔ |
-| yellowtail_snapper | Snapper 4 | Mesopredators | 2 | 0.8 | 0.5 | 0.8 | 0.6 | 0.3 | |
-| snappers_deep | Snapper 1 & 2 | Piscivores | 3 | 0.4 | 0.5 | 0.8 | 0.5 | 0.1 | |
-| groupers_shallow | Groupers (red hind, coney) | Piscivores | 2 | 0.5 | 0.5 | 1.0 | 0.4 | 0.7 | ✔ |
-| squirrelfishes | Squirrelfish | Invertivores | 3 | 0.9 | 0.5 | 1.0 | 0.7 | 0.6 | ✔ |
-| goatfishes | Goatfish | Invertivores | 3 | 1.0 | 0.5 | 0.5 | 0.7 | 0.2 | ✔ |
-| boxfishes | Boxfish | Invertivores | 3 | 0.8 | 0.5 | 0.3 | 0.7 | 0.2 | ✔ |
-| angelfishes | Angelfish | Invertivores | 3 | 0.7 | 0.5 | 0.5 | 0.7 | 0.5 | ✔ |
-| wrasses_hogfish | Wrasses (hogfish) | Invertivores | 3 | 0.8 | 0.5 | 0.5 | 0.5 | 0.3 | ✔ |
-| jacks | Jacks | Piscivores | 3 | 0.9 | 0.5 | 0.8 | 0.6 | 0 | |
-| porgies | Porgies | Invertivores | 3 | 0.8 | 0.5 | 0.2 | 0.7 | 0.1 | ✔ |
-| pelagics | Pelagics (dolphinfish, wahoo) | Pelagic piscivores | 3 | 1.5 | 0.5 | 0.3 | 0.7 | 0 | |
+<!-- BEGIN AUTO:groups -->
+| group | tier | P/B | M | x | x CV | B_MSY/K | partition (t km⁻²) | partition CV | open rec. | nursery | refuge | trap | status | source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| spiny_lobster | 1 | 1 | 0.34 | 0.323 | 0.2 | 0.315 | 3.27 | 0.5 | 0.8 | macroalgae;seagrass (0.3) | 0.5 | ✔ | derived: Opitz (1996) balanced model; nursery_dependence PLACEHOLDER; open_recruitment PLACEHOLDER magnitude; x_msy/M derived (life-history) | Opitz 1996 Table 3.22 Lobsters (B 3.27 g/m2, P/B 1.0); SEDAR 57 M ~0.34; x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); open recruitment 0.8 (larval supply largely from upstream; Kough, Paris & Butler 2013); x blends per-recruit h=0.99 (open) and h=0.75 (local); nursery dependence expert-informed (Nagelkerken et al. 2002; Mumby et al. 2004; Adams et al. 2006) - PLACEHOLDER magnitude; bmsy_k = per-recruit B_MSY/B0 |
+| queen_conch | 2 | 0.6 |  | 0.4 | 0.25 | 0.5 | 3 | 1 | 0 | seagrass (0.5) | 0 |  | PLACEHOLDER; prior re-centred by catch-feasibility check; wide prior (floor-density or no direct data); nursery_dependence PLACEHOLDER | Low x_msy reflects depensation/Allee effects; nursery dependence expert-informed (Nagelkerken et al. 2002; Mumby et al. 2004; Adams et al. 2006) - PLACEHOLDER magnitude |
+| parrotfish_1 | 3 | 0.36 | 0.339 | 0.18 | 0.2 | 0.346 | 18 | 0.5 | 0 | mangrove;seagrass (0.4) | 0.5 | ✔ | derived: Opitz (1996) VI species biomass x mass-balance factor; nursery_dependence PLACEHOLDER; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 75.31 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 0.38, FishBase M_Then 0.34); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); nursery dependence expert-informed (Nagelkerken et al. 2002; Mumby et al. 2004; Adams et al. 2006) - PLACEHOLDER magnitude; bmsy_k = per-recruit B_MSY/B0 |
+| parrotfish_2 | 2 | 0.926 | 0.73 | 0.226 | 0.29 | 0.328 | 7.62 | 0.5 | 0 | seagrass (0.2) | 0.5 | ✔ | derived: Opitz (1996) VI species biomass x mass-balance factor; nursery_dependence PLACEHOLDER; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 31.93 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 1.05, FishBase M_Then 0.82); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); nursery dependence expert-informed (Nagelkerken et al. 2002; Mumby et al. 2004; Adams et al. 2006) - PLACEHOLDER magnitude; bmsy_k = per-recruit B_MSY/B0 |
+| surgeonfishes | 3 | 0.79 | 0.78 | 0.214 | 0.23 | 0.352 | 2.94 | 0.5 | 0 |  | 0.4 | ✔ | derived: Opitz (1996) VI species biomass x mass-balance factor; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 12.30 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 0.71, FishBase M_Then 0.88); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); bmsy_k = per-recruit B_MSY/B0 |
+| queen_triggerfish | 1 | 0.442 | 0.325 | 0.189 | 0.2 | 0.352 | 0.219 | 0.5 | 0 |  | 0.3 | ✔ | derived: Opitz (1996) VI species biomass x mass-balance factor; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 0.92 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 0.60, FishBase M_Then 0.33); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); bmsy_k = per-recruit B_MSY/B0 |
+| grunts | 3 | 0.677 | 0.4 | 0.221 | 0.2 | 0.361 | 6.4 | 0.5 | 0 | seagrass;mangrove (0.5) | 0.6 | ✔ | derived: Opitz (1996) VI species biomass x mass-balance factor; nursery_dependence PLACEHOLDER; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 26.80 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 1.00, FishBase M_Then 0.46); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); nursery dependence expert-informed (Nagelkerken et al. 2002; Mumby et al. 2004; Adams et al. 2006) - PLACEHOLDER magnitude; bmsy_k = per-recruit B_MSY/B0 |
+| snappers_shallow | 3 | 0.378 | 0.206 | 0.177 | 0.2 | 0.356 | 6.04 | 0.5 | 0 | mangrove;seagrass (0.4) | 0.5 | ✔ | derived: Opitz (1996) VI species biomass x mass-balance factor; nursery_dependence PLACEHOLDER; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 25.32 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 0.64, FishBase M_Then 0.22); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); nursery dependence expert-informed (Nagelkerken et al. 2002; Mumby et al. 2004; Adams et al. 2006) - PLACEHOLDER magnitude; bmsy_k = per-recruit B_MSY/B0 |
+| yellowtail_snapper | 2 | 0.414 | 0.268 | 0.255 | 0.2 | 0.349 | 6.04 | 0.5 | 0 | seagrass (0.3) | 0.3 |  | derived: Opitz (1996) VI species biomass x mass-balance factor; nursery_dependence PLACEHOLDER; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 25.33 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 0.64, FishBase M_Then 0.27); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); nursery dependence expert-informed (Nagelkerken et al. 2002; Mumby et al. 2004; Adams et al. 2006) - PLACEHOLDER magnitude; bmsy_k = per-recruit B_MSY/B0 |
+| snappers_deep | 3 | 0.402 | 0.374 | 0.269 | 0.2 | 0.342 | 2 | 1 | 0 |  | 0.1 |  | PLACEHOLDER; prior re-centred by catch-feasibility check; wide prior (floor-density or no direct data); x_msy/M derived (life-history) | Hook-and-line fishery; minor trap bycatch; P/B = geomean(Opitz 0.40, FishBase M_Then 0.40); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); bmsy_k = per-recruit B_MSY/B0 |
+| groupers_shallow | 2 | 0.314 | 0.236 | 0.174 | 0.2 | 0.352 | 2.08 | 0.5 | 0 |  | 0.7 | ✔ | derived: Opitz (1996) VI species biomass x mass-balance factor; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 8.72 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 0.46, FishBase M_Then 0.21); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); bmsy_k = per-recruit B_MSY/B0 |
+| squirrelfishes | 3 | 1.03 | 0.973 | 0.249 | 0.32 | 0.328 | 0.666 | 0.5 | 0 |  | 0.6 | ✔ | derived: Opitz (1996) VI species biomass x mass-balance factor; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 2.79 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 0.90, FishBase M_Then 1.19); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); bmsy_k = per-recruit B_MSY/B0 |
+| goatfishes | 3 | 0.699 | 0.541 | 0.214 | 0.2 | 0.344 | 0.528 | 0.5 | 0 |  | 0.2 | ✔ | derived: Opitz (1996) VI species biomass x mass-balance factor; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 2.21 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 1.00, FishBase M_Then 0.49); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); bmsy_k = per-recruit B_MSY/B0 |
+| boxfishes | 3 | 0.8 |  | 0.214 | 0.4 | 0.352 | 0.708 | 0.5 | 0 |  | 0.2 | ✔ | derived: Opitz (1996) VI species biomass x mass-balance factor; x_msy/bmsy_k ASSUMPTION (median of other groups) | Opitz 1996 Table 3.6 (raw 2.97 g/m2) x 0.239 (Table 3.22 balance); x_msy: median per-recruit prior of other groups (no FishBase growth data) |
+| angelfishes | 3 | 0.411 | 0.284 | 0.192 | 0.2 | 0.363 | 3.54 | 0.5 | 0 |  | 0.5 | ✔ | derived: Opitz (1996) VI species biomass x mass-balance factor; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 14.85 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 0.70, FishBase M_Then 0.24); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); bmsy_k = per-recruit B_MSY/B0 |
+| wrasses_hogfish | 3 | 0.515 | 0.284 | 0.198 | 0.2 | 0.356 | 0.0475 | 1 | 0 | seagrass (0.2) | 0.3 | ✔ | derived: Opitz (1996) VI species biomass x mass-balance factor; wide prior (floor-density or no direct data); nursery_dependence PLACEHOLDER; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 0.20 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 0.80, FishBase M_Then 0.33); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); nursery dependence expert-informed (Nagelkerken et al. 2002; Mumby et al. 2004; Adams et al. 2006) - PLACEHOLDER magnitude; bmsy_k = per-recruit B_MSY/B0 |
+| jacks | 3 | 0.481 | 0.275 | 0.26 | 0.2 | 0.379 | 7.89 | 0.5 | 0 |  | 0 |  | derived: Opitz (1996) VI species biomass x mass-balance factor; x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 33.05 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 1.00, FishBase M_Then 0.23); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); bmsy_k = per-recruit B_MSY/B0 |
+| porgies | 3 | 0.527 | 0.334 | 0.203 | 0.2 | 0.356 | 0.0612 | 1 | 0 |  | 0.1 | ✔ | derived: Opitz (1996) VI species biomass x mass-balance factor; wide prior (floor-density or no direct data); x_msy/M derived (life-history) | Opitz 1996 Table 3.6 (raw 0.26 g/m2) x 0.239 (Table 3.22 balance); P/B = geomean(Opitz 0.80, FishBase M_Then 0.35); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); bmsy_k = per-recruit B_MSY/B0 |
+| pelagics | 3 | 0.841 | 0.438 | 0.309 | 0.22 | 0.29 | 0.3 | 1 | 0 |  | 0 |  | PLACEHOLDER; wide prior (floor-density or no direct data); x_msy/M derived (life-history) | Highly migratory; immigration term represents regional supply (Greater Caribbean model); P/B = geomean(Opitz 1.50, FishBase M_Then 0.47); x_msy, M: per-recruit life-history prior (data-raw/build_life_history_priors.R); bmsy_k = per-recruit B_MSY/B0 |
+<!-- END AUTO:groups -->
 
-All partition values and most P/B values are **placeholders** with literature-typical magnitudes. Replace partition values with NCRMP St. Croix biomass densities (t km⁻² = g m⁻²) by habitat, and P/B values with Opitz (1996) or assessment M + F.
 
 ---
 
@@ -255,6 +260,7 @@ Long format: `year, variable, value` (+ optional `sd` observation standard devia
 | `kd490`, `chla` | m⁻¹, mg m⁻³ | **API**: ESA OC-CCI v6, 1998– | optional covariates (water clarity, productivity) |
 | `coral_cover` | proportion | approximate 2000–2024 (TCRMP/NCRMP magnitudes, sd 0.01); **PLACEHOLDER** 1983–1999 (sd 0.03) | reef habitat quality |
 | `sargassum` | relative (fraction of AFAI-positive pixels / 2016–2024 mean) | **API**: USF Alternative Floating Algae Index, 7-day composites (NOAA AOML ERDDAP), 2016–; 2011–2015 relative belt magnitudes (Wang et al. 2019, placeholder); 0 before 2011 | nursery-habitat degradation; pelagic habitat |
+| `light_seagrass`, `light_macroalgae` | relative bottom light | **derived** from OC-CCI Kd490 (API): Kd(PAR) = 0.0864 + 0.884 Kd490 (Morel et al. 2007), bottom light exp(−Kd(PAR)·z) at 4 m and 8 m (depth **assumption**), relative to the 1998–2024 mean; held at 1 before 1998 | NPP index of seagrass and macroalgae (`npp_covariate`) |
 | `lionfish` | 0–1 invasion stage | **PLACEHOLDER** timeline: absent before 2009, established by 2012 (first USVI records 2008–2009) | predation and competition effects on small reef fish |
 
 Placeholder SST, DHW and NPP rows generated by `data-raw/` remain in `env_covariates.csv` as a fallback, flagged `PLACEHOLDER`. When API data exist for a variable they are replaced automatically.

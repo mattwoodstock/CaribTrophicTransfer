@@ -207,8 +207,9 @@ plot_sir <- function(res, groups = NULL) {
                        res$proj$benchmarks$group[as.logical(res$proj$benchmarks$use_in_sir) %in% TRUE]))
   }
   MM <- res$stage1$MMSY_ref[, groups, drop = FALSE]
+  pr <- .prior_rows(res)   # undo the adaptive proposal so the "prior" curve is the prior
   df <- rbind(
-    data.frame(dist = "Prior", group = rep(groups, each = nrow(MM)), MMSY_lb = t_to_lb(as.vector(MM))),
+    data.frame(dist = "Prior", group = rep(groups, each = length(pr)), MMSY_lb = t_to_lb(as.vector(MM[pr, , drop = FALSE]))),
     data.frame(dist = "SIR posterior", group = rep(groups, each = length(res$draws)),
                MMSY_lb = t_to_lb(as.vector(MM[res$draws, , drop = FALSE]))))
   p <- ggplot2::ggplot(df, ggplot2::aes(MMSY_lb, colour = dist, fill = dist)) +
@@ -436,7 +437,7 @@ plot_mse <- function(mse) {
   .need_gg()
   s <- mse$summary
   s$procedure <- factor(s$procedure, levels = s$procedure)
-  d <- rbind(data.frame(procedure = s$procedure, metric = "P(any focus group < 0.5 BMSY)", value = s$P_any_focus_overfished),
+  d <- rbind(data.frame(procedure = s$procedure, metric = "P(any focus group < 0.5 BMSY in any year)", value = s$P_any_focus_overfished),
              data.frame(procedure = s$procedure, metric = "Focus-group catch (k lb / yr)", value = s$focus_catch_lb_p50 / 1000),
              data.frame(procedure = s$procedure, metric = "Catch variability (AAV)", value = s$catch_AAV_p50),
              data.frame(procedure = s$procedure, metric = "Effort relative to 2024", value = s$effort_mult_p50))

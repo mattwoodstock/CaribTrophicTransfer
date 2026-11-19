@@ -94,7 +94,7 @@
 * Saltelli, A., et al. (2008). Global Sensitivity Analysis: The Primer. Wiley.
 * Sathyendranath, S., et al. (2019). An ocean-colour time series for use in climate studies: the experience of the Ocean-Colour Climate Change Initiative (OC-CCI). Sensors 19: 4285.
 * Then, A. Y., Hoenig, J. M., Hall, N. G., Hewitt, D. A. (2015). Evaluating the predictive performance of empirical estimators of natural mortality rate using information on over 200 fish species. ICES J. Mar. Sci. 72: 82–92.
-* Vehtari, A., Simpson, D., Gelman, A., Yao, Y., Gabry, J. (2015/2024). Pareto smoothed importance sampling. arXiv:1507.02646; J. Mach. Learn. Res. 25: 1–58.
+* Vehtari, A., Simpson, D., Gelman, A., Yao, Y., Gabry, J. (2024). Pareto smoothed importance sampling. J. Mach. Learn. Res. 25(72): 1–58 (arXiv:1507.02646, 2015).
 
 ## Ecological and fisheries-theory additions
 
@@ -117,7 +117,6 @@
 * Nagelkerken, I., et al. (2002). How important are mangroves and seagrass beds for coral-reef fish? The nursery hypothesis tested on an island scale. Mar. Ecol. Prog. Ser. 244: 299–305.
 * Oakley, J. E., O'Hagan, A. (2004). Probabilistic sensitivity analysis of complex models: a Bayesian approach. J. R. Stat. Soc. B 66: 751–769.
 * Palomares, M. L. D., Pauly, D. (2019). On the creeping increase of vessels' fishing power. Ecol. Soc. 24: 31.
-* Renchen, G. F., et al. (2014). Impact of derelict fish traps in the US Virgin Islands. Mar. Pollut. Bull. 86. *(verify volume/pages)*
 * Shertzer, K. W., Conn, P. B. (2012). Spawner-recruit relationships of demersal marine fishes: prior distribution of steepness. Bull. Mar. Sci. 88: 39–50.
 * Smith, V. L. (1969). On models of commercial fishing. J. Polit. Econ. 77: 181–198.
 * Stoner, A. W., Ray-Culp, M. (2000). Evidence for Allee effects in an over-harvested marine gastropod: density-dependent mating and egg production. Mar. Ecol. Prog. Ser. 202: 297–302.
@@ -126,3 +125,26 @@
 * Zhou, S., Yin, S., Thorson, J. T., Smith, A. D. M., Fuller, M. (2012). Linking fishing mortality reference points to life history traits: an empirical study. Can. J. Fish. Aquat. Sci. 69: 1292–1301.
 * Casazza, T. L., Ross, S. W. (2008). Fishes associated with pelagic *Sargassum* and open water lacking *Sargassum* in the Gulf Stream off North Carolina. Fish. Bull. 106: 348–363.
 * Schofield, P. J. (2010). Update on geographic spread of invasive lionfishes (*Pterois volitans* and *P. miles*) in the Western North Atlantic Ocean, Caribbean Sea and Gulf of Mexico. Aquat. Invasions 5 (Suppl. 1): S117–S122.
+
+## Additional primary sources (code-review audit)
+
+* Arthur, C., Sutton-Grier, A. E., Murphy, P., Bamford, H. (2014). Out of sight but not out of mind: harmful effects of derelict traps in selected U.S. coastal waters. Mar. Pollut. Bull. 86: 19–28.
+* Clark, R., Pittman, S. J., Battista, T. A., Caldow, C. (eds) (2012). Survey and impact assessment of derelict fish traps in St. Thomas and St. John, U.S. Virgin Islands. NOAA Technical Memorandum NOS NCCOS 147.
+* Duarte, C. M. (1991). Seagrass depth limits. Aquat. Bot. 40: 363–377.
+* Eppley, R. W. (1972). Temperature and phytoplankton growth in the sea. Fish. Bull. 70: 1063–1085.
+* Forsythe, W. C., Rykiel, E. J., Stahl, R. S., Wu, H., Schoolfield, R. M. (1995). A model comparison for daylength as a function of latitude and day of year. Ecol. Model. 80: 87–95.
+* Gower, J., Young, E., King, S. (2013). Satellite images suggest a new *Sargassum* source region in 2011. Remote Sens. Lett. 4: 764–773.
+* Ionides, E. L. (2008). Truncated importance sampling. J. Comput. Graph. Stat. 17: 295–311.
+* Juman, R. A. (2005). Biomass, litterfall and decomposition rates for the fringed *Rhizophora mangle* forest lining the Bon Accord Lagoon, Tobago. Rev. Biol. Trop. 53 (Suppl. 1): 207–217.
+* Link, J. S., Watson, R. A. (2019). Global ecosystem overfishing: clear delineation within real limits to production. Sci. Adv. 5: eaav0474.
+* Morel, A., Berthon, J.-F. (1989). Surface pigments, algal biomass profiles, and potential production of the euphotic layer: relationships reinvestigated in view of remote-sensing applications. Limnol. Oceanogr. 34: 1545–1562.
+* Nair, P. V. R., Pillai, C. S. G. (1972). Primary productivity of some coral reefs in the Indian seas. Proc. Symp. Corals and Coral Reefs, Marine Biological Association of India: 33–42. *(Indian Ocean values, used only to bracket the reef NPP range)*
+* Palomares, M. L. D., Bailly, N. (eds) (2024). SeaLifeBase, version 24.07 (www.sealifebase.org); AquaMaps temperature preferences for *Panulirus argus* and *Aliger gigas*.
+* Renchen, G. F., Pittman, S. J., Brandt, M. E., et al. (2010). A field study of the ecological impacts of derelict fish traps in the US Virgin Islands. Proc. Gulf Caribb. Fish. Inst. 63. *(confirm page range)*
+* Wang, M., Hu, C. (2016). Mapping and quantifying *Sargassum* distribution and coverage in the Central West Atlantic using MODIS observations. Remote Sens. Environ. 183: 350–367.
+* Zhang, J., Stephens, M. A. (2009). A new and efficient estimation method for the generalized Pareto distribution. Technometrics 51: 316–325.
+* Allen, K. R. (1971). Relation between production and biomass. J. Fish. Res. Board Can. 28: 1573–1581.
+* Christensen, V., Walters, C. J. (2004). Ecopath with Ecosim: methods, capabilities and limitations. Ecol. Model. 172: 109–139.
+* Fletcher, R. I. (1978). On the restructuring of the Pella-Tomlinson system. Fish. Bull. 76: 515–521.
+* Pella, J. J., Tomlinson, P. K. (1969). A generalized stock production model. Inter-Am. Trop. Tuna Comm. Bull. 13: 419–496.
+* Thorson, J. T., Cope, J. M., Branch, T. A., Jensen, O. P. (2012). Spawning biomass reference points for exploited marine fishes, incorporating taxonomic and body size information. Can. J. Fish. Aquat. Sci. 69: 1556–1568.

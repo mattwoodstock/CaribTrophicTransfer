@@ -13,8 +13,9 @@
 #                         (M = natural mortality, default P/B; N = nursery-habitat index)
 #   6. Reference point    MMSY_i = x_i * M_i * K_i   (Gulland 1971: x = 0.5; group x from
 #                         per-recruit theory, see life_history_xmsy())
-#   7. Biomass dynamics   dB/dt = (1-phi) r B (1 - B/K) + phi 2xM (K s_t - B) - C - G + I
-#                         r = 4 x M; phi = open-recruitment fraction with supply index s_t;
+#   7. Biomass dynamics   dB/dt = (1-phi) g(B) + phi 2xM (K s_t - B) - C - G + I
+#                         g = Pella-Tomlinson production with MSY = x M K and B_MSY/K = bmsy_k
+#                         (Schaefer when bmsy_k = 0.5); phi = open-recruitment fraction, s_t supply index;
 #                         G = unaccounted ghost-trap mortality after trap losses.
 #                         Exact logistic + exact linear sub-steps (`substeps`), catch removed
 #                         after each sub-step, from the fishable (non-MPA) fraction only.
@@ -70,6 +71,15 @@
   K / (1 + (K / pmax(B, 1e-12) - 1) * e)
 }
 
+.pt_step <- function(B, K, rho, n, dt) {
+  # exact solution of Pella-Tomlinson production with MSY = x M K (K constant within step):
+  # y = (B/K)^(1-n) obeys dy/dt = -rho (y - 1), rho = n^(n/(n-1)) x M  (n = 2: logistic, rho = r)
+  e1 <- 1 - n
+  y <- (pmax(B, 1e-12) / K)^e1
+  y <- 1 + (y - 1) * exp(-rho * dt)
+  K * pmax(y, 1e-12)^(1 / e1)
+}
+
 .pools <- function(P1, tte, R) {
   # P1: vector (habitats); tte: vector; R: habitats x 4 removals
   E <- matrix(0, length(P1), 4)
@@ -104,7 +114,8 @@ simulate_ttm <- function(proj, par, drv, q = NULL, mp = NULL) {
   bfrac <- rowSums(D[, 1:4, drop = FALSE])
   pb <- par$pb; x <- par$x_msy
   mnat <- if (is.null(par$m_nat)) pb else par$m_nat
-  r <- 4 * x * mnat
+  nshape <- pt_shape(if (is.null(g$bmsy_k)) rep(0.5, ng) else g$bmsy_k)
+  r <- nshape^(nshape / (nshape - 1)) * x * mnat     # = 4 x M for the Schaefer shape
   phi <- if (is.null(par$open_rec)) rep(0, ng) else par$open_rec
   mu_open <- 2 * x * mnat
   gears <- proj$gear_names; nge <- length(gears)
@@ -283,7 +294,7 @@ simulate_ttm <- function(proj, par, drv, q = NULL, mp = NULL) {
       }
     }
     step_bio <- function(B, dt) {
-      B <- .logistic_step(B, (1 - phi) * r, K, dt)
+      B <- .pt_step(B, K, (1 - phi) * r, nshape, dt)
       op <- phi > 0
       if (op_any) B[op] <- K[op] * sup[op] + (B[op] - K[op] * sup[op]) * exp(-phi[op] * mu_open[op] * dt)
       if (any_ghost) B * exp(-Fghost * dt) else B

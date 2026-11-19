@@ -72,6 +72,7 @@ Rscript Projects/StCroix_Trap/run_stcroix.R
 | [User Manual](docs/user_manual.md) | installation, workflow, running, outputs, SPF hand-off |
 | [Input Data Dictionary](docs/input_dictionary.md) | every input, units, defaults, St. Croix values |
 | [Ecological Review](docs/ecological_review.md) | theory, expert and stakeholder gaps, and the processes added |
+| [Assumptions Register](docs/assumptions.md) | every assumption with its basis, type and test |
 | [Data Acquisition & Uncertainty](docs/data_acquisition.md) | APIs, override rules, propagated uncertainties |
 | [Model Description](docs/model_description.md) | equations, capabilities, assumptions |
 | [St. Croix Case Study](docs/case_study_stcroix.md) | application, results and data-replacement checklist |

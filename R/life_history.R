@@ -103,3 +103,19 @@ life_history_xmsy <- function(species, lc = NULL, h_mean = 0.75, h_sd = 0.1, tra
                n_species = nrow(sp))
   }))
 }
+
+#' Pella-Tomlinson shape parameter for a given B_MSY / K
+#'
+#' Solves n^(1/(1-n)) = bmsy_k (n = 2: Schaefer, B_MSY = K/2; n -> 1: Fox,
+#' B_MSY = K/e). Used so that the biomass dynamics share the B_MSY/B0 implied by
+#' the per-recruit analysis that sets x (Pella & Tomlinson 1969; Fletcher 1978).
+#' @param bmsy_k B_MSY as a fraction of K (0.2-0.6)
+#' @export
+pt_shape <- function(bmsy_k) {
+  vapply(bmsy_k, function(b) {
+    if (!is.finite(b) || abs(b - 0.5) < 1e-9) return(2)
+    if (abs(b - exp(-1)) < 1e-4) return(1 + 1e-4)
+    f <- function(n) n^(1 / (1 - n)) - b
+    if (b < exp(-1)) stats::uniroot(f, c(0.02, 1 - 1e-6), tol = 1e-12)$root else stats::uniroot(f, c(1 + 1e-6, 50), tol = 1e-12)$root
+  }, numeric(1))
+}

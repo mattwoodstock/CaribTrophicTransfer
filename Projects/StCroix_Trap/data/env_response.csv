@@ -30,3 +30,5 @@ queen_conch,sargassum,loglinear,K,0,-0.03,1.0,,,,PLACEHOLDER magnitude,Sargassum
 parrotfish_1,sargassum,loglinear,K,0,-0.03,1.0,,,,PLACEHOLDER magnitude,Sargassum inundation degrades nearshore seagrass/mangrove nurseries (van Tussenbroek et al. 2017); per unit of relative AFAI index
 spiny_lobster,sargassum,loglinear,K,0,-0.03,1.0,,,,PLACEHOLDER magnitude,Sargassum inundation degrades nearshore seagrass/mangrove nurseries (van Tussenbroek et al. 2017); per unit of relative AFAI index
 pelagics,sargassum,loglinear,K,0,0.03,1.0,,,,PLACEHOLDER magnitude,Pelagic Sargassum is habitat for dolphinfish and juveniles of other pelagics (Casazza & Ross 2008)
+spiny_lobster,sst,thermal_performance,production,,,0,26.7,2.15,,derived: SeaLifeBase/AquaMaps temperature preference,"AquaMaps (via SeaLifeBase v24.07, SpecCode 26102) TempPref min/mean/max = 23.7/26.7/28.0 degC; width = (max-min)/2"
+queen_conch,sst,thermal_performance,production,,,0,27.0,1.35,,derived: SeaLifeBase/AquaMaps temperature preference,"AquaMaps (via SeaLifeBase v24.07, SpecCode 2799) TempPref min/mean/max = 25.3/27.0/28.0 degC; width = (max-min)/2"

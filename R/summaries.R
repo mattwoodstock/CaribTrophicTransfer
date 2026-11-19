@@ -30,7 +30,7 @@ get_metric <- function(res, metric, scenario = "Baseline") {
 
 #' Time series quantiles of any group-level metric
 #' @param res `ttm_results`
-#' @param metric metric name (see [get_metric()]); also "BBmsy" (2B/K),
+#' @param metric metric name (see [get_metric()]); also "BBmsy" (B / (bmsy_k K)),
 #'   "U" (C/MMSY) and "EU" (C/P).
 #' @param scenarios scenarios to include
 #' @param groups optional subset of groups
@@ -39,7 +39,7 @@ summarize_timeseries <- function(res, metric = "MMSY", scenarios = res$scenarios
   out <- list()
   for (s in scenarios) {
     a <- switch(metric,
-      BBmsy = 2 * get_metric(res, "B", s) / get_metric(res, "K", s),
+      BBmsy = sweep(get_metric(res, "B", s) / get_metric(res, "K", s), 3, res$proj$groups$bmsy_k, "/"),
       U = get_metric(res, "C", s) / get_metric(res, "MMSY", s),
       EU = get_metric(res, "C", s) / get_metric(res, "P", s),
       get_metric(res, metric, s))
@@ -79,6 +79,7 @@ reference_points <- function(res, scenario = "Baseline", years = NULL) {
   m <- function(metric) apply(get_metric(res, metric, scenario)[, yy, , drop = FALSE], c(1, 3), mean)
   MMSY <- m("MMSY"); MMSY0 <- m("MMSY0"); K <- m("K"); K0 <- m("K0"); B <- m("B"); C <- m("C"); P <- m("P")
   TL <- res$TL[res$draws, , drop = FALSE]
+  bk <- setNames(g$bmsy_k, g$group)
   rows <- lapply(g$group, function(gi) {
     mm <- .q(MMSY[, gi])
     data.frame(
@@ -88,7 +89,7 @@ reference_points <- function(res, scenario = "Baseline", years = NULL) {
       harvest_allowed = g[gi, "harvest_allowed"], data_tier = g[gi, "data_tier"],
       TL = stats::median(TL[, gi]),
       B0_t = stats::median(K0[, gi]), K_t = stats::median(K[, gi]),
-      B_t = stats::median(B[, gi]), B_over_BMSY = stats::median(2 * B[, gi] / K[, gi]),
+      B_t = stats::median(B[, gi]), B_over_BMSY = stats::median(B[, gi] / (bk[[gi]] * K[, gi])),
       MMSY_mean_t = mm[["mean"]], MMSY_p05_t = mm[["p05"]], MMSY_p25_t = mm[["p25"]],
       MMSY_p50_t = mm[["p50"]], MMSY_p75_t = mm[["p75"]], MMSY_p95_t = mm[["p95"]],
       MMSY_cv = stats::sd(MMSY[, gi]) / mean(MMSY[, gi]),
@@ -100,7 +101,7 @@ reference_points <- function(res, scenario = "Baseline", years = NULL) {
       EU = stats::median(C[, gi] / P[, gi]),
       U_catch_over_MMSY = stats::median(C[, gi] / MMSY[, gi]),
       P_overfishing = mean(C[, gi] > MMSY[, gi]),
-      P_overfished = mean(2 * B[, gi] / K[, gi] < st$bbmsy_overfished),
+      P_overfished = mean(B[, gi] / (bk[[gi]] * K[, gi]) < st$bbmsy_overfished),
       landings_shortfall = if (is.null(res$catch_shortfall)) NA else
         round(stats::median(res$catch_shortfall[res$draws, gi]), 4),
       stringsAsFactors = FALSE)

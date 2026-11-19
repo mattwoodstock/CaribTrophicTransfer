@@ -69,7 +69,7 @@ ttm_default_settings <- function() {
     coral_growth_cv       = 0,
     disturbance_loss_cv   = 0,      # CV of a common multiplier on disturbance loss magnitudes
     holdout_from_year     = NA,     # index observations from this year onward are held out (validation)
-    ryther_low            = 1,      # Ryther index thresholds (t km-2 yr-1; Link & Watson 2019 - verify)
+    ryther_low            = 1,      # Ryther index thresholds (t km-2 yr-1): practical limit ~1, extreme 3 (Link & Watson 2019)
     ryther_high           = 3,
     fogarty_low           = 0.22,   # Fogarty ratio thresholds (per mil; Link & Watson 2019)
     fogarty_high          = 0.92,
@@ -84,6 +84,7 @@ ttm_default_settings <- function() {
     ghost_efficiency_cv   = 0.5,
     ghost_half_life       = 1.5,    # years for half of lost traps to stop fishing
     ghost_gears           = NA,     # ;-separated trap gears that ghost-fish when lost
+    ghost_background_loss = 0,      # annual fraction of traps lost outside storms (chronic ghost fishing)
     herbivore_groups      = NA,     # ;-separated grazers whose biomass controls coral recovery
     herbivory_elasticity  = 0,      # gamma in coral growth x (grazing / reference)^gamma (projections)
     herbivory_elasticity_cv = 0.5,
@@ -203,7 +204,7 @@ validate_ttm_project <- function(proj) {
                    init_depletion = 0.6, init_depletion_cv = 0.2, refuge_dependence = 0,
                    immigration_t = 0, immigration_cv = 0, process_sd = 0.1, energy_density_kJ_g = 5,
                    harvest_allowed = TRUE, trap_relevant = FALSE, data_tier = 3,
-                   m_nat = NA, m_nat_cv = 0.25, open_recruitment = 0, open_recruitment_cv = 0.25,
+                   m_nat = NA, m_nat_cv = 0.25, bmsy_k = 0.5, open_recruitment = 0, open_recruitment_cv = 0.25,
                    recruit_covariate = NA, nursery_habitat = NA, nursery_dependence = 0)
   for (nm in names(defaults)) g <- .fill_col(g, nm, defaults[[nm]])
   g$harvest_allowed <- as.logical(g$harvest_allowed)

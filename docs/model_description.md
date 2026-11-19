@@ -203,7 +203,7 @@ $$
 $$
 
 * With $x = 0.5$ this is **Gulland's (1971) estimator**, MSY = 0.5 · M · B₀. Because $K = P/M$, MMSY = $x \cdot P$: a fixed fraction of the production the energy budget supplies to the group.
-* It is also exactly the **Schaefer** MSY, $rK/4$, when $r = 4\,x\,M$. The same $r$ is used in the dynamics, so the reference points and projections are internally consistent: $B_{MSY} = K/2$ and $F_{MSY} = r/2$.
+* **Production shape.** The dynamics use **Pella–Tomlinson** surplus production (Pella & Tomlinson 1969; Fletcher 1978) with MSY = $x\,M\,K$ at $B_{MSY} = \beta K$. The shape $n$ solves $n^{1/(1-n)} = \beta$ (`bmsy_k`). St. Croix uses each group's per-recruit $B_{MSY}/B_0$ ≈ 0.32–0.38, so the dynamics and the reference point share one theory. With $\beta = 0.5$ ($n = 2$) this is exactly Schaefer, $r = 4xM$, MSY = $rK/4$. The equation is integrated exactly: $y = (B/K)^{1-n}$ obeys $dy/dt = -\rho\,(y-1)$ with $\rho = n^{n/(n-1)}\,x\,M$. Status is reported as $B/(\beta K)$.
 * **Life-history priors for x.** Age-structured theory shows MSY/(M·B₀) depends on growth, maturity, gear selectivity and stock–recruit steepness. Gulland's 0.5 is an upper bound (Beddington & Cooke 1983; Clark 1991; Zhou et al. 2012). `life_history_xmsy()` derives a prior for each group with a Beverton–Holt per-recruit model:
   - von Bertalanffy growth and length–weight from FishBase;
   - maturity at $L_m$ (Froese & Binohlan 2000);
@@ -222,11 +222,17 @@ Two MMSY variants are reported:
 ### Dynamics
 
 $$
-\frac{dB_i}{dt} = (1-\phi_i)\,r_i B_i\Big(1-\frac{B_i}{K_i(t)}\Big) + \phi_i\,2x_iM_i\big(K_i(t)\,s_i(t) - B_i\big) - C_i(t) - G_i(t) + I_i(t)
+\frac{dB_i}{dt} = (1-\phi_i)\,g_i(B_i) + \phi_i\,2x_iM_i\big(K_i(t)\,s_i(t) - B_i\big) - C_i(t) - G_i(t) + I_i(t)
 $$
 
+where $g_i$ is the Pella–Tomlinson production function above (logistic when `bmsy_k` = 0.5).
+
 * **Open recruitment.** $\phi_i$ (`open_recruitment`) is the fraction of production that comes from externally supplied recruits, for example *Panulirus argus* larvae from upstream sources (Kough, Paris & Butler 2013). That part does not depend on local spawning biomass. It relaxes toward $K\,s(t)$ at rate $2xM$, so its yield at $F = 2xM$ equals the same $xMK$ cap and the reference point is unchanged. Local depletion cannot collapse it. $s_i(t)$ is a supply index (`recruit_covariate`, relative to its historical mean) multiplied by the nursery index.
-* **Ghost fishing.** $G_i(t)$ is unaccounted mortality from traps lost in disturbances (`ghost_gears`). Lost traps keep fishing at `ghost_efficiency` of an active trap and decay with `ghost_half_life` (Renchen et al. 2014). Removals are reported separately (`ghost`) and are not counted as landings.
+* **Ghost fishing.** $G_i(t)$ is unaccounted mortality from derelict traps (`ghost_gears`). Lost traps keep fishing at `ghost_efficiency` of an active trap and decay with `ghost_half_life` (Renchen et al. 2010; Clark et al. 2012; Arthur et al. 2014). Two sources of lost traps are included:
+  * **Chronic loss** (`ghost_background_loss`, about 10% of traps per year; Clark et al. 2012) gives a steady-state derelict-to-active ratio $d = \lambda\,t_{1/2}/\ln 2$.
+  * **Storm losses** from the disturbance templates add to it.
+
+  Ghost removals are reported separately (`ghost`) and are not counted as landings.
 
 * The equation is solved with the **exact logistic solution** in each sub-step. This keeps it stable even for P/B = 30 (zooplankton). Catch and immigration are removed or added after each sub-step.
 * Annual lognormal process error $\varepsilon_{i,t}\sim N(-\sigma^2/2,\sigma^2)$ is applied (`process_sd`).
@@ -310,9 +316,12 @@ Each effect recovers exponentially with its own half-life.
 
 ## 12. Key assumptions and caveats
 
+The full list, with values, sources, assumption type and how each is tested, is the [Assumptions Register](assumptions.md). The most consequential are:
+
 * **Static diet.** Diet composition is static apart from Monte Carlo uncertainty; there is no prey switching. Fishing feedback acts through pools, not explicit predator–prey functional responses.
 * **Lindeman spine.** Production at TL *k*+1 equals TTE × production at TL *k*, so all pool production is attributed to modeled consumers. Unmodeled consumers and detritus losses are absorbed by TTE and the food-web fraction. Include non-fishery competitor groups so that FMP groups do not receive energy that, in reality, supports other taxa.
-* **Logistic dynamics.** Surplus production is logistic (Schaefer), so $B_{MSY} = K/2$. Groups whose productivity peaks at lower biomass can be represented with lower `x_msy`.
+* **Production shape.** Surplus production is Pella–Tomlinson, with $B_{MSY}/K$ set to each group's per-recruit $B_{MSY}/B_0$ (Schaefer, $K/2$, when `bmsy_k` = 0.5). The open-recruitment component is linear and keeps the same MMSY definition, which is conservative for open populations.
+* **OFL as a calibration target.** Assessment OFLs are treated as observations of MMSY with CV 0.4. An OFL is $F_{MSY}$ × current biomass, so it equals MSY only near $B_{MSY}$ (Assumptions register C1). Leave-one-benchmark-out validation tests the consequence.
 * **Catch-driven history.** Historical dynamics are driven by landings, so landings quality matters. Use `catch_expansion` and its CV, or subsets of validated trip tickets (e.g., MER Consultants Sampling and Catch Validation Project).
 * **MMSY is conditional.** MMSY reflects prevailing conditions and must be re-estimated when indicators trigger (Section 9; SEDAR103-DW-20 Section C).
 * **Uncertain inputs.** Many inputs are literature-based. Run the sensitivity of key results to TTE, food-web fraction and partition weights, which are the main levers on absolute scale. The SIR benchmarks and the `data_status` flag on every input help identify weak points.

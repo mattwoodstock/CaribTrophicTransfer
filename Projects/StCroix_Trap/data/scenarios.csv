@@ -9,17 +9,17 @@ Climate_SSP585,cov_set,dhw,2028,2028,12,Bleaching year (PLACEHOLDER frequency/ma
 Climate_SSP585,cov_set,dhw,2033,2033,14,Bleaching year (PLACEHOLDER)
 Climate_SSP585,cov_set,dhw,2038,2038,14,Bleaching year (PLACEHOLDER)
 Climate_SSP585,cov_set,dhw,2043,2043,16,Bleaching year (PLACEHOLDER)
-Major_hurricane_2030,disturbance,major_hurricane,2030,2030,1,
-Major_hurricane_2030,disturbance,major_hurricane_other_gears,2030,2030,1,
+Major_hurricane_2030,disturbance,major_hurricane,2030,2030,1,Hurricane template from disturbances.csv (PLACEHOLDER loss magnitudes)
+Major_hurricane_2030,disturbance,major_hurricane_other_gears,2030,2030,1,Hurricane template from disturbances.csv (PLACEHOLDER loss magnitudes)
 Trap_effort_plus30,effort_mult,trap_fish;trap_lobster,2025,2045,1.3,Unmanaged trap effort surge
 Trap_reduction_minus25,effort_mult,trap_fish;trap_lobster,2025,2045,0.75,Trap reduction program (cf. St. Thomas)
 Coral_disease_SCTLD,coral_disease,coral_reef,2025,2032,0.08,Continued SCTLD-driven coral loss (PLACEHOLDER rate)
-Combined_stress,cov_from,sst=sst_ssp585,2025,2045,,
-Combined_stress,cov_from,npp_pelagic_index=npp_pelagic_index_ssp585,2025,2045,,
-Combined_stress,cov_set,dhw,2030,2030,12,
-Combined_stress,disturbance,major_hurricane,2033,2033,1,
-Combined_stress,disturbance,major_hurricane_other_gears,2033,2033,1,
-Combined_stress,effort_mult,trap_fish;trap_lobster,2025,2045,1.3,
+Combined_stress,cov_from,sst=sst_ssp585,2025,2045,,CMIP6 SSP5-8.5 delta projection (API)
+Combined_stress,cov_from,npp_pelagic_index=npp_pelagic_index_ssp585,2025,2045,,CMIP6 SSP5-8.5 delta projection (API)
+Combined_stress,cov_set,dhw,2030,2030,12,Bleaching year (PLACEHOLDER magnitude)
+Combined_stress,disturbance,major_hurricane,2033,2033,1,Hurricane template from disturbances.csv (PLACEHOLDER loss magnitudes)
+Combined_stress,disturbance,major_hurricane_other_gears,2033,2033,1,Hurricane template from disturbances.csv (PLACEHOLDER loss magnitudes)
+Combined_stress,effort_mult,trap_fish;trap_lobster,2025,2045,1.3,Trap effort x1.3 (hypothetical)
 MPA_expansion,closed_fraction,coral_reef,2026,2045,0.4,No-take reef area raised to 40% (from 25%)
 MPA_expansion,closed_fraction,colonized_pavement,2026,2045,0.3,No-take pavement raised to 30% (from 15%)
 Open_access_effort,effort_response,all,2025,2045,0.5,Effort follows catch rate (elasticity 0.5; Smith 1969 open-access dynamics)

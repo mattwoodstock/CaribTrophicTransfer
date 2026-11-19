@@ -29,3 +29,25 @@ I <- rd("indices.csv")
 out <- c(out, "## indices.csv", "", md_table(I[, c("year", "index", "group", "value", "cv", "lambda", "data_status")]), "")
 writeLines(out, "docs/stcroix_input_values.md")
 message("Wrote docs/stcroix_input_values.md")
+
+# ---- inject value tables into docs/input_dictionary.md (single source of truth) ----
+if (requireNamespace("CaribTTM", quietly = TRUE)) library(CaribTTM) else devtools::load_all(".", quiet = TRUE)
+pr <- read_ttm_project("Projects/StCroix_Trap")          # merged: user values + API data
+h <- pr$habitats
+ht <- data.frame(habitat = h$habitat, `area km²` = round(h$area_km2, 1), `NPP (as entered)` = paste(h$npp_value, h$npp_unit),
+                 `NPP t C km⁻² yr⁻¹` = signif(h$npp_t_C_km2_yr, 3), f = h$food_web_fraction, TTE = h$tte,
+                 closed = h$closed_fraction, `NPP index` = ifelse(is.na(h$npp_covariate), "", h$npp_covariate),
+                 status = h$data_status, source = h$reference, check.names = FALSE)
+g <- pr$groups; g <- g[g$group_type == "fmp", ]
+num <- function(x) ifelse(is.na(x), "", as.character(x))
+gt <- data.frame(group = g$group, tier = g$data_tier, `P/B` = g$pb, M = num(g$m_nat), x = g$x_msy, `x CV` = g$x_msy_cv,
+                 `B_MSY/K` = g$bmsy_k, `partition (t km⁻²)` = g$partition_value, `partition CV` = g$partition_cv,
+                 `open rec.` = g$open_recruitment, nursery = ifelse(g$nursery_dependence > 0, paste0(g$nursery_habitat, " (", g$nursery_dependence, ")"), ""),
+                 refuge = g$refuge_dependence, trap = ifelse(g$trap_relevant, "✔", ""), status = g$data_status, source = g$reference, check.names = FALSE)
+inject <- function(txt, key, tab) {
+  b <- grep(paste0("<!-- BEGIN AUTO:", key, " -->"), txt, fixed = TRUE); e <- grep(paste0("<!-- END AUTO:", key, " -->"), txt, fixed = TRUE)
+  c(txt[seq_len(b)], md_table(tab), txt[e:length(txt)])
+}
+dd <- readLines("docs/input_dictionary.md")
+dd <- inject(dd, "habitats", ht); dd <- inject(dd, "groups", gt)
+writeLines(dd, "docs/input_dictionary.md")

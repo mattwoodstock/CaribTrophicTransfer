@@ -119,6 +119,10 @@ build_drivers <- function(proj, scenario = "Baseline", par = NULL) {
   ghost_hl <- if (is.null(proj$settings$ghost_half_life)) 1.5 else proj$settings$ghost_half_life
   ghost_gears <- if (is.null(proj$settings$ghost_gears) || is.na(proj$settings$ghost_gears)) character(0) else
     strsplit(proj$settings$ghost_gears, ";")[[1]]
+  # chronic (non-storm) trap loss: steady-state derelict share L = d / (d + 1) with
+  # d = annual loss rate x mean derelict lifetime (half-life / ln 2)
+  bg <- if (is.null(proj$settings$ghost_background_loss)) 0 else proj$settings$ghost_background_loss
+  if (bg > 0) { d <- bg * ghost_hl / log(2); for (ge in intersect(ghost_gears, colnames(drv$ghost))) drv$ghost[, ge] <- d / (1 + d) }
   # no-take fraction of each habitat
   cf <- if ("closed_fraction" %in% names(h)) h$closed_fraction else rep(0, nrow(h))
   drv$closed <- matrix(rep(ifelse(is.na(cf), 0, cf), each = ny), ny, nrow(h), dimnames = list(yc, h$habitat))

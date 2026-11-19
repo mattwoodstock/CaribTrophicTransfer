@@ -6,12 +6,12 @@ proj_end,2045,Final projection year (effort-driven)
 ref_years,3,Years averaged for reference points (2022-2024)
 substeps,12,Monthly Euler steps for biomass dynamics
 c_to_ww,9,g wet weight per g C (Pauly & Christensen 1995)
-c_to_ww_cv,0.1,
+c_to_ww_cv,0.1,ASSUMPTION: 10% uncertainty on the C:WW conversion
 n_draws,12000,Monte Carlo draws per sampling round (prior + adaptive rounds)
 seed,103,Random seed (SEDAR 103)
 diet_concentration,40,Dirichlet concentration for diet uncertainty
 catch_expansion,1.5,Reported-to-total landings expansion (PR logbook expansion ~2.0; USVI unquantified - SEDAR103-DW-20)
-catch_expansion_cv,0.25,
+catch_expansion_cv,0.25,ASSUMPTION: +/-25% on the unquantified USVI expansion factor
 fishing_feedback,TRUE,Remove previous-year catch from TL pools
 pstar,0.40,Percentile of MMSY used as management target (SEDAR103-DW-20 example)
 gear_alloc_method,catch_share,catch_share or slide
@@ -20,7 +20,7 @@ coral_growth,0.10,Coral cover intrinsic growth (yr-1)
 coral_max_cover,0.30,Coral cover carrying capacity (proportion)
 bleach_dhw_threshold,4,DHW (degC-weeks) where bleaching mortality starts
 bleach_mort_per_dhw,0.03,Proportional coral loss per DHW above threshold
-bleach_mort_cv,0.3,
+bleach_mort_cv,0.3,ASSUMPTION: 30% uncertainty on bleaching mortality per DHW
 dhw_variable,dhw,Covariate name holding annual max DHW
 sir_resample,2000,Number of SIR resamples (0 = off)
 index_min_cv,0.2,Minimum CV applied to index observations
@@ -28,30 +28,31 @@ sir_catch_feasibility,TRUE,Stock-reduction-analysis penalty when simulated stock
 catch_feasibility_cv,0.25,Tolerance of the catch-feasibility penalty (self-reported landings with ~20% error)
 bbmsy_overfished,0.5,B/BMSY threshold for Overfished status (MSST proxy)
 domain_lon_min,-65.0,St. Croix shelf bounding box (data acquisition)
-domain_lon_max,-64.4,
-domain_lat_min,17.6,
-domain_lat_max,17.95,
+domain_lon_max,-64.4,St. Croix shelf bounding box (east)
+domain_lat_min,17.6,St. Croix shelf bounding box (south)
+domain_lat_max,17.95,St. Croix shelf bounding box (north)
 use_acquired,TRUE,Merge API-acquired data in data/acquired/ (user values take precedence)
 landings_cv,0.2,Observation CV of each landings record (self-reported trip tickets)
 effort_cv,0.1,Observation CV of each effort record
 pref_cv,0.2,CV on habitat preferences
-coral_growth_cv,0.3,
+coral_growth_cv,0.3,ASSUMPTION: 30% uncertainty on intrinsic coral growth
 disturbance_loss_cv,0.5,Uncertainty (CV) of a common multiplier on hurricane loss magnitudes (placeholder losses)
 holdout_from_year,,Set (e.g. 2015) to hold later index observations out of calibration; validation designs are also evaluated by re-weighting
-ryther_low,1,Ryther index thresholds (t/km2/yr; Link & Watson 2019 - verify)
-ryther_high,3,
+ryther_low,1,Practical not-to-exceed Ryther index ~1 t/km2/yr (range 0.3-1.1; Link & Watson 2019)
+ryther_high,3,Extreme Ryther threshold (3 t/km2/yr; Link & Watson 2019)
 fogarty_low,0.22,Fogarty ratio thresholds (per mil; Link & Watson 2019)
-fogarty_high,0.92,
+fogarty_high,0.92,Upper Fogarty threshold (0.92 per mil; Link & Watson 2019)
 sir_adaptive_rounds,4,Adaptive importance-sampling rounds (proposal refit on partition priors; exact mixture correction)
 sir_feasibility_groups,trap,Calibration focuses on the trap fishery: only trap-relevant groups (and assessed stocks) constrain the posterior
 cores,4,Parallel cores for Stage-1 draws
 effort_creep,0.02,Annual catchability creep applied to fishery-dependent CPUE indices (~2%/yr; Palomares & Pauly 2019)
 effort_response,0,Elasticity of projected effort to catch rate; 0 = scenario-driven effort (see Open_access_effort scenario)
-ghost_efficiency,0.2,"Catch rate of a lost trap relative to an active one (PLACEHOLDER; USVI derelict-trap studies, Renchen et al. 2014)"
-ghost_efficiency_cv,0.5,
-ghost_half_life,1.5,Years for half of lost traps to stop fishing (PLACEHOLDER)
+ghost_efficiency,0.2,PLACEHOLDER: lost-trap catch rate relative to active traps (derelict traps in USVI kept fishing: Renchen et al. 2010; Clark et al. 2012; Arthur et al. 2014)
+ghost_efficiency_cv,0.5,ASSUMPTION: wide (50%) uncertainty on ghost-trap efficiency
+ghost_half_life,1.5,ASSUMPTION: years for half of lost traps to stop fishing (trap degradation; replace with USVI decay data)
 ghost_gears,trap_fish;trap_lobster,Gears whose lost traps keep fishing
 herbivore_groups,parrotfish_1;parrotfish_2;surgeonfishes,Grazers controlling coral recovery (Mumby et al. 2006)
 herbivory_elasticity,1,Coral growth x (grazing/reference)^gamma in projections (PLACEHOLDER magnitude)
-herbivory_elasticity_cv,0.5,
+herbivory_elasticity_cv,0.5,ASSUMPTION: wide (50%) uncertainty on herbivory elasticity
 psis,TRUE,Pareto-smoothed importance weights
+ghost_background_loss,0.10,"Annual trap loss outside storms ~10% (about 650 of 6,500 traps per year in St. Thomas/St. John; Clark et al. 2012)"

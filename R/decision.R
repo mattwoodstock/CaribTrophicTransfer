@@ -108,7 +108,10 @@ value_of_information <- function(res, groups = intersect(focus_groups(res$proj),
                                  bins = 20, posterior = FALSE) {
   X <- res$stage1$params
   if (is.null(X)) stop("No stored parameters (res$stage1$params)")
-  w <- if (posterior && !is.null(res$sir)) res$sir$weights else rep(1 / nrow(X), nrow(X))
+  # prior weights undo the adaptive proposal (prior / proposal); posterior uses the SIR weights
+  lc <- res$stage1$log_is_correction
+  w <- if (posterior && !is.null(res$sir)) res$sir$weights else
+    if (is.null(lc)) rep(1 / nrow(X), nrow(X)) else { z <- exp(lc - max(lc)); z / sum(z) }
   keep <- apply(X, 2, function(z) all(is.finite(z)) && stats::sd(z) > 0)
   X <- X[, keep, drop = FALSE]
   Ys <- c(list(total_focus_MMSY = rowSums(res$stage1$MMSY_ref[, groups, drop = FALSE])),
@@ -255,7 +258,11 @@ default_mps <- function() list(
 #' @param n number of operating-model draws (sampled from the SIR resample)
 #' @param scenario operating-model scenario
 #' @param eval_years years used for performance statistics (default: final 10)
-#' @return list(summary = performance by procedure, by_group = per group)
+#' @return list(summary = performance by procedure, by_group = per group).
+#'   `P_any_focus_overfished`: probability that at least one focus group falls
+#'   below `bbmsy_overfished` x B_MSY in at least one evaluation year;
+#'   `annual_P_any_focus_overfished`: mean share of evaluation years in which
+#'   that happens; `by_group$P_overfished`: probability for each group.
 #' @export
 run_mse <- function(res, mps = default_mps(), n = 100, scenario = "Baseline", eval_years = NULL) {
   if (is.null(res$pars)) stop("run_mse needs res$pars (call before they are dropped)")
@@ -267,7 +274,7 @@ run_mse <- function(res, mps = default_mps(), n = 100, scenario = "Baseline", ev
   rows <- sample(res$row_of_draw[res$draws], n, replace = TRUE)
   out <- list(); grp <- list()
   for (mn in names(mps)) {
-    perf <- matrix(NA_real_, n, 5, dimnames = list(NULL, c("min_BBmsy", "P_any_overfished", "catch_t", "AAV", "effort_mult")))
+    perf <- matrix(NA_real_, n, 6, dimnames = list(NULL, c("min_BBmsy", "ever_overfished", "annual_share", "catch_t", "AAV", "effort_mult")))
     gb <- matrix(NA_real_, n, length(foc), dimnames = list(NULL, foc))
     for (i in seq_len(n)) {
       par <- res$pars[[rows[i]]]
@@ -275,14 +282,17 @@ run_mse <- function(res, mps = default_mps(), n = 100, scenario = "Baseline", ev
       mp_i <- mps[[mn]](seed = st$seed * 1000 + i)
       mpw <- function(year, state) { state$focus <- foc; mp_i(year, state) }
       o <- simulate_ttm(proj, par, drv, mp = mpw)
-      bb <- 2 * o$B[ey, foc, drop = FALSE] / o$K[ey, foc, drop = FALSE]
+      bb <- sweep(o$B[ey, foc, drop = FALSE] / o$K[ey, foc, drop = FALSE], 2, g$bmsy_k[match(foc, g$group)], "/")
       ct <- rowSums(o$C[ey, foc, drop = FALSE])
-      perf[i, ] <- c(min(bb), mean(apply(bb < st$bbmsy_overfished, 1, any)), mean(ct),
+      anyy <- apply(bb < st$bbmsy_overfished, 1, any)
+      perf[i, ] <- c(min(bb), as.numeric(any(anyy)), mean(anyy), mean(ct),
                      mean(abs(diff(ct))) / max(mean(ct), 1e-9),
                      mean(o$Eff[ey, ] / matrix(o$Eff[as.character(st$hist_end), ], length(ey), ncol(o$Eff), byrow = TRUE)))
       gb[i, ] <- apply(bb, 2, min)
     }
-    out[[mn]] <- data.frame(procedure = mn, P_any_focus_overfished = mean(perf[, "P_any_overfished"]),
+    out[[mn]] <- data.frame(procedure = mn,
+                            P_any_focus_overfished = mean(perf[, "ever_overfished"]),
+                            annual_P_any_focus_overfished = mean(perf[, "annual_share"]),
                             min_BBmsy_p05 = stats::quantile(perf[, "min_BBmsy"], 0.05, names = FALSE),
                             min_BBmsy_p50 = stats::median(perf[, "min_BBmsy"]),
                             focus_catch_lb_p50 = t_to_lb(stats::median(perf[, "catch_t"])),

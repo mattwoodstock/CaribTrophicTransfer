@@ -104,3 +104,16 @@ test_that("catch-only comparator, value of information and MSE run", {
   expect_equal(nrow(m$summary), 3)
   expect_true(all(m$summary$P_any_focus_overfished >= 0 & m$summary$P_any_focus_overfished <= 1))
 })
+
+test_that("Pella-Tomlinson dynamics: exact, Schaefer at bmsy_k = 0.5, MSY at the stated B_MSY", {
+  expect_equal(pt_shape(0.5), 2)
+  n <- pt_shape(0.35); expect_equal(n^(1 / (1 - n)), 0.35, tolerance = 1e-6)
+  # logistic equivalence
+  expect_equal(.pt_step(30, 100, 0.8, 2, 0.5), .logistic_step(30, 0.8, 100, 0.5), tolerance = 1e-10)
+  # surplus production peaks at B = bmsy_k K with value x M K
+  x <- 0.25; M <- 0.4; K <- 100; rho <- n^(n / (n - 1)) * x * M
+  sp <- function(B) (.pt_step(B, K, rho, n, 1e-4) - B) / 1e-4
+  Bs <- seq(5, 95, by = 0.5); spv <- vapply(Bs, sp, numeric(1))
+  expect_equal(Bs[which.max(spv)], 35, tolerance = 1)
+  expect_equal(max(spv), x * M * K, tolerance = 0.02)
+})

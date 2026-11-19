@@ -75,7 +75,7 @@ All environmental covariates are now acquired from APIs (Section F). What remain
 | G2 | No-take (MPA) share of each habitat | `habitats.csv: closed_fraction` | approximate (reef 0.25, pavement 0.15, …) | GIS overlay of Buck Island Reef NM and East End Marine Park no-take zones on the NCCOS habitat map | M |
 | G3 | Nursery dependence of each group | `groups.csv: nursery_habitat`, `nursery_dependence` | 0.2–0.5 expert-informed | structured expert elicitation; juvenile surveys; Nagelkerken-type nursery-value studies | M |
 | G4 | Herbivory–coral feedback strength | `settings: herbivory_elasticity` | 1 ± 50% | coral recruitment / macroalgae vs parrotfish biomass (NCRMP benthic + fish) | M |
-| G5 | Ghost-trap efficiency and decay | `settings: ghost_efficiency`, `ghost_half_life` | 0.2, 1.5 yr | USVI derelict-trap studies (Renchen et al. 2014); trap-loss reports after Maria | L |
+| G5 | Ghost-trap efficiency and decay | `settings: ghost_efficiency`, `ghost_half_life` | 0.2, 1.5 yr | USVI derelict-trap studies (Renchen et al. 2010; Clark et al. 2012; Arthur et al. 2014); trap-loss reports after Maria | L |
 | G6 | Lionfish invasion timeline and effect | `env_covariates.csv: lionfish`; `env_response.csv` | timeline 2009–2012; −10% / −5% K | NCRMP lionfish densities; fishers' LEK timelines | M |
 | G7 | Sargassum before 2016 and its effects | `env_covariates.csv: sargassum` (2011–2015); `env_response.csv` | Wang et al. 2019 relative magnitudes; −3% K per index unit | USF SaWS monthly bulletins (2011–2015); nursery-habitat surveys after inundation | L |
 | G8 | Trap selectivity (L50) by group | `data-raw/build_life_history_priors.R` | 15 cm TL (cap 0.6 L∞), CV 0.3 | trap selectivity studies for USVI mesh; TIP length compositions | M |

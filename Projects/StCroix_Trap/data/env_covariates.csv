@@ -1,185 +1,269 @@
-year,variable,value,units,source,data_status,sd
-1983,sst,27.218,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-1984,sst,27.227,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-1985,sst,27.169,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-1986,sst,27.306,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-1987,sst,27.322,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-1988,sst,27.526,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-1989,sst,27.398,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-1990,sst,27.608,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-1991,sst,27.375,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-1992,sst,27.286,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-1993,sst,27.33,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-1994,sst,27.486,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-1995,sst,27.226,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-1996,sst,27.733,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-1997,sst,27.566,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-1998,sst,27.686,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-1999,sst,27.388,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2000,sst,27.737,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2001,sst,27.73,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2002,sst,27.574,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2003,sst,27.711,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2004,sst,27.631,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2005,sst,28.353,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2006,sst,27.593,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2007,sst,27.451,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2008,sst,27.739,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2009,sst,27.93,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2010,sst,28.095,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2011,sst,27.824,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2012,sst,27.91,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2013,sst,27.909,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2014,sst,27.767,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2015,sst,27.792,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2016,sst,27.889,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2017,sst,28.102,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2018,sst,28.033,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2019,sst,28.223,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2020,sst,28.057,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2021,sst,28.106,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2022,sst,28.04,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2023,sst,28.891,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-2024,sst,28.63,degC,PLACEHOLDER (replace with GLORYS12 / OISST annual mean),PLACEHOLDER,0
-1983,dhw,1.1,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-1984,dhw,0.76,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-1985,dhw,1.85,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-1986,dhw,0.75,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-1987,dhw,1.72,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-1988,dhw,1.58,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-1989,dhw,1.3,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-1990,dhw,0.96,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-1991,dhw,0.38,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-1992,dhw,0.59,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-1993,dhw,1.78,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-1994,dhw,1.73,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-1995,dhw,0.41,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-1996,dhw,2.26,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-1997,dhw,0.38,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-1998,dhw,0,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-1999,dhw,0,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2000,dhw,0.26,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2001,dhw,1.16,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2002,dhw,1.28,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2003,dhw,1.25,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2004,dhw,0.64,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2005,dhw,12,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2006,dhw,1.83,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2007,dhw,1.28,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2008,dhw,0.5,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2009,dhw,1.71,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2010,dhw,6,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2011,dhw,0.59,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2012,dhw,0,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2013,dhw,0.74,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2014,dhw,0,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2015,dhw,1.69,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2016,dhw,1.78,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2017,dhw,3,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2018,dhw,0.33,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2019,dhw,6,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2020,dhw,4,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2021,dhw,1.95,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2022,dhw,1.79,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2023,dhw,16,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-2024,dhw,10,degC-weeks,PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW),PLACEHOLDER,0
-1983,npp_pelagic_index,0.966,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-1984,npp_pelagic_index,1.006,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-1985,npp_pelagic_index,0.961,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-1986,npp_pelagic_index,0.999,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-1987,npp_pelagic_index,0.992,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-1988,npp_pelagic_index,1.141,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-1989,npp_pelagic_index,0.896,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-1990,npp_pelagic_index,1.051,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-1991,npp_pelagic_index,1.02,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-1992,npp_pelagic_index,0.949,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-1993,npp_pelagic_index,0.965,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-1994,npp_pelagic_index,1.081,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-1995,npp_pelagic_index,1,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-1996,npp_pelagic_index,1.066,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-1997,npp_pelagic_index,1.008,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-1998,npp_pelagic_index,0.889,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-1999,npp_pelagic_index,0.986,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2000,npp_pelagic_index,1.182,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2001,npp_pelagic_index,0.919,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2002,npp_pelagic_index,1.128,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2003,npp_pelagic_index,1.071,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2004,npp_pelagic_index,1.054,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2005,npp_pelagic_index,1.019,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2006,npp_pelagic_index,1.081,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2007,npp_pelagic_index,1.035,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2008,npp_pelagic_index,1.062,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2009,npp_pelagic_index,1.35,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2010,npp_pelagic_index,0.935,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2011,npp_pelagic_index,1.068,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2012,npp_pelagic_index,0.915,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2013,npp_pelagic_index,0.982,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2014,npp_pelagic_index,1.18,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2015,npp_pelagic_index,0.959,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2016,npp_pelagic_index,1.014,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2017,npp_pelagic_index,1.227,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2018,npp_pelagic_index,1.188,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2019,npp_pelagic_index,0.935,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2020,npp_pelagic_index,0.984,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2021,npp_pelagic_index,1.3,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2022,npp_pelagic_index,1.052,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2023,npp_pelagic_index,0.944,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-2024,npp_pelagic_index,0.981,relative,PLACEHOLDER (replace with St. Croix NPP ensemble / mean),PLACEHOLDER,0
-1983,coral_cover,0.22,proportion,PLACEHOLDER (pre-TCRMP; post-Hugo/Marilyn losses assumed),PLACEHOLDER,0.03
-1989,coral_cover,0.2,proportion,PLACEHOLDER (pre-TCRMP; post-Hugo/Marilyn losses assumed),PLACEHOLDER,0.03
-1990,coral_cover,0.16,proportion,PLACEHOLDER (pre-TCRMP; post-Hugo/Marilyn losses assumed),PLACEHOLDER,0.03
-1995,coral_cover,0.15,proportion,PLACEHOLDER (pre-TCRMP; post-Hugo/Marilyn losses assumed),PLACEHOLDER,0.03
-1996,coral_cover,0.13,proportion,PLACEHOLDER (pre-TCRMP; post-Hugo/Marilyn losses assumed),PLACEHOLDER,0.03
-2000,coral_cover,0.15,proportion,APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021),approximate,0.01
-2004,coral_cover,0.14,proportion,APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021),approximate,0.01
-2006,coral_cover,0.1,proportion,APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021),approximate,0.01
-2009,coral_cover,0.1,proportion,APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021),approximate,0.01
-2013,coral_cover,0.08,proportion,APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021),approximate,0.01
-2015,coral_cover,0.075,proportion,APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021),approximate,0.01
-2017,coral_cover,0.065,proportion,APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021),approximate,0.01
-2019,coral_cover,0.045,proportion,APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021),approximate,0.01
-2021,coral_cover,0.045,proportion,APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021),approximate,0.01
-2023,coral_cover,0.035,proportion,APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021),approximate,0.01
-2024,coral_cover,0.03,proportion,APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021),approximate,0.01
-1983,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-1984,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-1985,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-1986,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-1987,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-1988,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-1989,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-1990,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-1991,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-1992,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-1993,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-1994,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-1995,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-1996,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-1997,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-1998,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-1999,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-2000,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-2001,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-2002,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-2003,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-2004,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-2005,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-2006,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-2007,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-2008,lionfish,0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0
-2009,lionfish,0.2,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0.2
-2010,lionfish,0.5,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0.2
-2011,lionfish,0.8,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0.2
-2012,lionfish,1.0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0.2
-2013,lionfish,1.0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0.2
-2014,lionfish,1.0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0.2
-2015,lionfish,1.0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0.2
-2016,lionfish,1.0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0.2
-2017,lionfish,1.0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0.2
-2018,lionfish,1.0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0.2
-2019,lionfish,1.0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0.2
-2020,lionfish,1.0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0.2
-2021,lionfish,1.0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0.2
-2022,lionfish,1.0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0.2
-2023,lionfish,1.0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0.2
-2024,lionfish,1.0,"relative invasion stage (0 = absent, 1 = established)",literature timeline,PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010),0.2
+"year","variable","value","units","source","data_status","sd"
+1983,"sst",27.218,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1984,"sst",27.227,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1985,"sst",27.169,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1986,"sst",27.306,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1987,"sst",27.322,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1988,"sst",27.526,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1989,"sst",27.398,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1990,"sst",27.608,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1991,"sst",27.375,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1992,"sst",27.286,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1993,"sst",27.33,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1994,"sst",27.486,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1995,"sst",27.226,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1996,"sst",27.733,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1997,"sst",27.566,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1998,"sst",27.686,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1999,"sst",27.388,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2000,"sst",27.737,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2001,"sst",27.73,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2002,"sst",27.574,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2003,"sst",27.711,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2004,"sst",27.631,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2005,"sst",28.353,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2006,"sst",27.593,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2007,"sst",27.451,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2008,"sst",27.739,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2009,"sst",27.93,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2010,"sst",28.095,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2011,"sst",27.824,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2012,"sst",27.91,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2013,"sst",27.909,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2014,"sst",27.767,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2015,"sst",27.792,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2016,"sst",27.889,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2017,"sst",28.102,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2018,"sst",28.033,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2019,"sst",28.223,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2020,"sst",28.057,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2021,"sst",28.106,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2022,"sst",28.04,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2023,"sst",28.891,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+2024,"sst",28.63,"degC","PLACEHOLDER (replace with GLORYS12 / OISST annual mean)","PLACEHOLDER",0
+1983,"dhw",1.1,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1984,"dhw",0.76,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1985,"dhw",1.85,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1986,"dhw",0.75,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1987,"dhw",1.72,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1988,"dhw",1.58,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1989,"dhw",1.3,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1990,"dhw",0.96,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1991,"dhw",0.38,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1992,"dhw",0.59,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1993,"dhw",1.78,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1994,"dhw",1.73,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1995,"dhw",0.41,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1996,"dhw",2.26,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1997,"dhw",0.38,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1998,"dhw",0,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1999,"dhw",0,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2000,"dhw",0.26,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2001,"dhw",1.16,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2002,"dhw",1.28,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2003,"dhw",1.25,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2004,"dhw",0.64,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2005,"dhw",12,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2006,"dhw",1.83,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2007,"dhw",1.28,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2008,"dhw",0.5,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2009,"dhw",1.71,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2010,"dhw",6,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2011,"dhw",0.59,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2012,"dhw",0,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2013,"dhw",0.74,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2014,"dhw",0,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2015,"dhw",1.69,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2016,"dhw",1.78,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2017,"dhw",3,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2018,"dhw",0.33,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2019,"dhw",6,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2020,"dhw",4,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2021,"dhw",1.95,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2022,"dhw",1.79,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2023,"dhw",16,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+2024,"dhw",10,"degC-weeks","PLACEHOLDER (replace with NOAA Coral Reef Watch annual max DHW)","PLACEHOLDER",0
+1983,"npp_pelagic_index",0.966,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1984,"npp_pelagic_index",1.006,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1985,"npp_pelagic_index",0.961,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1986,"npp_pelagic_index",0.999,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1987,"npp_pelagic_index",0.992,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1988,"npp_pelagic_index",1.141,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1989,"npp_pelagic_index",0.896,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1990,"npp_pelagic_index",1.051,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1991,"npp_pelagic_index",1.02,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1992,"npp_pelagic_index",0.949,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1993,"npp_pelagic_index",0.965,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1994,"npp_pelagic_index",1.081,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1995,"npp_pelagic_index",1,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1996,"npp_pelagic_index",1.066,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1997,"npp_pelagic_index",1.008,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1998,"npp_pelagic_index",0.889,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1999,"npp_pelagic_index",0.986,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2000,"npp_pelagic_index",1.182,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2001,"npp_pelagic_index",0.919,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2002,"npp_pelagic_index",1.128,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2003,"npp_pelagic_index",1.071,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2004,"npp_pelagic_index",1.054,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2005,"npp_pelagic_index",1.019,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2006,"npp_pelagic_index",1.081,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2007,"npp_pelagic_index",1.035,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2008,"npp_pelagic_index",1.062,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2009,"npp_pelagic_index",1.35,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2010,"npp_pelagic_index",0.935,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2011,"npp_pelagic_index",1.068,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2012,"npp_pelagic_index",0.915,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2013,"npp_pelagic_index",0.982,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2014,"npp_pelagic_index",1.18,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2015,"npp_pelagic_index",0.959,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2016,"npp_pelagic_index",1.014,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2017,"npp_pelagic_index",1.227,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2018,"npp_pelagic_index",1.188,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2019,"npp_pelagic_index",0.935,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2020,"npp_pelagic_index",0.984,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2021,"npp_pelagic_index",1.3,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2022,"npp_pelagic_index",1.052,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2023,"npp_pelagic_index",0.944,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+2024,"npp_pelagic_index",0.981,"relative","PLACEHOLDER (replace with St. Croix NPP ensemble / mean)","PLACEHOLDER",0
+1983,"coral_cover",0.22,"proportion","PLACEHOLDER (pre-TCRMP; post-Hugo/Marilyn losses assumed)","PLACEHOLDER",0.03
+1989,"coral_cover",0.2,"proportion","PLACEHOLDER (pre-TCRMP; post-Hugo/Marilyn losses assumed)","PLACEHOLDER",0.03
+1990,"coral_cover",0.16,"proportion","PLACEHOLDER (pre-TCRMP; post-Hugo/Marilyn losses assumed)","PLACEHOLDER",0.03
+1995,"coral_cover",0.15,"proportion","PLACEHOLDER (pre-TCRMP; post-Hugo/Marilyn losses assumed)","PLACEHOLDER",0.03
+1996,"coral_cover",0.13,"proportion","PLACEHOLDER (pre-TCRMP; post-Hugo/Marilyn losses assumed)","PLACEHOLDER",0.03
+2000,"coral_cover",0.15,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+2004,"coral_cover",0.14,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+2006,"coral_cover",0.1,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+2009,"coral_cover",0.1,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+2013,"coral_cover",0.08,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+2015,"coral_cover",0.075,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+2017,"coral_cover",0.065,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+2019,"coral_cover",0.045,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+2021,"coral_cover",0.045,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+2023,"coral_cover",0.035,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+2024,"coral_cover",0.03,"proportion","APPROXIMATE (TCRMP 2001-; NCRMP ~8% in 2013 to ~4% in 2019; SCTLD from 2021)","approximate",0.01
+1983,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+1984,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+1985,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+1986,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+1987,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+1988,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+1989,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+1990,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+1991,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+1992,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+1993,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+1994,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+1995,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+1996,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+1997,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+1998,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+1999,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+2000,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+2001,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+2002,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+2003,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+2004,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+2005,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+2006,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+2007,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+2008,"lionfish",0,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0
+2009,"lionfish",0.2,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0.2
+2010,"lionfish",0.5,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0.2
+2011,"lionfish",0.8,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0.2
+2012,"lionfish",1,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0.2
+2013,"lionfish",1,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0.2
+2014,"lionfish",1,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0.2
+2015,"lionfish",1,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0.2
+2016,"lionfish",1,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0.2
+2017,"lionfish",1,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0.2
+2018,"lionfish",1,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0.2
+2019,"lionfish",1,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0.2
+2020,"lionfish",1,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0.2
+2021,"lionfish",1,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0.2
+2022,"lionfish",1,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0.2
+2023,"lionfish",1,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0.2
+2024,"lionfish",1,"relative invasion stage (0 = absent, 1 = established)","literature timeline","PLACEHOLDER (timeline from first USVI records 2008-2009; Schofield 2010)",0.2
+1983,"light_seagrass",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0094
+1984,"light_seagrass",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0094
+1985,"light_seagrass",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0094
+1986,"light_seagrass",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0094
+1987,"light_seagrass",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0094
+1988,"light_seagrass",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0094
+1989,"light_seagrass",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0094
+1990,"light_seagrass",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0094
+1991,"light_seagrass",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0094
+1992,"light_seagrass",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0094
+1993,"light_seagrass",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0094
+1994,"light_seagrass",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0094
+1995,"light_seagrass",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0094
+1996,"light_seagrass",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0094
+1997,"light_seagrass",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0094
+1998,"light_seagrass",1.0067,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0591
+1999,"light_seagrass",1.0189,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0558
+2000,"light_seagrass",1.0059,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0731
+2001,"light_seagrass",1.0119,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0673
+2002,"light_seagrass",0.9994,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0852
+2003,"light_seagrass",0.9937,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0844
+2004,"light_seagrass",0.9903,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.085
+2005,"light_seagrass",0.997,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0942
+2006,"light_seagrass",0.9944,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0861
+2007,"light_seagrass",0.9941,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0933
+2008,"light_seagrass",0.9957,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0934
+2009,"light_seagrass",0.9818,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0872
+2010,"light_seagrass",0.9797,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.086
+2011,"light_seagrass",0.995,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.087
+2012,"light_seagrass",1.0056,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0783
+2013,"light_seagrass",1.0019,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0694
+2014,"light_seagrass",1.0083,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0847
+2015,"light_seagrass",1.003,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0919
+2016,"light_seagrass",1.0044,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0804
+2017,"light_seagrass",0.9958,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0898
+2018,"light_seagrass",0.9861,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0995
+2019,"light_seagrass",1.0041,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0956
+2020,"light_seagrass",1.0087,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0941
+2021,"light_seagrass",0.9954,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0797
+2022,"light_seagrass",1.0001,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0946
+2023,"light_seagrass",1.0076,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0993
+2024,"light_seagrass",1.0143,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 4 m (assumption)","derived",0.0687
+1983,"light_macroalgae",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0188
+1984,"light_macroalgae",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0188
+1985,"light_macroalgae",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0188
+1986,"light_macroalgae",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0188
+1987,"light_macroalgae",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0188
+1988,"light_macroalgae",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0188
+1989,"light_macroalgae",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0188
+1990,"light_macroalgae",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0188
+1991,"light_macroalgae",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0188
+1992,"light_macroalgae",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0188
+1993,"light_macroalgae",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0188
+1994,"light_macroalgae",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0188
+1995,"light_macroalgae",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0188
+1996,"light_macroalgae",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0188
+1997,"light_macroalgae",1,"relative bottom light (1998-2024 mean = 1)","held at mean before OC-CCI (assumption)","ASSUMPTION",0.0188
+1998,"light_macroalgae",1.0134,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1189
+1999,"light_macroalgae",1.038,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1138
+2000,"light_macroalgae",1.0117,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.147
+2001,"light_macroalgae",1.0238,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1362
+2002,"light_macroalgae",0.9987,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1703
+2003,"light_macroalgae",0.9873,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1677
+2004,"light_macroalgae",0.9807,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1683
+2005,"light_macroalgae",0.9939,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1879
+2006,"light_macroalgae",0.9887,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1712
+2007,"light_macroalgae",0.9882,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1856
+2008,"light_macroalgae",0.9914,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1859
+2009,"light_macroalgae",0.9639,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1711
+2010,"light_macroalgae",0.9598,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1685
+2011,"light_macroalgae",0.99,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1732
+2012,"light_macroalgae",1.0111,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1575
+2013,"light_macroalgae",1.0038,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1391
+2014,"light_macroalgae",1.0166,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1707
+2015,"light_macroalgae",1.006,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1843
+2016,"light_macroalgae",1.0088,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1616
+2017,"light_macroalgae",0.9915,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1788
+2018,"light_macroalgae",0.9723,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1962
+2019,"light_macroalgae",1.0082,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.192
+2020,"light_macroalgae",1.0174,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1899
+2021,"light_macroalgae",0.9908,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1587
+2022,"light_macroalgae",1.0001,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1891
+2023,"light_macroalgae",1.0153,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.2001
+2024,"light_macroalgae",1.0288,"relative bottom light (1998-2024 mean = 1)","derived: OC-CCI Kd490 (API) -> Kd(PAR) (Morel et al. 2007), depth 8 m (assumption)","derived",0.1394
