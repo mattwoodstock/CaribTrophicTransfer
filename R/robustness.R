@@ -101,7 +101,8 @@ sir_diagnostics <- function(res) {
                      ESS_raw = if (is.null(res$sir$ess_raw)) NA else res$sir$ess_raw,
                      unique_resampled = res$sir$n_unique,
                      max_weight = max(w), top10_weight_share = sum(ws[seq_len(min(10, length(ws)))]),
-                     pareto_k_hat = k_hat)
+                     pareto_k_hat = k_hat,
+                     weight_method = if (is.null(res$sir$weight_method)) NA else res$sir$weight_method)
   X <- res$stage1$params
   shrink <- NULL
   if (!is.null(X)) {
@@ -274,27 +275,31 @@ run_structural_ensemble <- function(proj, variants = default_structural_variants
 
 #' Default structural variants for the ensemble
 #'
-#' base; MMSY fraction x = 0.3 and 0.4 (Beddington & Cooke 1983); transfer
-#' efficiency 10% and 20% (SEDAR103-DW-20 sensitivity range); no fishing
-#' feedback; no direct thermal effects; food-web fraction x0.67 and x1.5;
-#' pelagic NPP from the computed satellite ensemble instead of the regional
-#' value.
+#' base (life-history x on natural mortality); `gulland_PB` (the original
+#' SEDAR103-DW-20 form, x = 0.5 on P/B); x reduced by 25%; closed population
+#' (no external recruitment); no nursery dependence; no herbivory-coral
+#' feedback; no ghost fishing; no lionfish / Sargassum effects; transfer
+#' efficiency 10% and 20%; no direct thermal effects; food-web fraction x0.67
+#' and x1.5. (Earlier runs showed that fishing feedback on the food web and the
+#' pelagic NPP source change trap-group MMSY by < 0.1%.)
 #' @export
 default_structural_variants <- function() {
   id <- function(p) p
   list(
     base = id,
-    x_msy_0.3 = function(p) { p$groups$x_msy[p$groups$group_type == "fmp"] <- 0.3; validate_ttm_project(p) },
-    x_msy_0.4 = function(p) { p$groups$x_msy[p$groups$group_type == "fmp"] <- 0.4; validate_ttm_project(p) },
+    gulland_PB = function(p) {   # original SEDAR103-DW-20 form: x = 0.5 on P/B (no per-recruit, no M basis)
+      f <- p$groups$group_type == "fmp"; p$groups$x_msy[f] <- 0.5; p$groups$x_msy_cv[f] <- 0.2; p$groups$m_nat[f] <- NA
+      validate_ttm_project(p) },
+    x_msy_low = function(p) { f <- p$groups$group_type == "fmp"; p$groups$x_msy[f] <- 0.75 * p$groups$x_msy[f]; validate_ttm_project(p) },
+    closed_population = function(p) { p$groups$open_recruitment <- 0; validate_ttm_project(p) },
+    no_nursery = function(p) { p$groups$nursery_dependence <- 0; validate_ttm_project(p) },
+    no_herbivory_feedback = function(p) { p$settings$herbivory_elasticity <- 0; p },
+    no_ghost_fishing = function(p) { p$settings$ghost_efficiency <- 0; p },
+    no_lionfish_sargassum = function(p) {
+      if (!is.null(p$env_response)) p$env_response <- p$env_response[!p$env_response$variable %in% c("lionfish", "sargassum"), ]; p },
     tte_0.10 = function(p) { p$habitats$tte <- 0.10; validate_ttm_project(p) },
     tte_0.20 = function(p) { p$habitats$tte <- 0.20; validate_ttm_project(p) },
-    no_fishing_feedback = function(p) { p$settings$fishing_feedback <- FALSE; p },
     no_thermal = function(p) { if (!is.null(p$env_response)) p$env_response <- p$env_response[p$env_response$variable != "sst", ]; p },
     fwf_low = function(p) { p$habitats$food_web_fraction <- p$habitats$food_web_fraction * 0.67; validate_ttm_project(p) },
-    fwf_high = function(p) { p$habitats$food_web_fraction <- pmin(0.9, p$habitats$food_web_fraction * 1.5); validate_ttm_project(p) },
-    pelagic_npp_satellite = function(p) {
-      ab <- p$env_covariates[p$env_covariates$variable == "npp_pelagic_index_abs", ]
-      if (nrow(ab)) { i <- p$habitats$type == "pelagic"; p$habitats$npp_value[i] <- mean(ab$value); p$habitats$npp_unit[i] <- "g_C_m2_yr" }
-      validate_ttm_project(p)
-    })
+    fwf_high = function(p) { p$habitats$food_web_fraction <- pmin(0.9, p$habitats$food_web_fraction * 1.5); validate_ttm_project(p) })
 }

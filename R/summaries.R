@@ -336,3 +336,33 @@ write_spf_inputs <- function(res, dir, scenario = "Baseline") {
   }
   invisible(list.files(dir, full.names = TRUE))
 }
+
+#' Ecological and fishery process diagnostics
+#'
+#' Medians across retained draws of the processes added for ecological
+#' realism: fishable (non-MPA) fraction, nursery-habitat index, ghost-fishing
+#' removals (lb, summed over the historical period and over the projection), and
+#' coral habitat quality at the end of the projection in each scenario.
+#' @param res `ttm_results`
+#' @param groups groups to report (default: focus groups)
+#' @export
+process_diagnostics <- function(res, groups = intersect(focus_groups(res$proj), res$proj$groups$group)) {
+  st <- res$proj$settings; yrs <- as.character(res$proj$years)
+  hy <- yrs[as.numeric(yrs) <= st$hist_end]; py <- yrs[as.numeric(yrs) > st$hist_end]
+  med <- function(a, yy, f = mean) apply(a[, yy, groups, drop = FALSE], 3, function(z) stats::median(apply(z, 1, f)))
+  out <- data.frame(group = groups,
+    fishable_fraction = med(get_metric(res, "fopen"), as.character(st$hist_end)),
+    nursery_index_hist_end = med(get_metric(res, "nursery"), as.character(st$hist_end)),
+    nursery_index_proj_end = med(get_metric(res, "nursery"), as.character(st$proj_end)),
+    ghost_removals_hist_lb = t_to_lb(med(get_metric(res, "ghost"), hy, sum)),
+    landings_hist_lb = t_to_lb(med(get_metric(res, "C"), hy, sum)), row.names = NULL)
+  out$ghost_share_of_catch <- out$ghost_removals_hist_lb / pmax(out$landings_hist_lb, 1e-9)
+  cq <- vapply(res$scenarios, function(s) {
+    Q <- res$results[[s]]$Q
+    if (is.null(Q) || !"coral_reef" %in% dimnames(Q)[[3]]) return(NA_real_)
+    rows <- if (is.null(res$row_of_draw)) res$draws else res$row_of_draw[res$draws]
+    stats::median(Q[rows, as.character(st$proj_end), "coral_reef"])
+  }, numeric(1))
+  attr(out, "coral_quality_proj_end") <- cq
+  out
+}

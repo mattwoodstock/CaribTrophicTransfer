@@ -27,7 +27,9 @@
 #' Replaces the largest importance weights by expected order statistics of a
 #' generalized Pareto distribution fitted to the upper tail, which stabilizes
 #' SIR when a few draws dominate. The shape estimate k diagnoses reliability:
-#' k < 0.5 good, 0.5-0.7 acceptable, > 0.7 unreliable (increase draws).
+#' k < 0.5 good, 0.5-0.7 acceptable, > 0.7 unreliable (increase draws). When
+#' k >= 0.7 the weights are instead truncated at mean(w) * sqrt(S) (truncated
+#' importance sampling; Ionides 2008) and `method = "truncated"` is returned.
 #' @param lw log importance weights (unnormalized)
 #' @return list(lw = smoothed log weights, k = Pareto shape estimate, tail_len)
 #' @export
@@ -41,10 +43,15 @@ psis_smooth <- function(lw) {
   ex <- sort(exp(lw[tail_ix]) - exp(cut))
   if (all(ex <= 0)) return(list(lw = lw, k = NA_real_, tail_len = M))
   fit <- .gpdfit(ex)
-  if (!is.finite(fit$k)) return(list(lw = lw, k = NA_real_, tail_len = M))
+  if (!is.finite(fit$k) || fit$k >= 0.7) {
+    # tail too heavy for reliable smoothing: truncated importance sampling instead
+    # (Ionides 2008: w <- min(w, mean(w) sqrt(S))), flagged by k >= 0.7
+    w <- exp(lw); cap <- mean(w) * sqrt(S)
+    return(list(lw = log(pmin(w, cap)), k = fit$k, tail_len = M, method = "truncated"))
+  }
   sm <- exp(cut) + .qgpd((seq_len(M) - 0.5) / M, fit$k, fit$sigma)
   sm <- pmin(sm, 1)                     # truncate at the largest raw weight (= 1 after scaling)
   rank_in_tail <- order(order(lw[tail_ix]))
   lw[tail_ix] <- log(sm[rank_in_tail])
-  list(lw = lw, k = fit$k, tail_len = M)
+  list(lw = lw, k = fit$k, tail_len = M, method = "psis")
 }

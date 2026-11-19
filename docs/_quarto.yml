@@ -14,6 +14,7 @@ book:
     - model_description.md
     - case_study_stcroix.md
     - review_readiness.md
+    - ecological_review.md
     - data_needs.md
     - stcroix_input_values.md
     - references.md

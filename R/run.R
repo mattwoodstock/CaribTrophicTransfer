@@ -2,7 +2,7 @@
 # Monte Carlo driver and Sampling-Importance-Resampling (SIR)
 # ==============================================================================
 
-.metrics <- c("B", "K", "K0", "P", "P0", "MMSY", "MMSY0", "C", "F")
+.metrics <- c("B", "K", "K0", "P", "P0", "MMSY", "MMSY0", "C", "F", "fopen", "ghost", "nursery")
 
 #' Run the TTM over Monte Carlo draws and scenarios
 #'
@@ -133,11 +133,17 @@ run_ttm <- function(proj, n_draws = proj$settings$n_draws, scenarios = scenario_
       nb <- .bench_nll_rows(tmp$stage1$MMSY_ref, bmj)
       ni <- .index_nll_rows(tmp$stage1$B, .fit_indices(proj), st$index_min_cv)
       shared <- if (ncol(ni)) rowSums(ni) else 0
-      corr <- tmp$stage1$log_is_correction
       mu <- sdv <- setNames(numeric(length(pv_groups)), pv_groups)
+      nr <- vapply(proposals, function(pp) pp$n, numeric(1)); lwm <- log(nr / sum(nr))
       for (k in seq_along(pv_groups)) {
         gi <- pv_groups[k]
-        own <- shared - corr
+        # marginal importance correction for this group's own partition (factorized proposal):
+        # log prior_k - log mixture_k; avoids injecting weight noise from the other groups
+        comp <- vapply(proposals, function(pp) stats::dnorm(lx[, k], pp$mu[k], pp$sd[k], log = TRUE), numeric(nrow(lx)))
+        comp <- matrix(comp, nrow = nrow(lx)); comp <- sweep(comp, 2, lwm, "+")
+        mz <- apply(comp, 1, max); lmix_k <- mz + log(rowSums(exp(comp - mz)))
+        corr_k <- stats::dnorm(lx[, k], prior_mu[k], s_pr[k], log = TRUE) - lmix_k
+        own <- shared - corr_k
         if (!is.null(cf) && paste0("feasibility_", gi) %in% colnames(cf)) own <- own + cf[, paste0("feasibility_", gi)]
         if (ncol(nb)) { jj <- grepl(paste0("(^|;)", gi, "(;|_)"), colnames(nb)); if (any(jj)) own <- own + rowSums(nb[, jj, drop = FALSE]) }
         wk <- exp(-(own - min(own))); wk <- wk / sum(wk)
@@ -168,17 +174,33 @@ run_ttm <- function(proj, n_draws = proj$settings$n_draws, scenarios = scenario_
   if (verbose) message("Stage 3: ", length(scenarios), " scenarios x ", length(keep), " draws")
   pars <- vector("list", length(keep))
   rng_now <- get(".Random.seed", envir = .GlobalEnv)
-  for (k in seq_along(keep)) {
+  stage3_one <- function(k) {
     d <- keep[k]
     assign(".Random.seed", seeds[[d]], envir = .GlobalEnv)
-    pars[[k]] <- draw_parameters(proj, stochastic = TRUE)
-    if (length(pv_groups)) pars[[k]]$partition_value[pv_groups] <- part_vals[d, ]
-    for (s in scenarios) {
-      o <- simulate_ttm(proj, pars[[k]], .drv_for(proj, drvs, s, pars[[k]], per_draw),
+    par <- draw_parameters(proj, stochastic = TRUE)
+    if (length(pv_groups)) par$partition_value[pv_groups] <- part_vals[d, ]
+    sims <- lapply(scenarios, function(s) {
+      o <- simulate_ttm(proj, par, .drv_for(proj, drvs, s, par, per_draw),
                         q = if (s == "Baseline") NULL else qs[[d]])
-      for (m in .metrics) res[[s]][[m]][k, , ] <- o[[m]]
-      res[[s]]$Cg[k, , , ] <- o$Cg; res[[s]]$P1[k, , ] <- o$P1; res[[s]]$Q[k, , ] <- o$Q
-      res[[s]]$Eff[k, , ] <- o$Eff
+      o[c(.metrics, "Cg", "P1", "Q", "Eff")]
+    })
+    names(sims) <- scenarios
+    list(par = par, sims = sims)
+  }
+  # parallel over draws (each draw regenerates its own parameters from its stored RNG stream)
+  chunks <- split(seq_along(keep), ceiling(seq_along(keep) / max(1, 25 * cores)))
+  for (ch in chunks) {
+    outs3 <- if (cores > 1) parallel::mclapply(ch, stage3_one, mc.cores = cores, mc.preschedule = TRUE) else lapply(ch, stage3_one)
+    for (j in seq_along(ch)) {
+      k <- ch[j]; oo <- outs3[[j]]
+      if (inherits(oo, "try-error")) stop("Stage 3 failed for draw ", keep[k], ": ", oo)
+      pars[[k]] <- oo$par
+      for (s in scenarios) {
+        o <- oo$sims[[s]]
+        for (m in .metrics) res[[s]][[m]][k, , ] <- o[[m]]
+        res[[s]]$Cg[k, , , ] <- o$Cg; res[[s]]$P1[k, , ] <- o$P1; res[[s]]$Q[k, , ] <- o$Q
+        res[[s]]$Eff[k, , ] <- o$Eff
+      }
     }
   }
   assign(".Random.seed", rng_now, envir = .GlobalEnv)
@@ -329,16 +351,18 @@ apply_sir <- function(res, n_resample = length(res$draws)) {
   tot <- rowSums(nll_all)
   if (!is.null(res$stage1$log_is_correction)) tot <- tot - res$stage1$log_is_correction
   lw <- -(tot - min(tot))
-  k_hat <- NA_real_; ess_raw <- { w0 <- exp(lw); w0 <- w0 / sum(w0); 1 / sum(w0^2) }
+  k_hat <- NA_real_; is_method <- "raw"; ess_raw <- { w0 <- exp(lw); w0 <- w0 / sum(w0); 1 / sum(w0^2) }
   if (!isFALSE(res$proj$settings$psis)) {
     ps <- psis_smooth(lw); lw <- ps$lw; k_hat <- ps$k
+    is_method <- if (is.null(ps$method)) "raw" else ps$method
   }
   wts <- exp(lw - max(lw)); wts <- wts / sum(wts)
   ess <- 1 / sum(wts^2)
   set.seed(res$proj$settings$seed + 1)
   pick <- sample(seq_along(wts), n_resample, replace = TRUE, prob = wts)
   res$sir <- list(nll = nll_all, weights = wts, ess = ess, ess_raw = ess_raw, resampled = pick,
-                  n_unique = length(unique(pick)), pareto_k_hat = k_hat)
+                  n_unique = length(unique(pick)), pareto_k_hat = k_hat,
+                  weight_method = is_method)
   res$draws <- pick
   res$weights <- rep(1 / n_resample, n_resample)
   if (ess < 20) warning(sprintf("SIR effective sample size is low (%.1f); increase n_draws or review priors/CVs", ess))

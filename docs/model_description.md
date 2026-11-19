@@ -138,10 +138,11 @@ Each weight carries a CV (`partition_cv`). Groups with weaker partitioning infor
 Energetically supported biomass (carrying capacity) in year *t*:
 
 $$
-K_i(t) = \frac{P_i(t)\,\phi_i^{P}(t)\,m_i(t)}{(P/B)_i}\;\bar Q_i(t)^{\rho_i}\;\phi_i^{K}(t)
+K_i(t) = \frac{P_i(t)\,\phi_i^{P}(t)\,m_i(t)}{M_i}\;\bar Q_i(t)^{\rho_i}\;\phi_i^{K}(t)\;N_i(t)^{\nu_i}
 $$
 
-* $(P/B)_i$ is the production-to-biomass ratio (≈ total mortality Z; equal to M when unfished).
+* $M_i$ is natural mortality (`m_nat`). Unfished biomass turns over at M, so $P/M$ is the biomass that production $P$ can sustain. If `m_nat` is blank, $M_i = (P/B)_i$, which is the original formulation. The Ecopath P/B of an exploited system equals total mortality Z = M + F. It still sets the group's **share** of production (partition weights), but no longer converts production into unfished biomass.
+* $N_i(t)$ is the **nursery-habitat index**: area × quality of the group's nursery habitats (`nursery_habitat`) relative to the first year. $\nu_i$ (`nursery_dependence`) is the elasticity of capacity to nursery availability. Juvenile survival in seagrass, mangrove or macroalgal nurseries limits the adults a reef can hold (Nagelkerken et al. 2002; Mumby et al. 2004).
 * $\phi_i^{P}(t)$ and $\phi_i^{K}(t)$ are environmental multipliers on production and on capacity (`env_response.csv`, Section 7).
 * $m_i(t)$ is a group-specific disturbance production multiplier, for example juvenile lobster habitat loss after a hurricane.
 * $\bar Q_i(t) = \sum_h u_{ih} Q_h(t)$ is the habitat quality experienced by the group. $\rho_i$ (`refuge_dependence`) sets how strongly capacity depends on structural refuge. For example, lobster and groupers depend on reef rugosity: as live coral and structure decline, predation increases and fewer individuals can be supported.
@@ -165,6 +166,8 @@ Habitat availability (km²) reaches the species through three routes:
   $$
 
   Here $\beta$ is bleaching mortality (degree heating weeks), $\mu_{dis}$ is disease mortality (e.g., SCTLD), and $\eta$ is hurricane cover loss. Quality is $Q = c / c_{ref}$.
+
+  **Herbivory feedback.** In projection years the coral growth rate $g$ is multiplied by $(G(t-1)/G_{ref})^{\gamma}$, capped at 2. $G = \sum B_{herb} / \sum K_{0,herb}$ is the grazing intensity of the `herbivore_groups` (parrotfishes, surgeonfishes), and $G_{ref}$ is its mean over the reference years. Fishing herbivores therefore slows coral recovery, which lowers habitat quality and the refuge capacity of reef-dependent groups (Mumby et al. 2006, 2007). $\gamma$ is `herbivory_elasticity` (with a CV).
 * `quality_model = "covariate"`: $Q$ = covariate / `quality_ref`. Use this for rugosity, seagrass shoot density, water clarity, etc.
 * `quality_model = "none"`: $Q$ = disturbance multiplier only.
 
@@ -189,19 +192,26 @@ $x_0$ (`baseline`) defaults to the historical mean, so multipliers equal 1 under
 
 ## 8. Biomass dynamics, catch and MMSY
 
-### Reference point: why MMSY = x · (P/B) · K
+### Reference point: why MMSY = x · M · K
 
 The SEDAR 103 presentation wrote MMSY = available biomass × P/B. That expression is the group's **total annual production**, which also supplies natural mortality: the prey for predators and the energy that sustains the stock. Harvesting all of it would collapse the group and starve its predators, so it is an **upper bound**, not an MSY.
 
 The package uses the defensible and widely applied data-limited form:
 
 $$
-\text{MMSY}_i(t) = x_i\,(P/B)_i\,K_i(t)
+\text{MMSY}_i(t) = x_i\,M_i\,K_i(t)
 $$
 
-* With $x = 0.5$ this is **Gulland's (1971) estimator**, MSY = 0.5 · M · B₀, because P/B = M in the unfished state.
-* It is also exactly the **Schaefer** MSY, $rK/4$, when $r = 4\,x\,(P/B)$. The same $r$ is used in the dynamics, so the reference points and projections are internally consistent: $B_{MSY} = K/2$ and $F_{MSY} = r/2$.
-* Values of $x$ between 0.2 and 0.4 give more precautionary estimates (Beddington & Cooke 1983; Garcia et al. 1989; Walters et al. 2005, who show single-species $F_{MSY}$ overstates multispecies-safe exploitation). Set `x_msy` and `x_msy_cv` per group. For example, queen conch uses 0.4 to reflect depensation and Allee effects.
+* With $x = 0.5$ this is **Gulland's (1971) estimator**, MSY = 0.5 · M · B₀. Because $K = P/M$, MMSY = $x \cdot P$: a fixed fraction of the production the energy budget supplies to the group.
+* It is also exactly the **Schaefer** MSY, $rK/4$, when $r = 4\,x\,M$. The same $r$ is used in the dynamics, so the reference points and projections are internally consistent: $B_{MSY} = K/2$ and $F_{MSY} = r/2$.
+* **Life-history priors for x.** Age-structured theory shows MSY/(M·B₀) depends on growth, maturity, gear selectivity and stock–recruit steepness. Gulland's 0.5 is an upper bound (Beddington & Cooke 1983; Clark 1991; Zhou et al. 2012). `life_history_xmsy()` derives a prior for each group with a Beverton–Holt per-recruit model:
+  - von Bertalanffy growth and length–weight from FishBase;
+  - maturity at $L_m$ (Froese & Binohlan 2000);
+  - trap retention $L_c$;
+  - steepness $h \sim N(0.75, 0.1)$ (Myers et al. 1999; Shertzer & Conn 2012).
+
+  It returns x, F_MSY/M and B_MSY/B₀ (`data-raw/build_life_history_priors.R` for St. Croix: x = 0.17–0.31, B_MSY/B₀ ≈ 0.33–0.36). Queen conch keeps 0.4 to reflect depensation.
+* The original SEDAR103-DW-20 form (x = 0.5 on P/B) is kept as the structural-ensemble variant `gulland_PB`.
 * `production_p50_t` in the outputs reports total production (the slide formula, x = 1) for comparison.
 
 Two MMSY variants are reported:
@@ -212,8 +222,11 @@ Two MMSY variants are reported:
 ### Dynamics
 
 $$
-\frac{dB_i}{dt} = r_i B_i\Big(1-\frac{B_i}{K_i(t)}\Big) - C_i(t) + I_i(t)
+\frac{dB_i}{dt} = (1-\phi_i)\,r_i B_i\Big(1-\frac{B_i}{K_i(t)}\Big) + \phi_i\,2x_iM_i\big(K_i(t)\,s_i(t) - B_i\big) - C_i(t) - G_i(t) + I_i(t)
 $$
+
+* **Open recruitment.** $\phi_i$ (`open_recruitment`) is the fraction of production that comes from externally supplied recruits, for example *Panulirus argus* larvae from upstream sources (Kough, Paris & Butler 2013). That part does not depend on local spawning biomass. It relaxes toward $K\,s(t)$ at rate $2xM$, so its yield at $F = 2xM$ equals the same $xMK$ cap and the reference point is unchanged. Local depletion cannot collapse it. $s_i(t)$ is a supply index (`recruit_covariate`, relative to its historical mean) multiplied by the nursery index.
+* **Ghost fishing.** $G_i(t)$ is unaccounted mortality from traps lost in disturbances (`ghost_gears`). Lost traps keep fishing at `ghost_efficiency` of an active trap and decay with `ghost_half_life` (Renchen et al. 2014). Removals are reported separately (`ghost`) and are not counted as landings.
 
 * The equation is solved with the **exact logistic solution** in each sub-step. This keeps it stable even for P/B = 30 (zooplankton). Catch and immigration are removed or added after each sub-step.
 * Annual lognormal process error $\varepsilon_{i,t}\sim N(-\sigma^2/2,\sigma^2)$ is applied (`process_sd`).
@@ -222,9 +235,12 @@ $$
 
 ### Catch
 
-* **Historical period:** catch = reported landings (lb → t) × `catch_expansion`. Catch is capped at 90% of biomass within any sub-step. The expansion factor addresses under-reporting (≈2.0 in Puerto Rico; unquantified in the USVI) and carries a CV.
+* **Historical period:** catch = reported landings (lb → t) × `catch_expansion`. Catch is capped at 90% of the **fishable** biomass within any sub-step. The fishable fraction is $f_i = 1 - \sum_h u_{ih}\,\text{closed}_h$, where `closed_fraction` is the no-take (MPA) share of habitat h. The expansion factor addresses under-reporting (≈2.0 in Puerto Rico; unquantified in the USVI) and carries a CV.
 * **Projection period:** effort-driven. $F_{gi}(t) = q_{gi}E_g(t)$, where catchability $q_{gi}$ is estimated draw by draw from the last `q_years` of history. Each sub-step catch is $B(1-e^{-F/S})$. Groups with `harvest_allowed = FALSE` (e.g., Parrotfish 1 in St. Croix) have $F = 0$.
 * Effort $E_g(t)$ is the reference effort (mean of the last `q_years`) times scenario and disturbance multipliers. For example, trap losses after a major hurricane recover with a half-life.
+* **No-take areas.** Projected F is scaled by $f_i(t)/f_i^{ref}$, so expanding a no-take area (`closed_fraction` scenario driver) reduces exploitation of the groups that use it.
+* **Effort dynamics.** With `effort_response` = ε > 0 (setting or scenario driver), effort follows profitability. Each year it is multiplied by $(\text{CPUE}_{t-1}/\text{CPUE}_{ref})^{ε}$, bounded at 0.2–3× (open-access dynamics; Smith 1969).
+* **Management procedures.** `simulate_ttm(..., mp = )` accepts a closed-loop management procedure that resets effort each year from noisy assessment outputs or catch rates (Section 20).
 
 ## 9. Outputs for management and for the SPF
 
@@ -361,5 +377,52 @@ Because the Stage-1 draws are retained, every design re-weights the same simulat
 |---|---|
 | `sensitivity_analysis()` | Which inputs drive MMSY? Standardized rank regression coefficients (SRRC) with the rank-model R², plus partial rank correlation coefficients (PRCC), on all prior draws |
 | `self_test()` | Does the estimator recover the truth? Pseudo-data are simulated from a known draw and re-estimated, giving bias (median relative error), MARE and 50/90% interval coverage |
-| `run_structural_ensemble()` | How much do structural choices matter? Variants: x_msy 0.3/0.4; TTE 10/20%; no fishing feedback; no thermal effects; food-web fraction ×0.67/×1.5; satellite pelagic NPP. Reported per variant and pooled with equal weight |
+| `run_structural_ensemble()` | How much do structural choices matter? Variants: the original Gulland-on-P/B form; x −25%; closed population (no external recruitment); no nursery dependence; no herbivory feedback; no ghost fishing; no lionfish / Sargassum effects; TTE 10/20%; no thermal effects; food-web fraction ×0.67/×1.5. Reported per variant and pooled with equal weight |
 | `ecosystem_overfishing_indices()` | Whole-system fishing intensity independent of species partitioning: Ryther index (catch / km²) and Fogarty ratio (catch / primary production), with Link & Watson (2019) thresholds |
+
+## 17. Observation models for indices
+
+Each index row can declare how it relates to biomass:
+
+$$
+I_t = q\,(1+c)^{\,t-t_0}\,B_t^{\beta}\,e^{\varepsilon_t}
+$$
+
+| Column | Meaning | Default |
+|---|---|---|
+| `hyperstability` | β < 1: CPUE declines more slowly than abundance (aggregation, trap saturation; Harley et al. 2001) | 1 |
+| `creep` | annual catchability increase c for fishery-dependent CPUE (technology, skill; Palomares & Pauly 2019) | `settings$effort_creep` (St. Croix 0.02) for indices with `fishery_dependent = TRUE` (default: names containing "CPUE"), else 0 |
+| `type` | `relative` (q profiled out analytically) or `absolute` (index in tonnes, e.g., NCRMP density × habitat area) | relative |
+| `q_prior`, `q_cv` | for absolute indices: lognormal prior on detectability or availability; the conditional MAP of log q is used together with its prior penalty | 1, 0.5 |
+
+Absolute survey indices are the most direct constraint on the scale of unassessed groups, because density × area pins biomass up to detectability.
+
+## 18. Pareto-smoothed importance sampling
+
+After the adaptive importance-sampling rounds, the largest raw weights are replaced by expected order statistics of a generalized Pareto distribution fitted to the weight tail (`psis_smooth()`; Vehtari et al. 2024). This bounds the influence of any single draw. The shape estimate k is reported as a reliability diagnostic: below 0.5 is good, 0.5–0.7 acceptable, above 0.7 means more draws are needed. Raw and smoothed ESS are both reported (`sir_diagnostics()`).
+
+## 19. Independent comparator and value of information
+
+* **Catch-only comparator.** `catch_msy()` and `method_comparison()` run a CMSY-style stock-reduction analysis (Martell & Froese 2013; Froese et al. 2017): Schaefer dynamics with only landings and a resilience prior from M. It shares no energy-budget assumption with the TTM, so agreement between the two is independent corroboration and disagreement points to which assumptions drive a result.
+* **Value of information.** `value_of_information()` estimates each input's first-order variance share of log MMSY (Sobol' main effect, by quantile binning, with a bias correction for binning noise). That share is the expected variance reduction from learning the input exactly. Inputs are mapped to the data stream that would inform them (biomass surveys, catch monitoring, production studies, life history, connectivity, and so on), so data collection can be ranked by how much uncertainty it would remove.
+
+## 20. Closed-loop management strategy evaluation
+
+`run_mse()` treats SIR-conditioned draws as operating models and steps each management procedure through the projection years. The procedure sees only noisy information; the operating model keeps every process (open recruitment, nursery, herbivory, ghost fishing, environment).
+
+| Procedure | Rule |
+|---|---|
+| `mp_status_quo()` | effort fixed at the reference level |
+| `mp_fixed(0.75, traps)` | 25% trap reduction |
+| `mp_spf_ceiling()` | every 3 years, an assessment estimates each focus group's MMSY with CV 0.3. Each gear's effort is set so no focus group's catch by that gear exceeds its share of the P* target, with changes capped at ±25% per decision. This is the SPF effort-ceiling rule. |
+| `mp_spf_ceiling(bias = 1.5)` | the same rule with a 50% optimistic assessment (robustness test) |
+| `mp_cpue_hcr()` | empirical rule: effort follows each gear's observed catch rate relative to the reference years |
+
+Performance over the final 10 projection years:
+* probability that any focus group falls below 0.5 B_MSY;
+* median minimum B/B_MSY;
+* median focus-group catch;
+* catch variability (average annual variation);
+* effort relative to the reference years.
+
+User-defined procedures are functions of `(year, state)` that return effort multipliers by gear.

@@ -389,3 +389,61 @@ plot_ensemble <- function(ens, groups = c("spiny_lobster", "queen_triggerfish", 
     ggplot2::labs(title = "Structural uncertainty: MMSY under alternative model assumptions",
                   subtitle = "Median and 90% interval per variant (lb / yr, log scale)", x = NULL, y = NULL) + .theme_ttm()
 }
+
+#' TTM MMSY vs catch-only MSY and assessment OFLs
+#' @param mc output of [method_comparison()]
+#' @export
+plot_method_comparison <- function(mc) {
+  .need_gg()
+  d <- rbind(data.frame(group = mc$group, method = "TTM MMSY", p05 = mc$MMSY_p05_lb, p50 = mc$MMSY_p50_lb, p95 = mc$MMSY_p95_lb),
+             data.frame(group = mc$group, method = "Catch-only (CMSY-style)", p05 = mc$CMSY_p05_lb, p50 = mc$CMSY_p50_lb, p95 = mc$CMSY_p95_lb))
+  d <- d[is.finite(d$p50), ]
+  d$group <- factor(d$group, levels = mc$group[order(mc$MMSY_p50_lb)])
+  p <- ggplot2::ggplot(d, ggplot2::aes(y = group, colour = method)) +
+    ggplot2::geom_linerange(ggplot2::aes(xmin = p05, xmax = p95), linewidth = 1.6, position = ggplot2::position_dodge(width = 0.6)) +
+    ggplot2::geom_point(ggplot2::aes(x = p50), size = 2.2, position = ggplot2::position_dodge(width = 0.6)) +
+    ggplot2::scale_colour_manual(values = c("TTM MMSY" = ttm_palette()[1], "Catch-only (CMSY-style)" = ttm_palette()[2])) +
+    ggplot2::scale_x_log10(labels = function(x) format(x, big.mark = ",", scientific = FALSE))
+  if ("OFL_lb" %in% names(mc) && any(is.finite(mc$OFL_lb)))
+    p <- p + ggplot2::geom_point(data = mc[is.finite(mc$OFL_lb), ], ggplot2::aes(x = OFL_lb, y = group), inherit.aes = FALSE,
+                                 shape = 4, size = 3, stroke = 1.2, colour = "black")
+  p + ggplot2::labs(title = "Independent comparator: TTM MMSY vs catch-only MSY",
+                    subtitle = "Median and 90% interval (lb / yr, log scale); x = SEDAR OFL", x = NULL, y = NULL, colour = NULL) +
+    .theme_ttm() + ggplot2::theme(legend.position = "top")
+}
+
+#' Value of information by data stream
+#' @param voi output of [value_of_information()]
+#' @param output which output to show
+#' @export
+plot_voi <- function(voi, output = "total_focus_MMSY") {
+  .need_gg()
+  d <- voi$streams[voi$streams$output == output & voi$streams$S1_sum > 0.005, ]
+  d$data_stream <- factor(d$data_stream, levels = d$data_stream[order(d$S1_sum)])
+  ggplot2::ggplot(d, ggplot2::aes(x = S1_sum, y = data_stream)) +
+    ggplot2::geom_col(fill = ttm_palette()[1], width = 0.65) +
+    ggplot2::geom_text(ggplot2::aes(label = sprintf("%.0f%%", 100 * S1_sum)), hjust = -0.15, size = 3.4, colour = "#34474F") +
+    ggplot2::scale_x_continuous(labels = function(x) paste0(round(100 * x), "%"), expand = ggplot2::expansion(mult = c(0, 0.15))) +
+    ggplot2::labs(title = "Value of information: share of MMSY variance each data stream could remove",
+                  subtitle = sprintf("First-order variance contribution, %s (prior draws)", gsub("_", " ", output)), x = NULL, y = NULL) +
+    .theme_ttm()
+}
+
+#' Closed-loop MSE performance
+#' @param mse output of [run_mse()]
+#' @export
+plot_mse <- function(mse) {
+  .need_gg()
+  s <- mse$summary
+  s$procedure <- factor(s$procedure, levels = s$procedure)
+  d <- rbind(data.frame(procedure = s$procedure, metric = "P(any focus group < 0.5 BMSY)", value = s$P_any_focus_overfished),
+             data.frame(procedure = s$procedure, metric = "Focus-group catch (k lb / yr)", value = s$focus_catch_lb_p50 / 1000),
+             data.frame(procedure = s$procedure, metric = "Catch variability (AAV)", value = s$catch_AAV_p50),
+             data.frame(procedure = s$procedure, metric = "Effort relative to 2024", value = s$effort_mult_p50))
+  ggplot2::ggplot(d, ggplot2::aes(x = value, y = procedure)) +
+    ggplot2::geom_col(fill = ttm_palette()[1], width = 0.6) +
+    ggplot2::facet_wrap(~metric, scales = "free_x") +
+    ggplot2::labs(title = "Closed-loop management strategy evaluation (final 10 projection years)",
+                  subtitle = "Operating models = SIR-conditioned draws; procedures see noisy assessments or catch rates", x = NULL, y = NULL) +
+    .theme_ttm()
+}

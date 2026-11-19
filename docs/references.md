@@ -95,3 +95,34 @@
 * Sathyendranath, S., et al. (2019). An ocean-colour time series for use in climate studies: the experience of the Ocean-Colour Climate Change Initiative (OC-CCI). Sensors 19: 4285.
 * Then, A. Y., Hoenig, J. M., Hall, N. G., Hewitt, D. A. (2015). Evaluating the predictive performance of empirical estimators of natural mortality rate using information on over 200 fish species. ICES J. Mar. Sci. 72: 82–92.
 * Vehtari, A., Simpson, D., Gelman, A., Yao, Y., Gabry, J. (2015/2024). Pareto smoothed importance sampling. arXiv:1507.02646; J. Mach. Learn. Res. 25: 1–58.
+
+## Ecological and fisheries-theory additions
+
+* Adams, A. J., et al. (2006). Nursery function of tropical back-reef systems. Mar. Ecol. Prog. Ser. 318: 287–301.
+* Albins, M. A. (2013). Effects of invasive Pacific red lionfish *Pterois volitans* versus a native predator on Bahamian coral-reef fish communities. Biol. Invasions 15: 29–43.
+* Albins, M. A., Hixon, M. A. (2008). Invasive Indo-Pacific lionfish *Pterois volitans* reduce recruitment of Atlantic coral-reef fishes. Mar. Ecol. Prog. Ser. 367: 233–238.
+* Beddington, J. R., Cooke, J. G. (1983). The potential yield of fish stocks. FAO Fish. Tech. Pap. 242.
+* Clark, W. G. (1991). Groundfish exploitation rates based on life history parameters. Can. J. Fish. Aquat. Sci. 48: 734–750.
+* Froese, R., Demirel, N., Coro, G., Kleisner, K. M., Winker, H. (2017). Estimating fisheries reference points from catch and resilience. Fish Fish. 18: 506–526.
+* Green, S. J., Akins, J. L., Maljković, A., Côté, I. M. (2012). Invasive lionfish drive Atlantic coral reef fish declines. PLoS ONE 7: e32596.
+* Harley, S. J., Myers, R. A., Dunn, A. (2001). Is catch-per-unit-effort proportional to abundance? Can. J. Fish. Aquat. Sci. 58: 1760–1772.
+* Hu, C., Feng, L., Hardy, R. F., Hochberg, E. J. (2015). Spectral and spatial requirements of remote measurements of pelagic *Sargassum* macroalgae. Remote Sens. Environ. 167: 229–246.
+* Kough, A. S., Paris, C. B., Butler, M. J. IV (2013). Larval connectivity and the international management of fisheries. PLoS ONE 8: e64970.
+* Mace, P. M., Doonan, I. J. (1988). A generalised bioeconomic simulation model for fish population dynamics. NZ Fish. Assess. Res. Doc. 88/4.
+* Maunder, M. N., Punt, A. E. (2004). Standardizing catch and effort data: a review of recent approaches. Fish. Res. 70: 141–159.
+* Mumby, P. J., et al. (2004). Mangroves enhance the biomass of coral reef fish communities in the Caribbean. Nature 427: 533–536.
+* Mumby, P. J., et al. (2006). Fishing, trophic cascades, and the process of grazing on coral reefs. Science 311: 98–101.
+* Mumby, P. J., Hastings, A., Edwards, H. J. (2007). Thresholds and the resilience of Caribbean coral reefs. Nature 450: 98–101.
+* Myers, R. A., Bowen, K. G., Barrowman, N. J. (1999). Maximum reproductive rate of fish at low population sizes. Can. J. Fish. Aquat. Sci. 56: 2404–2419.
+* Nagelkerken, I., et al. (2002). How important are mangroves and seagrass beds for coral-reef fish? The nursery hypothesis tested on an island scale. Mar. Ecol. Prog. Ser. 244: 299–305.
+* Oakley, J. E., O'Hagan, A. (2004). Probabilistic sensitivity analysis of complex models: a Bayesian approach. J. R. Stat. Soc. B 66: 751–769.
+* Palomares, M. L. D., Pauly, D. (2019). On the creeping increase of vessels' fishing power. Ecol. Soc. 24: 31.
+* Renchen, G. F., et al. (2014). Impact of derelict fish traps in the US Virgin Islands. Mar. Pollut. Bull. 86. *(verify volume/pages)*
+* Shertzer, K. W., Conn, P. B. (2012). Spawner-recruit relationships of demersal marine fishes: prior distribution of steepness. Bull. Mar. Sci. 88: 39–50.
+* Smith, V. L. (1969). On models of commercial fishing. J. Polit. Econ. 77: 181–198.
+* Stoner, A. W., Ray-Culp, M. (2000). Evidence for Allee effects in an over-harvested marine gastropod: density-dependent mating and egg production. Mar. Ecol. Prog. Ser. 202: 297–302.
+* van Tussenbroek, B. I., et al. (2017). Severe impacts of brown tides caused by *Sargassum* spp. on near-shore Caribbean seagrass communities. Mar. Pollut. Bull. 122: 272–281.
+* Wang, M., Hu, C., Barnes, B. B., Mitchum, G., Lapointe, B., Montoya, J. P. (2019). The great Atlantic *Sargassum* belt. Science 365: 83–87.
+* Zhou, S., Yin, S., Thorson, J. T., Smith, A. D. M., Fuller, M. (2012). Linking fishing mortality reference points to life history traits: an empirical study. Can. J. Fish. Aquat. Sci. 69: 1292–1301.
+* Casazza, T. L., Ross, S. W. (2008). Fishes associated with pelagic *Sargassum* and open water lacking *Sargassum* in the Gulf Stream off North Carolina. Fish. Bull. 106: 348–363.
+* Schofield, P. J. (2010). Update on geographic spread of invasive lionfishes (*Pterois volitans* and *P. miles*) in the Western North Atlantic Ocean, Caribbean Sea and Gulf of Mexico. Aquat. Invasions 5 (Suppl. 1): S117–S122.

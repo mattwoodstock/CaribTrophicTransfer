@@ -79,6 +79,26 @@ write.csv(eo, file.path(tdir, "ecosystem_overfishing_indices.csv"), row.names = 
 sv(plot_eco_indices(eo), "fig14_eco_indices.png", 9, 6)
 cat("\n=== Ecosystem-overfishing indices (2022-2024) ===\n"); print(eo[eo$year %in% 2022:2024, ], row.names = FALSE)
 
+# ---- independent comparator, value of information, MSE ------------------------
+set.seed(11)
+mc <- method_comparison(res, catch_msy(proj, n = 50000))
+write.csv(mc, file.path(tdir, "method_comparison_catch_only.csv"), row.names = FALSE)
+cat("\n=== TTM vs catch-only MSY (CMSY-style) ===\n"); print(mc[, c("group", "CMSY_p50_lb", "MMSY_p50_lb", "OFL_lb", "ratio_TTM_to_catch_only")], row.names = FALSE)
+sv(plot_method_comparison(mc), "fig16_method_comparison.png", 9, 6)
+voi <- value_of_information(res)
+write.csv(voi$inputs, file.path(tdir, "value_of_information_inputs.csv"), row.names = FALSE)
+write.csv(voi$streams, file.path(tdir, "value_of_information_streams.csv"), row.names = FALSE)
+sv(plot_voi(voi), "fig17_value_of_information.png", 10, 6)
+cat("\n=== Value of information (total focus MMSY) ===\n"); print(head(voi$streams[voi$streams$output == "total_focus_MMSY", ], 8), row.names = FALSE)
+mse <- run_mse(res, n = 150)
+write.csv(mse$summary, file.path(tdir, "mse_performance.csv"), row.names = FALSE)
+write.csv(mse$by_group, file.path(tdir, "mse_performance_by_group.csv"), row.names = FALSE)
+sv(plot_mse(mse), "fig18_mse.png", 10, 6)
+cat("\n=== Closed-loop MSE (2036-2045) ===\n"); print(mse$summary, row.names = FALSE)
+pdx <- process_diagnostics(res)
+write.csv(pdx, file.path(tdir, "process_diagnostics.csv"), row.names = FALSE)
+cat("\n=== Ecological process diagnostics (Baseline, medians) ===\n"); print(pdx, row.names = FALSE)
+
 # ---- figures -----------------------------------------------------------------
 save_standard_plots(res, file.path(out_dir, "figures"))
 res$pars <- NULL   # parameter draws are large; drop before saving

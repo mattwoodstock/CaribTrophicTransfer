@@ -285,9 +285,10 @@ simulate_ttm <- function(proj, par, drv, q = NULL, mp = NULL) {
     step_bio <- function(B, dt) {
       B <- .logistic_step(B, (1 - phi) * r, K, dt)
       op <- phi > 0
-      if (any(op)) B[op] <- K[op] * sup[op] + (B[op] - K[op] * sup[op]) * exp(-phi[op] * mu_open[op] * dt)
-      B * exp(-Fghost * dt)
+      if (op_any) B[op] <- K[op] * sup[op] + (B[op] - K[op] * sup[op]) * exp(-phi[op] * mu_open[op] * dt)
+      if (any_ghost) B * exp(-Fghost * dt) else B
     }
+    any_ghost <- any(Fghost > 0); op_any <- any(phi > 0)
     if (yr <= hist_end) {
       Cg_target <- Chist[t, , , drop = FALSE][1, , ]
       if (is.null(dim(Cg_target))) Cg_target <- matrix(Cg_target, nrow = dim(Chist)[2], dimnames = list(dimnames(Chist)[[2]], gn))

@@ -14,7 +14,7 @@ n_draws <- if (length(args) >= 1) as.integer(args[1]) else 1500
 cores <- if (length(args) >= 2) as.integer(args[2]) else max(1, parallel::detectCores() - 1)
 
 proj <- read_ttm_project("Projects/StCroix_Trap")
-proj$settings$sir_adaptive_rounds <- 2
+proj$settings$sir_adaptive_rounds <- 3
 proj$settings$cores <- 1   # parallelism is across variants
 proj$settings$sir_resample <- 1000
 variants <- default_structural_variants()

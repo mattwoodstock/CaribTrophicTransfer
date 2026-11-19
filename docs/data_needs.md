@@ -67,6 +67,20 @@ All environmental covariates are now acquired from APIs (Section F). What remain
 | E3 | Future bleaching frequency and DHW magnitude | `scenarios.csv` (`cov_set dhw`) | assumed event years | Coral Reef Watch / CMIP6-based bleaching projections (e.g., van Hooidonk et al.) | M |
 | E4 | Pelagic NPP absolute level | `habitats.csv: npp_value` (pelagic) | 85 g C m⁻² yr⁻¹ (SEDAR103-DW-20 regional magnitude); the computed shelf ensemble is ~130–240 (shelf chlorophyll is likely biased high by bottom reflectance) | St. Croix-domain extraction of the Ryan-Keogh et al. (2023) ensemble | M |
 
+## G. Ecological-process magnitudes added in the theory review (placeholders; see [Ecological Review](ecological_review.md))
+
+| # | Item | File / columns | Current placeholder | Suggested source | Priority |
+|---|---|---|---|---|---|
+| G1 | Spiny lobster open-recruitment fraction and larval-supply index | `groups.csv: open_recruitment`, `recruit_covariate` | 0.8 ± 25%; no supply index | biophysical connectivity model output (Kough et al. 2013 framework); puerulus collector time series | **H** |
+| G2 | No-take (MPA) share of each habitat | `habitats.csv: closed_fraction` | approximate (reef 0.25, pavement 0.15, …) | GIS overlay of Buck Island Reef NM and East End Marine Park no-take zones on the NCCOS habitat map | M |
+| G3 | Nursery dependence of each group | `groups.csv: nursery_habitat`, `nursery_dependence` | 0.2–0.5 expert-informed | structured expert elicitation; juvenile surveys; Nagelkerken-type nursery-value studies | M |
+| G4 | Herbivory–coral feedback strength | `settings: herbivory_elasticity` | 1 ± 50% | coral recruitment / macroalgae vs parrotfish biomass (NCRMP benthic + fish) | M |
+| G5 | Ghost-trap efficiency and decay | `settings: ghost_efficiency`, `ghost_half_life` | 0.2, 1.5 yr | USVI derelict-trap studies (Renchen et al. 2014); trap-loss reports after Maria | L |
+| G6 | Lionfish invasion timeline and effect | `env_covariates.csv: lionfish`; `env_response.csv` | timeline 2009–2012; −10% / −5% K | NCRMP lionfish densities; fishers' LEK timelines | M |
+| G7 | Sargassum before 2016 and its effects | `env_covariates.csv: sargassum` (2011–2015); `env_response.csv` | Wang et al. 2019 relative magnitudes; −3% K per index unit | USF SaWS monthly bulletins (2011–2015); nursery-habitat surveys after inundation | L |
+| G8 | Trap selectivity (L50) by group | `data-raw/build_life_history_priors.R` | 15 cm TL (cap 0.6 L∞), CV 0.3 | trap selectivity studies for USVI mesh; TIP length compositions | M |
+| G9 | CPUE hyperstability and creep | `indices.csv: hyperstability, creep` | β = 1, creep 2% yr⁻¹ | SEDAR 57 / 80 standardization diagnostics | M |
+
 ## F. Already acquired automatically (no action needed; refresh with `acquire_project_data()`)
 
 | Data | Source | Years |
@@ -78,6 +92,7 @@ All environmental covariates are now acquired from APIs (Section F). What remain
 | SST and NPP projections | CMIP6 CESM2 + ACCESS-ESM1-5, SSP2-4.5 and SSP5-8.5, delta method (PIFSC) | 2025–2045 |
 | Benthic habitat areas | NOAA NCCOS USVI 2002 benthic habitat map (ArcGIS REST) | static |
 | Hurricane disturbances | NOAA NHC HURDAT2 | 1983–2024 |
+| Pelagic Sargassum index | USF AFAI 7-day composites (NOAA AOML ERDDAP) | 2016–2024 |
 
 Optional sources that are configured but disabled, because they need credentials or were unreachable from the development container:
 

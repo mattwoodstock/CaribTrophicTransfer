@@ -70,6 +70,12 @@ const cov90 = selfT.map((r) => num(r.coverage90));
 const ensG = (gname) => ensP.find((r) => r.group === gname);
 const ecoLast = eco.filter((r) => ["2022", "2023", "2024"].includes(r.year));
 const sc = (sn, gname) => scen.find((r) => r.scenario === sn && r.group === gname);
+const rdOpt = (f) => (fs.existsSync(path.join(TAB, f)) ? readCSV(path.join(TAB, f)) : []);
+const lhx = fs.existsSync(path.join(PROJ, "data-raw/life_history/xmsy_priors.csv")) ? readCSV(path.join(PROJ, "data-raw/life_history/xmsy_priors.csv")) : [];
+const mcmp = rdOpt("method_comparison_catch_only.csv");
+const voiS = rdOpt("value_of_information_streams.csv").filter((r) => r.output === "total_focus_MMSY");
+const mseS = rdOpt("mse_performance.csv");
+const pdx = rdOpt("process_diagnostics.csv");
 
 // ---------------------------------------------------------------- theme
 const THEME = {
@@ -351,23 +357,23 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   txt(s, "Coral cover is a state variable: observed where data exist; otherwise logistic growth minus bleaching (DHW above 4 degC-weeks), disease (e.g., SCTLD) and hurricane losses.", { x: 1.65, y: 5.45, w: 10.9, h: 1.1, fontSize: 15, color: HEX.dk1 });
 
   // DYNAMICS & MMSY
-  s = content("MMSY = x (P/B) K: a defensible cap, not total production", S1);
+  s = content("MMSY = x M K: a defensible cap, not total production", S1);
   card(s, 0.5, 1.45, 6.0, 5.25);
   txt(s, "Biomass dynamics", { x: 0.8, y: 1.6, w: 5.4, h: 0.4, fontSize: 18, bold: true, fontFace: THEME.headFontFace });
-  txt(s, "dB/dt = r B (1 - B / K(t)) - C(t) + I(t)", { x: 0.8, y: 2.05, w: 5.4, h: 0.4, fontSize: 16, bold: true, color: HEX.accent1 });
+  txt(s, "dB/dt = (1-phi) r B (1-B/K) + phi 2xM (K s - B) - C - G + I", { x: 0.8, y: 2.05, w: 5.4, h: 0.4, fontSize: 14, bold: true, color: HEX.accent1 });
   bullets(s, [
-    "K(t) = group production x environment / (P/B) x refuge quality",
-    "r = 4 x (P/B): Schaefer form consistent with the reference point",
-    "Exact logistic solution in monthly sub-steps (stable even for P/B = 30)",
+    "K(t) = production x environment / M x refuge quality x nursery index",
+    "r = 4 x M: Schaefer form consistent with the reference point",
+    "Open recruitment, ghost fishing and no-take areas in the dynamics",
     "History driven by landings (x expansion); projections by effort with estimated catchability",
     "Annual process error; immigration hook for connectivity",
   ], { x: 0.8, y: 2.6, w: 5.45, h: 4.0, fontSize: 14 });
   card(s, 6.8, 1.45, 6.0, 5.25, "FDE3E0");
-  txt(s, "Why x = 0.5?", { x: 7.1, y: 1.6, w: 5.4, h: 0.4, fontSize: 18, bold: true, fontFace: THEME.headFontFace });
-  stat(s, "0.5 x M x B0", "Gulland (1971) = Schaefer rK/4 when P/B = M", 7.1, 2.1, 5.4, HEX.accent2);
+  txt(s, "Which x?", { x: 7.1, y: 1.6, w: 5.4, h: 0.4, fontSize: 18, bold: true, fontFace: THEME.headFontFace });
+  stat(s, "x M B0", "Gulland (1971) form on natural mortality; x from per-recruit theory", 7.1, 2.1, 5.4, HEX.accent2);
   bullets(s, [
     "Total production (x = 1) also feeds natural mortality and predators: an upper bound, not MSY",
-    "x = 0.2-0.4 gives precautionary caps (Beddington & Cooke 1983; Walters et al. 2005)",
+    "Per-recruit theory gives x = 0.17-0.31 for St. Croix groups; 0.5 is an upper bound (Beddington & Cooke 1983)",
     "Reported: MMSY quantiles, OFL proxy (median), P* target (40th percentile), P(overfishing), B/BMSY",
   ], { x: 7.1, y: 3.6, w: 5.45, h: 3.0, fontSize: 14 });
 
@@ -408,7 +414,7 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   txt(s, "Sampled uncertainty", { x: 0.5, y: 4.0, w: 6, h: 0.4, fontSize: 16, bold: true, fontFace: THEME.headFontFace });
   bullets(s, [
     "Habitat area, NPP, food-web fraction, TTE, C:WW",
-    "P/B, x_msy, partition weights, initial depletion, immigration, diet (Dirichlet)",
+    "P/B, M, x_msy, partition weights, initial depletion, open recruitment, diet (Dirichlet)",
     "Covariate observation error (API spatial / ensemble SD)",
     "Landings, effort and expansion-factor errors; hurricane intensity",
   ], { x: 0.5, y: 4.45, w: 6.0, h: 2.3, fontSize: 13 });
@@ -436,6 +442,43 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
     iconCircle(s, o[0], x + 0.25, y + 0.42, 0.65, col ? HEX.accent1 : HEX.accent6);
     txt(s, o[1], { x: x + 1.1, y: y + 0.2, w: 4.7, h: 0.42, fontSize: 17, bold: true, fontFace: THEME.headFontFace });
     txt(s, o[2], { x: x + 1.1, y: y + 0.65, w: 4.7, h: 0.8, fontSize: 13, color: "34474F" });
+  });
+
+  // THEORY REVIEW
+  s = content("A theory review added the processes ecologists expect", S1);
+  const thy = [
+    ["fish", "Natural-mortality basis", "K = P/M and MMSY = x M K: Gulland on M, not on Ecopath P/B (= Z)"],
+    ["chart", "Life-history x priors", "Per-recruit MSY/(M B0) from growth, maturity, trap selectivity, steepness"],
+    ["globe", "Open recruitment", "Imported larvae (spiny lobster): local depletion cannot collapse supply"],
+    ["leaf", "Nursery habitats", "Seagrass / mangrove / macroalgae area x quality scales capacity"],
+    ["coral", "Herbivory feedback", "Parrotfish and surgeonfish grazing sets coral recovery"],
+    ["lock", "No-take areas", "Only the fishable share of each stock supplies landings"],
+    ["net", "Ghost fishing", "Traps lost in hurricanes keep fishing, decaying over time"],
+    ["wave", "Lionfish and Sargassum", "Satellite Sargassum index (AFAI); lionfish invasion effects"],
+  ];
+  thy.forEach((o, i) => {
+    const col = i % 2, row = Math.floor(i / 2);
+    const x = 0.5 + col * 6.2, y = 1.4 + row * 1.33;
+    card(s, x, y, 6.0, 1.2);
+    iconCircle(s, o[0], x + 0.22, y + 0.28, 0.62, col ? HEX.accent1 : HEX.accent5);
+    txt(s, o[1], { x: x + 1.05, y: y + 0.14, w: 4.8, h: 0.4, fontSize: 16, bold: true, fontFace: THEME.headFontFace });
+    txt(s, o[2], { x: x + 1.05, y: y + 0.56, w: 4.8, h: 0.55, fontSize: 12, color: "34474F" });
+  });
+  txt(s, "Each process can be switched off and is a variant in the structural ensemble. Details: docs/ecological_review.md", { x: 0.5, y: 6.75, w: 12.3, h: 0.3, fontSize: 12, italic: true, color: "6B7F87" });
+
+  // DECISION TOOLS
+  s = content("Decision support: triangulate, prioritize data, test the harvest rule", S1);
+  const dtl = [
+    ["scale", "Independent comparator", "Catch-only surplus-production MSY (CMSY-style) shares no energy-budget assumption with the TTM"],
+    ["target", "Value of information", "Share of MMSY variance each data stream could remove, so data collection is ranked by payoff"],
+    ["recycle", "Closed-loop MSE", "SIR-conditioned operating models test status quo, trap cuts, the SPF effort-ceiling rule (unbiased and biased) and a catch-rate rule"],
+  ];
+  dtl.forEach((t, i) => {
+    const x = 0.5 + i * 4.15;
+    card(s, x, 1.45, 3.95, 4.9);
+    iconCircle(s, t[0], x + 0.3, 1.7, 0.72, [HEX.accent1, HEX.accent2, HEX.accent4][i]);
+    txt(s, t[1], { x: x + 0.3, y: 2.65, w: 3.4, h: 0.5, fontSize: 18, bold: true, fontFace: THEME.headFontFace });
+    txt(s, t[2], { x: x + 0.3, y: 3.25, w: 3.4, h: 2.8, fontSize: 14, color: "34474F" });
   });
 
   // DATA ACQUISITION
@@ -614,6 +657,56 @@ async function icon(Comp, color = "FFFFFF", size = 256) {
   stat(s, "x" + fmt(num(lobCeil.effort_multiplier_p50), 2), `lobster-trap effort multiplier; choke: ${lobCeil.choke_group.replace(/_/g, " ")} (${fmt(100 * num(lobCeil.P_choke))}%)`, 9.35, 1.55, 3.3);
   stat(s, "x" + fmt(num(trapCeil.effort_multiplier_p50), 2), `fish-trap effort multiplier; choke: ${trapCeil.choke_group.replace(/_/g, " ")} (${fmt(100 * num(trapCeil.P_choke))}%)`, 9.35, 3.05, 3.3, HEX.accent2);
   txt(s, "Only SIR-calibrated groups can be choke groups. Small, low-MMSY bycatch groups, not lobster, bind first.", { x: 9.35, y: 4.6, w: 3.3, h: 1.9, fontSize: 13, color: "34474F" });
+
+  // ===== THEORY-BASED PRIORS AND DECISION TOOLS =====
+  if (lhx.length) {
+    s = content("Life-history theory puts x well below Gulland's 0.5", S2);
+    const lo = lhx.slice().sort((a, b) => num(a.x_msy) - num(b.x_msy));
+    s.addChart(pres.charts.BAR, [{ name: "x = MSY / (M B0)", labels: lo.map((r) => r.group.replace(/_/g, " ")), values: lo.map((r) => Math.round(num(r.x_msy) * 1000) / 1000) }], {
+      x: 0.5, y: 1.4, w: 7.6, h: 5.4, barDir: "bar", chartColors: [HEX.accent1], showValue: true, dataLabelPosition: "outEnd", dataLabelFormatCode: "0.00",
+      dataLabelFontFace: "+mn-lt", dataLabelFontSize: 10, dataLabelColor: "34474F",
+      catAxisLabelFontFace: "+mn-lt", catAxisLabelFontSize: 10, catAxisLabelColor: "34474F",
+      valAxisMinVal: 0, valAxisMaxVal: 0.5, valAxisLabelFontFace: "+mn-lt", valAxisLabelFontSize: 10, valAxisLabelColor: "34474F",
+      valGridLine: { color: "E3ECEE", size: 0.5 }, catGridLine: { style: "none" }, showLegend: false,
+      showTitle: true, title: "Per-recruit x by group (mean of 400 draws)", titleFontFace: "+mn-lt", titleFontSize: 13, titleColor: "34474F",
+    });
+    card(s, 8.4, 1.4, 4.4, 5.3);
+    stat(s, fmt(Math.min(...lhx.map((r) => num(r.x_msy))), 2) + "-" + fmt(Math.max(...lhx.map((r) => num(r.x_msy))), 2), "x across trap and hook groups (Gulland: 0.5)", 8.65, 1.6, 4.0);
+    stat(s, fmt(Math.min(...lhx.map((r) => num(r.Bmsy_over_B0))), 2) + "-" + fmt(Math.max(...lhx.map((r) => num(r.Bmsy_over_B0))), 2), "B_MSY / B0, in line with meta-analyses", 8.65, 3.1, 4.0, HEX.accent2);
+    txt(s, "FishBase growth and length-weight, maturity from L-infinity, trap retention ~15 cm, steepness 0.75 +/- 0.1. Lobster blends open (h -> 1) and local recruitment.", { x: 8.65, y: 4.6, w: 4.0, h: 1.9, fontSize: 12, color: "34474F" });
+  }
+  if (mcmp.length) {
+    s = content("An independent catch-only model corroborates the assessed stocks", S2);
+    figure(s, "fig16_method_comparison.png", 0.5, 1.35, 8.3, 5.3, "TTM vs catch-only MSY");
+    card(s, 9.1, 1.35, 3.7, 5.3);
+    const mq = mcmp.find((r) => r.group === "queen_triggerfish"), ml = mcmp.find((r) => r.group === "spiny_lobster");
+    bullets(s, [
+      mq ? `Queen triggerfish: TTM ${fmtK(num(mq.MMSY_p50_lb))}, catch-only ${fmtK(num(mq.CMSY_p50_lb))}, OFL ${fmtK(num(mq.OFL_lb))} lb` : "",
+      ml ? `Spiny lobster: TTM ${fmtK(num(ml.MMSY_p50_lb))}, catch-only ${fmtK(num(ml.CMSY_p50_lb))}, OFL ${fmtK(num(ml.OFL_lb))} lb` : "",
+      "The catch-only model uses only landings and resilience: agreement is independent corroboration",
+    ].filter((x) => x), { x: 9.35, y: 1.6, w: 3.3, h: 4.9, fontSize: 13 });
+  }
+  if (voiS.length) {
+    s = content("Value of information: which data would narrow MMSY most", S2);
+    figure(s, "fig17_value_of_information.png", 0.5, 1.35, 8.6, 5.2, "Value of information by data stream");
+    card(s, 9.4, 1.35, 3.4, 5.3);
+    const top = voiS.slice().sort((a, b) => num(b.S1_sum) - num(a.S1_sum));
+    stat(s, fmt(100 * num(top[0].S1_sum)) + "%", `of total focus-MMSY variance: ${top[0].data_stream}`, 9.6, 1.55, 3.0);
+    if (top[1]) stat(s, fmt(100 * num(top[1].S1_sum)) + "%", top[1].data_stream, 9.6, 3.15, 3.0, HEX.accent2);
+    txt(s, "First-order variance shares from the prior Monte Carlo: the expected uncertainty removed if that input were known exactly.", { x: 9.6, y: 4.75, w: 3.0, h: 1.8, fontSize: 12, color: "34474F" });
+  }
+  if (mseS.length) {
+    s = content("Closed-loop MSE: how the SPF effort-ceiling rule performs", S2);
+    figure(s, "fig18_mse.png", 0.5, 1.35, 8.6, 5.2, "Management strategy evaluation");
+    card(s, 9.4, 1.35, 3.4, 5.3);
+    const g1 = (n) => mseS.find((r) => r.procedure === n);
+    bullets(s, [
+      g1("Status_quo") ? `Status quo: P(any focus group < 0.5 BMSY) = ${fmt(100 * num(g1("Status_quo").P_any_focus_overfished))}%` : "",
+      g1("SPF_ceiling") ? `SPF ceiling rule: ${fmt(100 * num(g1("SPF_ceiling").P_any_focus_overfished))}%, catch ${fmtK(num(g1("SPF_ceiling").focus_catch_lb_p50))} lb` : "",
+      g1("SPF_ceiling_biased") ? `With a +50% biased assessment: ${fmt(100 * num(g1("SPF_ceiling_biased").P_any_focus_overfished))}%` : "",
+      g1("CPUE_HCR") ? `Catch-rate rule: ${fmt(100 * num(g1("CPUE_HCR").P_any_focus_overfished))}%` : "",
+    ].filter((x) => x), { x: 9.6, y: 1.6, w: 3.0, h: 4.9, fontSize: 13 });
+  }
 
   // ===== ROBUSTNESS AND VALIDATION =====
   s = content("Calibration passes a simulation self-test", S2);

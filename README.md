@@ -10,8 +10,26 @@
   * Hurricanes, bleaching and coral disease are applied with recovery curves.
   * Fishing feedback cascades through the trophic pools.
   * Biomass follows logistic dynamics, driven by landings in the historical period and by effort in projections.
-* **Defensible MMSY.** MMSY = x · (P/B) · K, which is Gulland/Schaefer with x = 0.5. The model reports quantiles, an OFL proxy (median), a P* target, P(overfishing), B/BMSY and energy utilization.
-* **Full uncertainty.** Every parameter CV is sampled, along with observation error in covariates, landings, effort and disturbance intensities. SIR uses abundance indices, assessment OFLs and a stock-reduction catch-feasibility constraint.
+* **Defensible MMSY.** MMSY = x · M · K, the Gulland/Schaefer form on natural mortality, with K = P/M. Group-specific x priors come from per-recruit life-history theory (growth, maturity, trap selectivity, steepness). The model reports quantiles, an OFL proxy (median), a P* target, P(overfishing), B/BMSY and energy utilization.
+* **Ecological realism.** These processes can each be switched on or off and are tested in the structural ensemble:
+  * open recruitment (larval import, e.g., spiny lobster);
+  * nursery-habitat dependence;
+  * herbivory–coral feedback;
+  * no-take areas;
+  * ghost fishing by traps lost in storms;
+  * lionfish and *Sargassum* drivers;
+  * effort dynamics.
+* **Full uncertainty.** Every parameter CV is sampled, along with observation error in covariates, landings, effort and disturbance intensities.
+  * SIR uses abundance indices (with hyperstability, catchability creep or absolute-survey observation models), assessment OFLs and a stock-reduction catch-feasibility constraint.
+  * Sampling uses adaptive importance sampling with Pareto smoothing.
+* **Review tools.**
+  * out-of-sample validation (held-out indices, leave-one-benchmark-out, retrospective peel);
+  * simulation self-test;
+  * global sensitivity analysis;
+  * structural ensemble;
+  * an independent catch-only MSY comparator;
+  * value-of-information ranking of data streams;
+  * closed-loop management strategy evaluation of SPF-style harvest rules.
 * **Automated data acquisition with user override.**
   * Sources: NOAA ERDDAP (Coral Reef Watch SST/DHW, OISST, satellite NPP ensemble, VIIRS chlorophyll and Kd490), MOM6-NWA12 via OPeNDAP, GLORYS12 via Copernicus Marine, NCCOS benthic habitat maps (ArcGIS REST) and NHC HURDAT2 hurricane tracks.
   * Values entered by the user always win.
@@ -53,6 +71,7 @@ Rscript Projects/StCroix_Trap/run_stcroix.R
 |---|---|
 | [User Manual](docs/user_manual.md) | installation, workflow, running, outputs, SPF hand-off |
 | [Input Data Dictionary](docs/input_dictionary.md) | every input, units, defaults, St. Croix values |
+| [Ecological Review](docs/ecological_review.md) | theory, expert and stakeholder gaps, and the processes added |
 | [Data Acquisition & Uncertainty](docs/data_acquisition.md) | APIs, override rules, propagated uncertainties |
 | [Model Description](docs/model_description.md) | equations, capabilities, assumptions |
 | [St. Croix Case Study](docs/case_study_stcroix.md) | application, results and data-replacement checklist |

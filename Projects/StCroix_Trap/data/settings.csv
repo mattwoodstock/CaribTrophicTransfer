@@ -42,7 +42,7 @@ ryther_low,1,Ryther index thresholds (t/km2/yr; Link & Watson 2019 - verify)
 ryther_high,3,
 fogarty_low,0.22,Fogarty ratio thresholds (per mil; Link & Watson 2019)
 fogarty_high,0.92,
-sir_adaptive_rounds,3,Adaptive importance-sampling rounds (proposal refit on partition priors; exact mixture correction)
+sir_adaptive_rounds,4,Adaptive importance-sampling rounds (proposal refit on partition priors; exact mixture correction)
 sir_feasibility_groups,trap,Calibration focuses on the trap fishery: only trap-relevant groups (and assessed stocks) constrain the posterior
 cores,4,Parallel cores for Stage-1 draws
 effort_creep,0.02,Annual catchability creep applied to fishery-dependent CPUE indices (~2%/yr; Palomares & Pauly 2019)

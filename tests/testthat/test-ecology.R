@@ -89,7 +89,8 @@ test_that("PSIS smooths heavy tails and reports k", {
   set.seed(3)
   ps <- psis_smooth(log(abs(stats::rcauchy(2000))))
   expect_true(is.finite(ps$k) && ps$k > 0.5)
-  expect_true(max(ps$lw) <= 0 + 1e-12)
+  expect_true(ps$method %in% c("psis", "truncated"))
+  ok <- psis_smooth(stats::rnorm(4000, 0, 0.5)); expect_equal(ok$method, "psis")
 })
 
 test_that("catch-only comparator, value of information and MSE run", {
